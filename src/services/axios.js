@@ -3,8 +3,10 @@ import axios from "axios";
 // Backend API configuration
 // Uses environment variable REACT_APP_API_BASE_URL
 // Defaults to localhost for development
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "http://localhost:5000";
+
 const instance = axios.create({
-    baseURL: process.env.REACT_APP_API_BASE_URL || "http://localhost:5000/api/v1",
+    baseURL: `${API_BASE_URL}/api/v1`,
     headers: {
         "Content-Type": "application/json",
     },
@@ -31,7 +33,7 @@ instance.interceptors.response.use(
         if (error.response?.status === 401 && user?.refreshToken) {
             try {
                 const response = await axios.post(
-                    "http://localhost:5000/api/v1/auth/refresh-token",
+                    `${API_BASE_URL}/api/v1/auth/refresh-token`,
                     { refreshToken: user.refreshToken }
                 );
 
