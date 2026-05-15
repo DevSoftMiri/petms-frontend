@@ -1,0 +1,407 @@
+/* ================================================
+   PET MODULE — pet.css
+   ================================================ */
+
+/* ---- Legacy layouts ---- */
+.list { display: flex; width: 100%; }
+.list .listContainer { flex: 6; }
+.new { width: 100%; display: flex; }
+.new .newContainer { flex: 6; }
+.new .newContainer .top,
+.new .newContainer .bottom {
+    box-shadow: 2px 4px 10px 1px rgba(201, 201, 201, 0.47);
+    padding: 10px; margin: 20px; display: flex;
+}
+.new .newContainer .top h1,
+.new .newContainer .bottom h1 { color: lightgray; font-size: 20px; }
+
+/* ================================================
+   PETS LIST — no inner scroll, height = content
+   ================================================ */
+
+.pets-list {
+    display: flex;
+    width: 100%;
+    background-color: #f4f6f9;
+    font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    /* NO min-height: 100vh — no forced empty space */
+}
+
+.pets-list-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    /* NO overflow: auto — no inner scrollbar */
+}
+
+.pets-list-content {
+    flex: 1;
+    padding: 28px 32px;
+    /* NO overflow-y: auto — page body scrolls naturally */
+}
+
+/* ================================================
+   PAGE HEADER
+   ================================================ */
+
+.page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+.page-header h1 {
+    font-size: 26px; font-weight: 700;
+    color: #1a1a2e; margin: 0 0 4px 0; letter-spacing: -0.3px;
+}
+.page-header p { font-size: 13px; color: #888; margin: 0; }
+
+/* ================================================
+   FILTER BAR
+   ================================================ */
+
+.filter-section {
+    display: flex; gap: 10px; margin-bottom: 20px;
+    align-items: center; flex-wrap: wrap;
+}
+.filter-input {
+    flex: 1; max-width: 420px; padding: 10px 14px;
+    border: 1px solid #dde1e9; border-radius: 8px;
+    font-size: 14px; background-color: #fff; color: #333;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+.filter-input:focus {
+    outline: none; border-color: #57a7b3;
+    box-shadow: 0 0 0 3px rgba(87, 167, 179, 0.15);
+}
+
+/* ================================================
+   BUTTONS
+   ================================================ */
+
+.btn {
+    padding: 10px 20px; border: none; border-radius: 8px;
+    font-size: 14px; font-weight: 600; cursor: pointer;
+    transition: background-color 0.2s, transform 0.15s, box-shadow 0.2s;
+    white-space: nowrap;
+}
+.btn-primary { background-color: #2e86ab; color: #fff; }
+.btn-primary:hover {
+    background-color: #256f8f; transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(46, 134, 171, 0.3);
+}
+.btn-secondary {
+    background-color: #f0f2f5; color: #555; border: 1px solid #dde1e9;
+}
+.btn-secondary:hover { background-color: #e4e7ec; }
+
+/* ================================================
+   LOADING STATE
+   ================================================ */
+
+.loading-state {
+    display: flex; flex-direction: column; align-items: center;
+    justify-content: center; padding: 60px 0; color: #999; gap: 14px;
+}
+.loading-spinner {
+    width: 36px; height: 36px;
+    border: 3px solid #e0e0e0; border-top-color: #2e86ab;
+    border-radius: 50%; animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ================================================
+   TABLE — full-width, no scrollbar
+   ================================================ */
+
+.pets-table {
+    background: #fff; border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
+    overflow: hidden; width: 100%;
+}
+.pets-table table {
+    width: 100%; border-collapse: collapse; table-layout: fixed;
+}
+
+/* Column widths — must total 100% */
+.pets-table table th:nth-child(1) { width: 18%; } /* Pet Name */
+.pets-table table th:nth-child(2) { width: 17%; } /* Owner    */
+.pets-table table th:nth-child(3) { width: 10%; } /* Species  */
+.pets-table table th:nth-child(4) { width: 13%; } /* Breed    */
+.pets-table table th:nth-child(5) { width: 10%; } /* Colour   */
+.pets-table table th:nth-child(6) { width: 9%;  } /* Gender   */
+.pets-table table th:nth-child(7) { width: 10%; } /* Created  */
+.pets-table table th:nth-child(8) { width: 13%; } /* Actions  */
+
+.pets-table thead {
+    background: linear-gradient(135deg, #2e86ab 0%, #57a7b3 100%);
+}
+.pets-table th {
+    padding: 14px 16px; text-align: left;
+    font-size: 12px; font-weight: 700;
+    color: rgba(255,255,255,0.92); text-transform: uppercase;
+    letter-spacing: 0.6px; white-space: nowrap;
+    overflow: hidden; text-overflow: ellipsis;
+}
+.pets-table th.center { text-align: center; }
+
+.pets-table tbody tr {
+    border-bottom: 1px solid #f0f2f5; transition: background-color 0.15s;
+}
+.pets-table tbody tr:last-child { border-bottom: none; }
+.pets-table tbody tr:hover { background-color: #f7fbfd; }
+
+.pets-table td {
+    padding: 13px 16px; font-size: 14px; color: #333;
+    vertical-align: middle; overflow: hidden;
+    text-overflow: ellipsis; white-space: nowrap;
+}
+
+/* ================================================
+   CELL STYLES
+   ================================================ */
+
+.pet-name-cell { display: flex; align-items: center; gap: 10px; overflow: hidden; }
+.species-icon  { font-size: 20px; flex-shrink: 0; }
+.pet-name      { font-weight: 600; color: #1a1a2e; overflow: hidden; text-overflow: ellipsis; }
+.pet-id-sub    { font-size: 11px; color: #aaa; margin-top: 1px; }
+
+.owner-cell  { overflow: hidden; }
+.owner-name  { font-weight: 500; color: #333; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.customer-code {
+    display: inline-block; background-color: #e8f4f8; color: #2e86ab;
+    padding: 2px 7px; border-radius: 4px; font-size: 11px;
+    font-weight: 700; margin-top: 3px; letter-spacing: 0.3px;
+}
+
+.species-tag {
+    display: inline-block; background-color: #f0faf5; color: #2a7a50;
+    padding: 3px 9px; border-radius: 20px; font-size: 12px;
+    font-weight: 600; border: 1px solid #c8ecd9;
+}
+
+.colour-cell { display: flex; align-items: center; gap: 7px; overflow: hidden; }
+.colour-dot  {
+    width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0;
+    border: 1px solid rgba(0,0,0,0.15);
+}
+
+.badge         { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+.badge-male    { background-color: #e8f0fe; color: #1a56db; border: 1px solid #c3d5fd; }
+.badge-female  { background-color: #fde8f0; color: #c2185b; border: 1px solid #f9c3d5; }
+.badge-unknown { background-color: #f5f5f5; color: #777;    border: 1px solid #ddd; }
+
+.date-cell { color: #888; font-size: 13px; }
+.muted     { color: #ccc; }
+
+/* ================================================
+   ACTIONS COLUMN
+   ================================================ */
+
+.pets-table td.actions-cell { white-space: nowrap; text-align: center; }
+.btn-action {
+    background: none; border: none; font-size: 15px; cursor: pointer;
+    padding: 5px 7px; border-radius: 6px; transition: background-color 0.2s;
+    display: inline-block; line-height: 1;
+}
+.btn-action.edit:hover   { background-color: #e3f2fd; }
+.btn-action.delete:hover { background-color: #ffebee; }
+
+/* ================================================
+   EMPTY STATE
+   ================================================ */
+
+.empty-state {
+    text-align: center !important;
+    padding: 60px 20px !important;
+    color: #bbb;
+}
+.empty-icon       { font-size: 40px; margin-bottom: 10px; }
+.empty-state p    { font-size: 15px; margin: 0 0 4px; color: #aaa; }
+.empty-state small{ font-size: 12px; color: #ccc; }
+
+/* ================================================
+   PAGINATION
+   ================================================ */
+
+.pagination-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 16px;
+    padding: 0 2px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.pagination-info { font-size: 13px; color: #888; }
+.pagination-info strong { color: #444; }
+
+.pagination-controls {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.page-btn {
+    min-width: 36px;
+    height: 36px;
+    padding: 0 10px;
+    border: 1px solid #dde1e9;
+    border-radius: 7px;
+    background: #fff;
+    color: #444;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+.page-btn:hover:not(:disabled) {
+    background-color: #e8f4f8;
+    border-color: #2e86ab;
+    color: #2e86ab;
+}
+.page-btn.active {
+    background-color: #2e86ab;
+    border-color: #2e86ab;
+    color: #fff;
+}
+.page-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+.page-btn.arrow    { font-size: 16px; font-weight: 700; }
+
+/* ================================================
+   NO CLINIC SELECTED
+   ================================================ */
+
+.no-clinic-state {
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 80px 20px; color: #aaa; text-align: center;
+}
+.no-clinic-state .empty-icon { font-size: 44px; margin-bottom: 12px; }
+.no-clinic-state p     { font-size: 16px; color: #888; margin: 0 0 6px; font-weight: 600; }
+.no-clinic-state small { font-size: 13px; color: #bbb; }
+
+/* ================================================
+   MODAL
+   ================================================ */
+
+.modal-overlay {
+    position: fixed; inset: 0;
+    background-color: rgba(10, 20, 40, 0.45);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 1000; backdrop-filter: blur(2px);
+}
+.modal {
+    background: #fff; border-radius: 12px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.18);
+    width: 90%; max-width: 580px;
+    animation: slideIn 0.25s ease;
+    max-height: 90vh; display: flex; flex-direction: column;
+}
+@keyframes slideIn {
+    from { transform: translateY(-30px); opacity: 0; }
+    to   { transform: translateY(0);     opacity: 1; }
+}
+
+.modal-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 20px 24px; border-bottom: 1px solid #eef0f4;
+}
+.modal-header h2 { font-size: 17px; font-weight: 700; color: #1a1a2e; margin: 0; }
+
+.close-btn {
+    background: none; border: none; font-size: 18px; cursor: pointer;
+    color: #aaa; line-height: 1; padding: 4px 6px; border-radius: 4px;
+    transition: color 0.15s, background-color 0.15s;
+}
+.close-btn:hover { color: #333; background-color: #f5f5f5; }
+
+.modal-body {
+    padding: 20px 24px; display: flex; flex-direction: column;
+    gap: 14px; overflow-y: auto; flex: 1;
+}
+
+.form-group { display: flex; flex-direction: column; gap: 5px; }
+.form-group label {
+    font-size: 12px; font-weight: 700; color: #555;
+    text-transform: uppercase; letter-spacing: 0.4px;
+}
+.form-group input,
+.form-group select,
+.form-group textarea {
+    padding: 10px 12px; border: 1px solid #dde1e9; border-radius: 7px;
+    font-size: 14px; font-family: inherit; color: #333;
+    background-color: #fff; transition: border-color 0.2s, box-shadow 0.2s;
+}
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none; border-color: #2e86ab;
+    box-shadow: 0 0 0 3px rgba(46,134,171,0.12);
+}
+.form-group select   { cursor: pointer; appearance: auto; }
+.form-group textarea { resize: vertical; }
+
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+.modal-footer {
+    display: flex; gap: 10px; padding: 16px 24px;
+    border-top: 1px solid #eef0f4; justify-content: flex-end;
+}
+
+/* ================================================
+   DARK MODE
+   ================================================ */
+
+.app.dark .pets-list           { background-color: #13131f; }
+.app.dark .pets-list-content   { color: #ddd; }
+.app.dark .page-header h1      { color: #f0f0f0; }
+.app.dark .page-header p       { color: #888; }
+.app.dark .filter-input        { background-color: #1e1e2e; border-color: #333; color: #ddd; }
+.app.dark .filter-input:focus  { border-color: #57a7b3; }
+.app.dark .pets-table          { background: #1a1a2a; box-shadow: 0 2px 12px rgba(0,0,0,0.4); }
+.app.dark .pets-table tbody tr { border-bottom-color: #252535; }
+.app.dark .pets-table tbody tr:hover { background-color: #1e1e30; }
+.app.dark .pets-table td       { color: #ccc; }
+.app.dark .pet-name            { color: #eee; }
+.app.dark .owner-name          { color: #ccc; }
+.app.dark .modal               { background: #1e1e2e; }
+.app.dark .modal-header        { border-bottom-color: #2a2a3a; }
+.app.dark .modal-header h2     { color: #f0f0f0; }
+.app.dark .modal-body          { color: #ddd; }
+.app.dark .form-group label    { color: #aaa; }
+.app.dark .form-group input,
+.app.dark .form-group select,
+.app.dark .form-group textarea { background-color: #252535; border-color: #333; color: #ddd; }
+.app.dark .form-group input:focus,
+.app.dark .form-group select:focus,
+.app.dark .form-group textarea:focus { border-color: #57a7b3; }
+.app.dark .modal-footer        { border-top-color: #2a2a3a; }
+.app.dark .btn-secondary       { background-color: #252535; color: #ccc; border-color: #333; }
+.app.dark .btn-secondary:hover { background-color: #2e2e40; }
+.app.dark .pagination-info strong { color: #ccc; }
+.app.dark .page-btn            { background-color: #1e1e2e; border-color: #333; color: #ccc; }
+.app.dark .page-btn:hover:not(:disabled) { background-color: #252540; border-color: #57a7b3; color: #57a7b3; }
+.app.dark .page-btn.active     { background-color: #2e86ab; border-color: #2e86ab; color: #fff; }
+
+/* ================================================
+   RESPONSIVE
+   ================================================ */
+
+@media (max-width: 900px) {
+    .pets-list-content { padding: 16px; }
+    .pets-table        { overflow-x: auto; }
+    .pets-table table  { table-layout: auto; min-width: 700px; }
+    .form-row          { grid-template-columns: 1fr; }
+    .filter-input      { max-width: 100%; }
+    .pagination-bar    { flex-direction: column; align-items: flex-start; }
+}

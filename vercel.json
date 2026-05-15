@@ -1,0 +1,14 @@
+{
+  "buildCommand": "npm run build",
+  "outputDirectory": "build",
+  "rewrites": [
+    {
+      "source": "/:path*",
+      "destination": "/index.html"
+    }
+  ],
+  "env": {
+    "REACT_APP_API_BASE_URL": "@react_app_api_base_url",
+    "REACT_APP_ENVIRONMENT": "@react_app_environment"
+  }
+}

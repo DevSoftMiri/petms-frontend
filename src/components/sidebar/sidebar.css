@@ -1,0 +1,446 @@
+/* ============================================================
+   sidebar.css — VetCare clean white sidebar
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+:root {
+  --accent: #f97316;
+  --accent-light: #fff3ed;
+  --accent-hover: #ea6c0a;
+  --sidebar-bg: #ffffff;
+  --sidebar-border: #f0f0f0;
+  --text-primary: #1a1a2e;
+  --text-secondary: #6b7280;
+  --text-muted: #9ca3af;
+  --nav-hover: #fafafa;
+  --section-label: #9ca3af;
+  --radius: 10px;
+}
+
+.sidebar {
+  position: relative;
+  width: 220px;
+  min-height: 100vh;
+  background: var(--sidebar-bg);
+  border-right: 1px solid var(--sidebar-border);
+  display: flex;
+  flex-direction: column;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  overflow: hidden;
+  transition: transform 0.3s ease, width 0.3s ease;
+}
+
+/* Collapsed state for mobile */
+.sidebar.collapsed {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 0;
+  z-index: 999;
+  overflow-x: hidden;
+  transform: translateX(-100%);
+}
+
+/* Remove slideshow background — clean white */
+.sidebar-bg,
+.sidebar-overlay {
+  display: none !important;
+}
+
+/* Ensure dropdown has no borders */
+.sidebar-dropdown,
+.sidebar-dropdown-item {
+  border: none !important;
+}
+
+/* --- All content --- */
+.sidebar-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding-bottom: 16px;
+}
+
+/* --- Logo / Brand --- */
+.sidebar-logo {
+  padding: 24px 20px 20px 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 1px solid var(--sidebar-border);
+  margin-bottom: 8px;
+}
+
+.sidebar-logo-icon {
+  width: 36px;
+  height: 36px;
+  background: var(--accent);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 800;
+  color: white;
+  letter-spacing: -1px;
+  flex-shrink: 0;
+}
+
+.logo-vet {
+  color: var(--text-primary);
+  font-weight: 800;
+  font-size: 18px;
+  font-style: normal;
+  letter-spacing: -0.3px;
+}
+
+.logo-pms {
+  color: var(--text-secondary);
+  font-weight: 500;
+  font-size: 13px;
+  margin-left: 1px;
+  letter-spacing: 0.2px;
+}
+
+/* --- Section labels --- */
+.sidebar-section-label {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--section-label);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 16px 20px 6px 20px;
+}
+
+/* --- Nav list --- */
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 4px 12px;
+  margin: 0;
+  gap: 2px;
+}
+
+/* --- Each nav item (Link or Button) --- */
+.sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-size: 13.5px;
+  font-weight: 500;
+  letter-spacing: 0.1px;
+  border-radius: var(--radius);
+  transition: background 0.15s ease, color 0.15s ease;
+  cursor: pointer;
+  position: relative;
+  border: none;
+  background: transparent;
+  width: 100%;
+  text-align: left;
+}
+
+.sidebar-item:hover {
+  background: var(--nav-hover);
+  color: var(--text-primary);
+}
+
+.sidebar-item:hover .sidebar-icon {
+  color: var(--accent);
+}
+
+/* Active item */
+.sidebar-item.active {
+  background: var(--accent-light);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.sidebar-item.active .sidebar-icon {
+  color: var(--accent);
+}
+
+/* Active left bar indicator */
+.sidebar-item.active::before {
+  content: '';
+  position: absolute;
+  left: -12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 60%;
+  background: var(--accent);
+  border-radius: 0 3px 3px 0;
+}
+
+/* --- Icon --- */
+.sidebar-icon {
+  display: flex;
+  align-items: center;
+  color: var(--text-muted);
+  min-width: 20px;
+  transition: color 0.15s ease;
+}
+
+.sidebar-icon svg {
+  font-size: 18px;
+}
+
+/* --- Label --- */
+.sidebar-label {
+  flex: 1;
+}
+
+/* --- Arrow indicator --- */
+.sidebar-arrow {
+  font-size: 16px;
+  color: var(--text-muted);
+  line-height: 1;
+}
+
+.sidebar-item:hover .sidebar-arrow,
+.sidebar-item.active .sidebar-arrow {
+  color: var(--accent);
+}
+
+/* --- Dropdown Arrow --- */
+.sidebar-dropdown-arrow {
+  display: flex;
+  align-items: center;
+  color: var(--text-muted);
+  transition: transform 0.2s ease;
+}
+
+.sidebar-item:hover .sidebar-dropdown-arrow,
+.sidebar-item.active .sidebar-dropdown-arrow {
+  color: var(--accent);
+}
+
+/* --- Sidebar Item Wrapper (for dropdown) --- */
+.sidebar-item-wrapper {
+  display: flex;
+  flex-direction: column;
+}
+
+/* --- Dropdown Menu --- */
+.sidebar-dropdown {
+  display: flex;
+  flex-direction: column;
+  margin: 2px 0 4px 12px;
+  padding-left: 0;
+  border: none !important;
+}
+
+.sidebar-dropdown::before,
+.sidebar-dropdown::after {
+  display: none !important;
+}
+
+.sidebar-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: var(--radius);
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.sidebar-dropdown-item:hover {
+  background: var(--nav-hover);
+  color: var(--accent);
+}
+
+.sidebar-dropdown-item.active {
+  background: var(--accent-light);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.sidebar-dropdown-icon {
+  display: flex;
+  align-items: center;
+  color: var(--text-muted);
+  min-width: 18px;
+}
+
+.sidebar-dropdown-icon svg {
+  font-size: 16px;
+}
+
+.sidebar-dropdown-label {
+  flex: 1;
+}
+
+/* Dark mode dropdown */
+.app.dark .sidebar-dropdown-item:hover {
+  background: #1f2937;
+}
+
+.app.dark .sidebar-dropdown-item.active {
+  background: rgba(249, 115, 22, 0.12);
+}
+
+/* --- Mobile Toggle Button --- */
+.sidebar-toggle-btn {
+  display: none;
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 1000;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--text-primary);
+  padding: 8px;
+  border-radius: var(--radius);
+  transition: background 0.2s ease;
+}
+
+.sidebar-toggle-btn:hover {
+  background: var(--accent-light);
+  color: var(--accent);
+}
+
+/* --- User profile at bottom --- */
+.sidebar-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 20px;
+  margin: 8px 12px 0;
+  border-top: 1px solid var(--sidebar-border);
+  padding-top: 16px;
+}
+
+.sidebar-user-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--accent-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  color: var(--accent);
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.sidebar-user-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.sidebar-user-role {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* Dark mode */
+.app.dark .sidebar {
+  background: #141920;
+  border-right-color: #1f2937;
+  --sidebar-bg: #141920;
+  --sidebar-border: #1f2937;
+  --text-primary: #f9fafb;
+  --text-secondary: #9ca3af;
+  --text-muted: #6b7280;
+  --nav-hover: #1f2937;
+  --accent-light: rgba(249, 115, 22, 0.12);
+}
+
+/* ============================================================
+   Responsive Design — Mobile, Tablet, Desktop
+   ============================================================ */
+
+/* Tablets and small laptops (1024px and below) */
+@media (max-width: 1024px) {
+  .sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100vh;
+    z-index: 999;
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .sidebar.collapsed {
+    transform: translateX(-100%);
+  }
+
+  .sidebar-toggle-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .sidebar-content {
+    padding-top: 60px;
+  }
+
+  .sidebar-logo {
+    padding-top: 16px;
+  }
+}
+
+/* Large desktops (1025px and above) */
+@media (min-width: 1025px) {
+  .sidebar {
+    position: relative;
+    transform: translateX(0) !important;
+  }
+
+  .sidebar-toggle-btn {
+    display: none !important;
+  }
+}
+
+/* Mobile phones (768px and below) */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 100%;
+    max-width: 280px;
+  }
+
+  .sidebar-logo {
+    padding: 20px 16px;
+    font-size: 14px;
+  }
+
+  .logo-vet {
+    font-size: 16px;
+  }
+
+  .logo-pms {
+    font-size: 12px;
+  }
+
+  .sidebar-nav {
+    padding: 4px 8px;
+    gap: 2px;
+  }
+
+  .sidebar-item {
+    padding: 8px 10px;
+    font-size: 13px;
+  }
+
+  .sidebar-icon {
+    min-width: 18px;
+  }
+
+  .sidebar-icon svg {
+    font-size: 16px;
+  }
+}

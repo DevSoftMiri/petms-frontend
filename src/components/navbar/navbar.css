@@ -1,0 +1,325 @@
+/* ============================================================
+   navbar.css — VetCare clean top navbar
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+:root {
+  --accent: #f97316;
+  --accent-light: #fff3ed;
+  --text-primary: #1a1a2e;
+  --text-secondary: #6b7280;
+  --border: #f0f0f0;
+  --navbar-bg: #ffffff;
+  --search-bg: #f9fafb;
+  --radius: 10px;
+}
+
+.navbar-wrapper {
+  background: var(--navbar-bg);
+  border-bottom: 1px solid var(--border);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+.navbar-wrapper hr {
+  display: none;
+}
+
+.navbar {
+  height: 64px;
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.navbar .wrapper {
+  width: 100%;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  border-bottom: none;
+}
+
+/* --- Page title area (left) --- */
+.navbar-title-area {
+  display: flex;
+  flex-direction: column;
+}
+
+.navbar-title {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: -0.5px;
+  line-height: 1.1;
+}
+
+.navbar-subtitle {
+  font-size: 12.5px;
+  color: var(--text-secondary);
+  font-weight: 400;
+}
+
+/* --- Search bar --- */
+.navbar .wrapper .search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--search-bg);
+  border: 1.5px solid var(--border);
+  border-radius: 24px;
+  padding: 8px 16px;
+  width: 280px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  visibility: visible;
+}
+
+.navbar .wrapper .search:focus-within {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1);
+}
+
+.navbar .wrapper .search input {
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 13.5px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  color: var(--text-primary);
+  width: 100%;
+}
+
+.navbar .wrapper .search input::placeholder {
+  font-size: 13px;
+  color: var(--text-muted, #9ca3af);
+}
+
+.navbar .wrapper .search svg {
+  font-size: 18px;
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+
+/* --- Action buttons (New Pet, Schedule) --- */
+.navbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
+}
+
+.navbar-btn-outline {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border: 1.5px solid var(--accent);
+  border-radius: 24px;
+  background: transparent;
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 600;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+  white-space: nowrap;
+}
+
+.navbar-btn-outline:hover {
+  background: var(--accent-light);
+}
+
+.navbar-btn-solid {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 18px;
+  border: none;
+  border-radius: 24px;
+  background: var(--accent);
+  color: white;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  cursor: pointer;
+  transition: background 0.2s ease, box-shadow 0.2s ease;
+  white-space: nowrap;
+}
+
+.navbar-btn-solid:hover {
+  background: #ea6c0a;
+  box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
+}
+
+/* --- Nav menu (center links) --- */
+.navbar-menu {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+}
+
+.navbar-menu-item {
+  text-decoration: none;
+  color: var(--text-secondary);
+  font-size: 13.5px;
+  font-weight: 500;
+  padding: 6px 12px;
+  border-radius: 8px;
+  transition: background 0.15s ease, color 0.15s ease;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.navbar-menu-item:hover {
+  background: var(--search-bg);
+  color: var(--text-primary);
+}
+
+.navbar-menu-item.active {
+  background: var(--accent-light);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+/* --- Right items --- */
+.navbar .wrapper .items {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.navbar .wrapper .items .item {
+  display: flex;
+  align-items: center;
+  margin-right: 0;
+  position: relative;
+  padding: 6px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.navbar .wrapper .items .item:hover {
+  background: var(--search-bg);
+}
+
+.navbar .wrapper .items .item .icon {
+  font-size: 20px;
+  color: var(--text-secondary);
+}
+
+.navbar .wrapper .items .item .avatar,
+.navbar .wrapper .items .item .itemImg {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--border);
+}
+
+.navbar .wrapper .items .item .counter {
+  width: 16px;
+  height: 16px;
+  background-color: var(--accent);
+  border-radius: 50%;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  font-weight: 700;
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  border: 2px solid white;
+}
+
+/* Dark mode */
+.app.dark .navbar-wrapper {
+  background: #141920;
+  border-bottom-color: #1f2937;
+}
+
+.app.dark .navbar {
+  color: #9ca3af;
+  --navbar-bg: #141920;
+  --border: #1f2937;
+  --search-bg: #1f2937;
+  --text-primary: #f9fafb;
+  --text-secondary: #9ca3af;
+}
+
+.app.dark .navbar .wrapper .search input {
+  color: #f9fafb;
+}
+
+/* Auth Buttons (Login/Logout) */
+.auth-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+  font-size: 18px;
+  padding: 0;
+}
+
+.auth-btn:hover {
+  background: var(--search-bg);
+}
+
+.auth-btn.login-btn {
+  color: var(--accent);
+}
+
+.auth-btn.login-btn:hover {
+  background: var(--accent-light);
+  color: var(--accent);
+}
+
+.auth-btn.logout-btn {
+  color: #ef4444;
+  margin-left: 8px;
+}
+
+.auth-btn.logout-btn:hover {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+}
+
+/* Dark mode auth buttons */
+.app.dark .auth-btn {
+  color: #9ca3af;
+}
+
+.app.dark .auth-btn:hover {
+  background: #374151;
+  color: #f9fafb;
+}
+
+.app.dark .auth-btn.login-btn {
+  color: #667eea;
+}
+
+.app.dark .auth-btn.login-btn:hover {
+  background: rgba(102, 126, 234, 0.1);
+  color: #667eea;
+}
+
+.app.dark .auth-btn.logout-btn {
+  color: #ef4444;
+}
+
+.app.dark .auth-btn.logout-btn:hover {
+  background: rgba(239, 68, 68, 0.1);
+}

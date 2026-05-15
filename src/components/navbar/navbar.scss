@@ -1,0 +1,153 @@
+// navbar.scss — VetCare theme
+
+$accent: #f97316;
+$accent-light: #fff3ed;
+$text-primary: #1a1a2e;
+$text-secondary: #6b7280;
+$text-muted: #9ca3af;
+$border: #f0f0f0;
+$bg: #ffffff;
+$search-bg: #f9fafb;
+$radius: 10px;
+
+.navbar-wrapper {
+  background: $bg;
+  border-bottom: 1px solid $border;
+
+  hr { display: none; }
+}
+
+.navbar {
+  height: 64px;
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  color: $text-secondary;
+
+  .wrapper {
+    width: 100%;
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    border-bottom: none;
+
+    .search {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: $search-bg;
+      border: 1.5px solid $border;
+      border-radius: 24px;
+      padding: 8px 16px;
+      width: 280px;
+      visibility: visible;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+      &:focus-within {
+        border-color: $accent;
+        box-shadow: 0 0 0 3px rgba($accent, 0.1);
+      }
+
+      input {
+        border: none;
+        outline: none;
+        background: transparent;
+        font-size: 13.5px;
+        color: $text-primary;
+        width: 100%;
+
+        &::placeholder {
+          font-size: 13px;
+          color: $text-muted;
+        }
+      }
+
+      svg {
+        font-size: 18px;
+        color: $text-secondary;
+        flex-shrink: 0;
+      }
+    }
+
+    .items {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+
+      .item {
+        display: flex;
+        align-items: center;
+        margin-right: 0;
+        position: relative;
+        padding: 6px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background 0.15s ease;
+
+        &:hover { background: $search-bg; }
+
+        .icon {
+          font-size: 20px;
+          color: $text-secondary;
+        }
+
+        .avatar, .itemImg {
+          width: 32px;
+          height: 32px;
+          border-radius: 50%;
+          object-fit: cover;
+          border: 2px solid $border;
+        }
+
+        .counter {
+          width: 16px;
+          height: 16px;
+          background-color: $accent;
+          border-radius: 50%;
+          color: white;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 9px;
+          font-weight: 700;
+          position: absolute;
+          top: 2px;
+          right: 2px;
+          border: 2px solid white;
+        }
+      }
+    }
+  }
+}
+
+.navbar-menu {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+}
+
+.navbar-menu-item {
+  text-decoration: none;
+  color: $text-secondary;
+  font-size: 13.5px;
+  font-weight: 500;
+  padding: 6px 12px;
+  border-radius: 8px;
+  transition: background 0.15s ease, color 0.15s ease;
+  cursor: pointer;
+  white-space: nowrap;
+
+  &:hover {
+    background: $search-bg;
+    color: $text-primary;
+  }
+
+  &.active {
+    background: $accent-light;
+    color: $accent;
+    font-weight: 600;
+  }
+}

@@ -1,0 +1,187 @@
+/* ============================================================
+   dashboardCard.css — VetCare stat cards
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+:root {
+  --accent: #f97316;
+  --accent-light: #fff3ed;
+  --card-bg: #ffffff;
+  --card-border: #f0f0f0;
+  --text-primary: #1a1a2e;
+  --text-secondary: #6b7280;
+  --text-muted: #9ca3af;
+  --radius-card: 16px;
+}
+
+.dashboard-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 24px;
+  background: var(--card-bg);
+  border-radius: var(--radius-card);
+  border: 1px solid var(--card-border);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  position: relative;
+  overflow: hidden;
+}
+
+.dashboard-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+/* Subtle top accent line */
+.dashboard-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--card-accent-color, var(--accent));
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.dashboard-card:hover::before {
+  opacity: 1;
+}
+
+.card-top {
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Small label above the number */
+.card-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+/* Big number */
+.card-count {
+  font-size: 36px;
+  font-weight: 800;
+  color: var(--accent);
+  margin: 0;
+  line-height: 1;
+  letter-spacing: -1px;
+}
+
+/* Subtitle line e.g. "+12 this month" */
+.card-subtitle {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-weight: 400;
+  margin-top: 4px;
+}
+
+/* Icon box — top right corner */
+.card-icon-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  color: white;
+  align-self: flex-end;
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  opacity: 0.9;
+}
+
+.card-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+}
+
+.card-icon svg {
+  font-size: 22px;
+}
+
+.card-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.card-divider {
+  height: 1px;
+  background-color: var(--card-border);
+  margin: 16px 0 12px;
+}
+
+.card-bottom {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.card-btn-icon {
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card-btn-icon svg {
+  font-size: 15px;
+}
+
+.card-btn {
+  flex: 1;
+  padding: 8px 14px;
+  border: none;
+  border-radius: 20px;
+  color: white;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  cursor: pointer;
+  transition: opacity 0.2s ease, box-shadow 0.2s ease;
+  letter-spacing: 0.2px;
+}
+
+.card-btn:hover {
+  opacity: 0.9;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Dark Mode */
+.app.dark .dashboard-card {
+  background: #1f2937;
+  border-color: #374151;
+  --card-bg: #1f2937;
+  --card-border: #374151;
+}
+
+.app.dark .card-title {
+  color: #6b7280;
+}
+
+.app.dark .card-count {
+  color: var(--accent);
+}
+
+.app.dark .card-divider {
+  background-color: #374151;
+}
+
+.app.dark .card-subtitle {
+  color: #6b7280;
+}

@@ -1,0 +1,457 @@
+/* ============================================================
+   superAdminNavbar.css — Super Admin Navbar
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@500&display=swap');
+
+/* ── CSS Variables ── */
+:root {
+  --sa-accent: #f97316;
+  --sa-accent-dim: rgba(249, 115, 22, 0.12);
+  --sa-accent-glow: rgba(249, 115, 22, 0.25);
+
+  --sa-bg: #ffffff;
+  --sa-bg-scrolled: #fff0e9;
+  --sa-border: rgba(0, 0, 0, 0.07);
+  --sa-surface: #f8f8f9;
+  --sa-surface-hover: #f1f1f3;
+
+  --sa-text-primary: #111827;
+  --sa-text-secondary: #6b7280;
+  --sa-text-muted: #9ca3af;
+
+  --sa-shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --sa-shadow-scrolled: 0 4px 24px rgba(249, 115, 22, 0.10), 0 1px 4px rgba(0,0,0,0.06);
+  --sa-shadow-card: 0 8px 32px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.06);
+
+  --sa-radius: 10px;
+  --sa-radius-sm: 7px;
+  --sa-radius-pill: 50px;
+  --sa-font: 'DM Sans', sans-serif;
+  --sa-navbar-h: 62px;
+}
+
+/* ── Wrapper ── */
+.sa-navbar-wrapper {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background: var(--sa-bg);
+  border-bottom: 1px solid var(--sa-border);
+  box-shadow: var(--sa-shadow-sm);
+  font-family: var(--sa-font);
+
+  /* Smooth transition for bg + blur changes */
+  transition:
+    background 0.35s ease,
+    backdrop-filter 0.35s ease,
+    -webkit-backdrop-filter 0.35s ease,
+    box-shadow 0.35s ease,
+    border-color 0.35s ease;
+}
+
+/* ── Scrolled state: warm bg + blur ── */
+.sa-navbar-wrapper--scrolled {
+  background: rgba(255, 240, 233, 0.82);   /* #FFF0E9 at 82% opacity so blur shows */
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom-color: rgba(249, 115, 22, 0.15);
+  box-shadow: var(--sa-shadow-scrolled);
+}
+
+/* ── Navbar Layout ── */
+.sa-navbar {
+  height: var(--sa-navbar-h);
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  padding: 0 28px;
+  gap: 16px;
+}
+
+/* ─────────────────────────────────────
+   LEFT: Brand
+───────────────────────────────────── */
+.sa-brand {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  text-decoration: none;
+}
+
+.sa-brand-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: var(--sa-radius-sm);
+  background: var(--sa-accent);
+  color: #fff;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px var(--sa-accent-glow);
+}
+
+.sa-brand-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1;
+  gap: 2px;
+}
+
+.sa-brand-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--sa-text-primary);
+  letter-spacing: -0.3px;
+}
+
+.sa-brand-tag {
+  font-size: 10.5px;
+  font-weight: 500;
+  color: var(--sa-accent);
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  font-family: 'DM Mono', monospace;
+}
+
+/* ─────────────────────────────────────
+   CENTER: Nav Links
+───────────────────────────────────── */
+.sa-nav-center {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--sa-surface);
+  /* border: 1px solid var(--sa-border); */
+  border-radius: var(--sa-radius-pill);
+  padding: 4px;
+}
+
+.sa-nav-link {
+  position: relative;
+  text-decoration: none;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--sa-text-secondary);
+  padding: 7px 20px;
+  border-radius: var(--sa-radius-pill);
+  transition: color 0.2s ease, background 0.2s ease;
+  white-space: nowrap;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-family: var(--sa-font);
+}
+
+.sa-nav-link:hover {
+  color: var(--sa-text-primary);
+  background: var(--sa-accent-dim);
+}
+
+.sa-nav-link--active {
+  color: #fff !important;
+  background: var(--sa-accent) !important;
+  font-weight: 600;
+  box-shadow: 0 2px 8px var(--sa-accent-glow);
+}
+
+/* Dark mode nav links */
+.app.dark .sa-nav-link {
+  color: var(--sa-text-secondary);
+}
+
+.app.dark .sa-nav-link:hover {
+  color: var(--sa-text-primary);
+  background: rgba(249, 115, 22, 0.15);
+}
+
+/* ─────────────────────────────────────
+   RIGHT: Actions
+───────────────────────────────────── */
+.sa-nav-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+/* Search */
+.sa-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--sa-surface);
+  /* border: 1.5px solid var(--sa-border); */
+  /* border-radius: var(--sa-radius-pill); */
+  padding: 7px 14px;
+  width: 200px;
+  transition: border-color 0.2s, box-shadow 0.2s, width 0.25s ease;
+}
+
+.sa-search:focus-within {
+  border-color: var(--sa-accent);
+  box-shadow: 0 0 0 3px var(--sa-accent-dim);
+  width: 240px;
+}
+
+.sa-search-icon {
+  color: var(--sa-text-muted);
+  flex-shrink: 0;
+}
+
+.sa-search input {
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 13px;
+  font-family: var(--sa-font);
+  color: var(--sa-text-primary);
+  width: 100%;
+}
+
+.sa-search input::placeholder {
+  color: var(--sa-text-muted);
+}
+
+/* Icon Buttons */
+.sa-icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--sa-radius-sm);
+  border: 1.5px solid var(--sa-border);
+  background: var(--sa-bg);
+  color: var(--sa-text-secondary);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s, transform 0.1s;
+}
+
+.sa-icon-btn:hover {
+  background: var(--sa-surface-hover);
+  border-color: rgba(0,0,0,0.12);
+  color: var(--sa-text-primary);
+  transform: translateY(-1px);
+}
+
+.sa-icon-btn:active {
+  transform: translateY(0);
+}
+
+/* Logout Button */
+.sa-logout-btn {
+  color: #ef4444;
+  border-color: rgba(239, 68, 68, 0.2);
+}
+
+.sa-logout-btn:hover {
+  background: rgba(239, 68, 68, 0.08);
+  border-color: rgba(239, 68, 68, 0.35);
+  color: #ef4444;
+}
+
+/* Vertical Divider */
+.sa-divider {
+  width: 1px;
+  height: 24px;
+  background: var(--sa-border);
+  margin: 0 4px;
+  flex-shrink: 0;
+}
+
+/* ─────────────────────────────────────
+   Avatar
+───────────────────────────────────── */
+.sa-avatar-wrap {
+  position: relative;
+}
+
+.sa-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--sa-accent) 0%, #fb923c 100%);
+  border: 2.5px solid rgba(255, 255, 255, 0.85);
+  cursor: pointer;
+  box-shadow: 0 2px 8px var(--sa-accent-glow);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  overflow: hidden;
+  padding: 0;
+}
+
+.sa-avatar:hover {
+  transform: scale(1.08);
+  box-shadow: 0 4px 16px var(--sa-accent-glow);
+}
+
+/* Avatar image fills the circle */
+.sa-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  display: block;
+}
+
+/* Initials fallback (added via JS when img errors) */
+.sa-avatar--initials::after {
+  content: attr(data-initials);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: var(--sa-font);
+  letter-spacing: 0.5px;
+}
+
+/* ─────────────────────────────────────
+   Profile Hover Card (name + role only)
+───────────────────────────────────── */
+.sa-profile-card {
+  position: absolute;
+  top: calc(100% + 12px);
+  right: 0;
+  width: 210px;
+  background: var(--sa-bg);
+  border: 1px solid var(--sa-border);
+  border-radius: var(--sa-radius);
+  box-shadow: var(--sa-shadow-card);
+  padding: 14px;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(8px) scale(0.96);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  z-index: 200;
+}
+
+.sa-profile-card--visible {
+  opacity: 1;
+  pointer-events: all;
+  transform: translateY(0) scale(1);
+}
+
+/* Caret arrow pointing up toward avatar */
+.sa-profile-card::before {
+  content: '';
+  position: absolute;
+  top: -6px;
+  right: 14px;
+  width: 10px;
+  height: 10px;
+  background: var(--sa-bg);
+  border-left: 1px solid var(--sa-border);
+  border-top: 1px solid var(--sa-border);
+  transform: rotate(45deg);
+}
+
+.sa-profile-card-header {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+
+/* Avatar image inside the card */
+.sa-profile-card-img {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 2px solid var(--sa-accent-dim);
+  box-shadow: 0 2px 8px var(--sa-accent-glow);
+}
+
+.sa-profile-card-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  overflow: hidden;
+}
+
+.sa-profile-card-name {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--sa-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sa-profile-card-role {
+  font-size: 10.5px;
+  font-weight: 500;
+  color: var(--sa-accent);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  font-family: 'DM Mono', monospace;
+}
+
+/* ─────────────────────────────────────
+   Dark Mode
+───────────────────────────────────── */
+.app.dark .sa-navbar-wrapper {
+  background: #0f1117;
+  border-bottom-color: rgba(255,255,255,0.06);
+  box-shadow: 0 1px 0 rgba(255,255,255,0.04);
+}
+
+.app.dark .sa-navbar-wrapper--scrolled {
+  background: rgba(30, 18, 10, 0.82);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom-color: rgba(249, 115, 22, 0.18);
+  box-shadow: 0 4px 24px rgba(0,0,0,0.35);
+}
+
+.app.dark .sa-navbar {
+  --sa-bg: #0f1117;
+  --sa-surface: #1a1d27;
+  --sa-surface-hover: #22263a;
+  --sa-border: rgba(255,255,255,0.07);
+  --sa-text-primary: #f3f4f6;
+  --sa-text-secondary: #9ca3af;
+  --sa-text-muted: #6b7280;
+  --sa-shadow-card: 0 8px 32px rgba(0,0,0,0.45), 0 2px 8px rgba(0,0,0,0.3);
+}
+
+.app.dark .sa-icon-btn {
+  background: #1a1d27;
+  border-color: rgba(255,255,255,0.07);
+  color: #9ca3af;
+}
+
+.app.dark .sa-icon-btn:hover {
+  background: #22263a;
+  color: #f3f4f6;
+}
+
+.app.dark .sa-logout-btn {
+  border-color: rgba(239, 68, 68, 0.25);
+}
+
+.app.dark .sa-search {
+  background: #1a1d27;
+  border-color: rgba(255,255,255,0.07);
+}
+
+.app.dark .sa-search:focus-within {
+  border-color: var(--sa-accent);
+}
+
+.app.dark .sa-search input {
+  color: #f3f4f6;
+}
+
+.app.dark .sa-profile-card {
+  background: #1a1d27;
+  border-color: rgba(255,255,255,0.08);
+}
+
+.app.dark .sa-profile-card::before {
+  background: #1a1d27;
+  border-color: rgba(255,255,255,0.08);
+}

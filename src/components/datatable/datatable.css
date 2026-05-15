@@ -1,0 +1,241 @@
+/* ============================================================
+   datatable.css — VetCare clean data table
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+:root {
+  --accent: #f97316;
+  --accent-light: #fff3ed;
+  --text-primary: #1a1a2e;
+  --text-secondary: #6b7280;
+  --text-muted: #9ca3af;
+  --border: #f0f0f0;
+  --bg-card: #ffffff;
+  --bg-page: #f8f9fb;
+  --radius: 16px;
+}
+
+.datatable {
+  padding: 24px;
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+/* MuiDataGrid tweaks */
+.datatable .MuiDataGrid-columnHeaders,
+.datatable .MuiDataGrid-row {
+  padding-left: 8px;
+}
+
+.datatable .MuiDataGrid-root {
+  border: none !important;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+.datatable .MuiDataGrid-columnHeaders {
+  background: var(--bg-page);
+  border-radius: 10px;
+  border: none !important;
+}
+
+.datatable .MuiDataGrid-columnHeaderTitle {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+
+.datatable .MuiDataGrid-cell {
+  border-bottom: 1px solid var(--border) !important;
+  font-size: 13.5px;
+  color: var(--text-primary);
+}
+
+.datatable .MuiDataGrid-row:hover {
+  background-color: var(--accent-light) !important;
+}
+
+.datatable .MuiDataGrid-footerContainer {
+  border-top: 1px solid var(--border);
+}
+
+/* Allow full scrolling for all rows */
+.datatable .MuiDataGrid-virtualScroller {
+  overflow-y: auto !important;
+}
+
+/* --- Table header --- */
+.datatable .datatableTitle {
+  width: 100%;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  letter-spacing: -0.2px;
+}
+
+.datatable .datatableTitle .link {
+  text-decoration: none;
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 600;
+  border: 1.5px solid var(--accent);
+  padding: 7px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.datatable .datatableTitle .link:hover {
+  background: var(--accent);
+  color: white;
+}
+
+/* --- Cell with avatar image --- */
+.datatable .cellWithImg {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.datatable .cellWithImg .cellImg {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--border);
+}
+
+/* --- Status badge --- */
+.datatable .cellWithStatus {
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.datatable .cellWithStatus::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.datatable .cellWithStatus.active {
+  background-color: rgba(22, 163, 74, 0.1);
+  color: #16a34a;
+}
+
+.datatable .cellWithStatus.active::before {
+  background: #16a34a;
+}
+
+.datatable .cellWithStatus.pending {
+  background-color: rgba(234, 179, 8, 0.1);
+  color: #b45309;
+}
+
+.datatable .cellWithStatus.pending::before {
+  background: #b45309;
+}
+
+.datatable .cellWithStatus.passive {
+  background-color: rgba(220, 38, 38, 0.08);
+  color: #dc2626;
+}
+
+.datatable .cellWithStatus.passive::before {
+  background: #dc2626;
+}
+
+/* --- Action buttons --- */
+.datatable .cellAction {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.datatable .cellAction .viewButton,
+.datatable .cellAction .editButton,
+.datatable .cellAction .deleteButton {
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: background 0.15s ease;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+.datatable .cellAction .viewButton {
+  background: rgba(59, 130, 246, 0.08);
+  color: #2563eb;
+  border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.datatable .cellAction .viewButton:hover {
+  background: rgba(59, 130, 246, 0.15);
+}
+
+.datatable .cellAction .editButton {
+  background: rgba(249, 115, 22, 0.08);
+  color: var(--accent);
+  border: 1px solid rgba(249, 115, 22, 0.2);
+}
+
+.datatable .cellAction .editButton:hover {
+  background: rgba(249, 115, 22, 0.15);
+}
+
+.datatable .cellAction .deleteButton {
+  background: rgba(220, 38, 38, 0.06);
+  color: #dc2626;
+  border: 1px solid rgba(220, 38, 38, 0.15);
+}
+
+.datatable .cellAction .deleteButton:hover {
+  background: rgba(220, 38, 38, 0.12);
+}
+
+.datatable .title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0;
+  letter-spacing: -0.2px;
+}
+
+/* Dark mode */
+.app.dark .datatable {
+  background: #1f2937;
+  border-color: #374151;
+  --bg-card: #1f2937;
+  --bg-page: #111827;
+  --border: #374151;
+  --text-primary: #f9fafb;
+  --text-muted: #6b7280;
+}
+
+.app.dark .datatable .MuiDataGrid-cell {
+  color: #e5e7eb;
+}
+
+.app.dark .datatable .MuiDataGrid-row:hover {
+  background-color: rgba(249, 115, 22, 0.08) !important;
+}

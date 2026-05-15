@@ -1,0 +1,354 @@
+/* ============================================================
+   Clinic Pages — VetCare Design System
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap');
+
+:root {
+  --c-accent:      #F4631E;
+  --c-accent-2:    #FF8C5A;
+  --c-accent-light:#FFF0E9;
+  --c-bg:          #F6F5F0;
+  --c-surface:     #FFFFFF;
+  --c-surface-2:   #FAFAF8;
+  --c-border:      #E2E2DC;
+  --c-text:        #1A1A18;
+  --c-text-2:      #6B6B65;
+  --c-text-3:      #9B9B95;
+  --c-success:     #2EAD6E;
+  --c-success-bg:  #E8F8F1;
+  --c-danger:      #ff0000;
+  --c-danger-bg:   #f0c6c6;
+  --c-shadow:      0 2px 16px rgba(26, 26, 24, 0.06);
+  --radius:        16px;
+  --radius-sm:     10px;
+  --transition:    0.22s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ---------- Animations ---------- */
+@keyframes pageFadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes tabSlide {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.5; }
+  50%       { opacity: 1; }
+}
+
+/* ---------- Container ---------- */
+.clinic-pages-container {
+  flex: 1;
+  padding: 32px 36px;
+  background: var(--c-bg);
+  font-family: 'DM Sans', sans-serif;
+  animation: pageFadeIn 0.38s cubic-bezier(0.4, 0, 0.2, 1) both;
+  min-height: 100vh;
+}
+
+/* ---------- Header ---------- */
+.clinic-pages-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 26px;
+}
+
+.clinic-pages-header h1 {
+  margin: 0;
+  font-family: 'Sora', sans-serif;
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--c-text);
+  letter-spacing: -0.5px;
+}
+
+/* ---------- Back Button ---------- */
+.back-to-clinics {
+  padding: 11px 22px;
+  background: var(--c-surface);
+  border: 1.5px solid var(--c-accent);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: 'DM Sans', sans-serif;
+  color: var(--c-accent);
+  transition: all var(--transition);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.back-to-clinics:hover {
+  background: var(--c-accent);
+  color: #fff;
+  transform: translateX(-2px);
+  box-shadow: 0 4px 14px rgba(244, 99, 30, 0.28);
+}
+
+/* ---------- Tabs ---------- */
+/* DEPRECATED: Clinic tabs are now rendered in the Sidebar component
+   The tabs have been moved to the left sidebar for better UX and
+   consistent navigation across the application.
+   Previous .clinic-tabs and .clinic-tab styles kept below for reference but not used.
+*/
+
+/* .clinic-tabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 24px;
+  background: var(--c-surface);
+  padding: 12px 14px;
+  border-radius: var(--radius);
+  box-shadow: var(--c-shadow);
+  border: 1.5px solid #EEEDE9;
+  overflow-x: auto;
+  flex-wrap: wrap;
+  scrollbar-width: none;
+}
+
+.clinic-tabs::-webkit-scrollbar { display: none; }
+
+.clinic-tab {
+  padding: 9px 16px;
+  background: transparent;
+  border: 1.5px solid transparent;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: 'DM Sans', sans-serif;
+  color: var(--c-text-2);
+  transition: all var(--transition);
+  white-space: nowrap;
+  position: relative;
+}
+
+.clinic-tab:hover:not(.active) {
+  border-color: rgba(244, 99, 30, 0.2);
+  color: var(--c-accent);
+  background: var(--c-accent-light);
+}
+
+.clinic-tab.active {
+  background: var(--c-accent);
+  border-color: var(--c-accent);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(244, 99, 30, 0.28);
+} */
+
+/* ---------- Content Area ---------- */
+.clinic-content {
+  background: var(--c-surface);
+  border-radius: var(--radius);
+  padding: 28px 30px;
+  box-shadow: var(--c-shadow);
+  border: 1.5px solid #ffffff;
+  animation: tabSlide 0.28s cubic-bezier(0.4, 0, 0.2, 1) both;
+  min-height: 400px;
+}
+
+/* ---------- Clinic Overview / Dashboard Tab ---------- */
+.clinic-overview {
+  animation: fadeIn 0.3s ease;
+}
+
+.clinic-overview h2 {
+  margin: 0 0 26px;
+  font-family: 'Sora', sans-serif;
+  font-size: 22px;
+  color: var(--c-text);
+  font-weight: 700;
+  padding-bottom: 14px;
+  border-bottom: 2px solid var(--c-accent);
+  display: inline-block;
+  letter-spacing: -0.3px;
+}
+
+/* ---------- Info Cards Grid ---------- */
+.clinic-info {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 16px;
+}
+
+@keyframes cardReveal {
+  from { opacity: 0; transform: translateY(12px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.info-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 18px 20px;
+  background: var(--c-surface-2);
+  border: 1.5px solid #F0EFEA;
+  border-radius: var(--radius-sm);
+  transition: all var(--transition);
+  animation: cardReveal 0.35s both;
+  position: relative;
+  overflow: hidden;
+}
+
+/* accent bottom line on hover */
+.info-card::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 2px;
+  background: var(--c-accent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.info-card:hover { border-color: rgba(244, 99, 30, 0.22); }
+.info-card:hover::after { transform: scaleX(1); }
+
+.info-card:nth-child(1) { animation-delay: 0.06s; }
+.info-card:nth-child(2) { animation-delay: 0.10s; }
+.info-card:nth-child(3) { animation-delay: 0.14s; }
+.info-card:nth-child(4) { animation-delay: 0.18s; }
+
+.info-card .label {
+  font-family: 'Sora', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--c-text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+}
+
+.info-card .value {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  color: var(--c-text);
+  font-weight: 600;
+}
+
+.info-card .value.status {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: 'Sora', sans-serif;
+  width: fit-content;
+  letter-spacing: 0.2px;
+}
+
+.info-card .value.status.active {
+  background: var(--c-success-bg);
+  color: var(--c-success);
+}
+
+.info-card .value.status.inactive {
+  background: var(--c-danger-bg);
+  color: var(--c-danger);
+}
+
+/* ---------- State Messages ---------- */
+.loading {
+  padding: 80px 20px;
+  text-align: center;
+  color: var(--c-text-2);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  animation: pulse 1.8s ease-in-out infinite;
+}
+
+.error {
+  padding: 60px 20px;
+  text-align: center;
+  color: var(--c-danger);
+  font-size: 15px;
+  font-family: 'DM Sans', sans-serif;
+  background: var(--c-danger-bg);
+  border-radius: var(--radius);
+  border: 1.5px solid #fecaca;
+}
+
+/* ---------- Dark Mode ---------- */
+.app.dark .clinic-pages-container { background: #111110; }
+.app.dark .clinic-pages-header h1 { color: #F5F4F0; }
+
+.app.dark .back-to-clinics {
+  background: transparent;
+  border-color: var(--c-accent);
+  color: var(--c-accent);
+}
+.app.dark .back-to-clinics:hover { background: var(--c-accent); color: #fff; }
+
+.app.dark .clinic-tabs {
+  background: #1C1C1A;
+  border-color: #2E2E2C;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+}
+.app.dark .clinic-tab { color: #8B8B85; }
+.app.dark .clinic-tab:hover:not(.active) {
+  border-color: rgba(244, 99, 30, 0.25);
+  color: var(--c-accent);
+  background: rgba(244, 99, 30, 0.08);
+}
+.app.dark .clinic-tab.active { background: var(--c-accent); color: #fff; }
+
+.app.dark .clinic-content {
+  background: #1C1C1A;
+  border-color: #2E2E2C;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.3);
+}
+
+.app.dark .clinic-overview h2 { color: #F5F4F0; }
+
+.app.dark .info-card {
+  background: #161614;
+  border-color: #2E2E2C;
+}
+.app.dark .info-card:hover { border-color: rgba(244, 99, 30, 0.3); }
+.app.dark .info-card .label { color: #6B6B65; }
+.app.dark .info-card .value { color: #F5F4F0; }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 768px) {
+  .clinic-pages-container { padding: 18px 16px; }
+
+  .clinic-pages-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .clinic-pages-header h1 { font-size: 22px; }
+
+  .back-to-clinics {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .clinic-tabs {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    -webkit-overflow-scrolling: touch;
+    padding: 10px 12px;
+  }
+
+  .clinic-info {
+    grid-template-columns: 1fr;
+  }
+
+  .clinic-content {
+    padding: 20px 18px;
+  }
+}

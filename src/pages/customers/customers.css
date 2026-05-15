@@ -1,0 +1,535 @@
+.customers {
+  display: flex;
+  width: 100%;
+  min-height: 100vh;
+  background-color: #f5f5f5;
+}
+
+.customers-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+}
+
+.customers-content {
+  flex: 1;
+  padding: 30px;
+  overflow-y: auto;
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 30px;
+}
+
+.page-header h1 {
+  font-size: 28px;
+  font-weight: 700;
+  color: #333;
+  margin: 0 0 8px 0;
+}
+
+.page-header p {
+  font-size: 14px;
+  color: #666;
+  margin: 0;
+}
+
+.btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-primary {
+  background-color: #57a7b3;
+  color: rgb(0, 0, 0);
+}
+
+.btn-primary:hover {
+  background-color: #469399;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(87, 167, 179, 0.3);
+}
+
+.btn-secondary {
+  background-color: #f0f0f0;
+  color: #333;
+  border: 1px solid #ddd;
+}
+
+.btn-secondary:hover {
+  background-color: #e8e8e8;
+  border-color: #bbb;
+}
+
+/* Table */
+.customers-table {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.customers-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.customers-table thead {
+  background-color: #f9f9f9;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.customers-table th {
+  padding: 15px;
+  text-align: left;
+  font-size: 13px;
+  font-weight: 600;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.customers-table tbody tr {
+  border-bottom: 1px solid #f0f0f0;
+  transition: background-color 0.2s ease;
+}
+
+.customers-table tbody tr:hover {
+  background-color: #fafafa;
+}
+
+.customers-table td {
+  padding: 15px;
+  font-size: 14px;
+  color: #333;
+}
+
+.customers-table td.center {
+  text-align: start;
+}
+
+.customers-table td.actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.btn-action {
+  background: none;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 5px 8px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.btn-action.edit:hover {
+  background-color: #e3f2fd;
+}
+
+.btn-action.delete:hover {
+  background-color: #ffebee;
+}
+
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  width: 90%;
+  max-width: 500px;
+  animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(-50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.modal-header h2 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: #999;
+}
+
+.close-btn:hover {
+  color: #333;
+}
+
+.modal-body {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.form-group label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #666;
+  text-transform: uppercase;
+}
+
+.form-group input {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: #57a7b3;
+  box-shadow: 0 0 0 3px rgba(87, 167, 179, 0.1);
+}
+
+.modal-footer {
+  display: flex;
+  gap: 12px;
+  padding: 20px;
+  border-top: 1px solid #e0e0e0;
+  justify-content: flex-end;
+}
+
+/* Dark Mode */
+.app.dark .customers {
+  background-color: #1a1a1a;
+}
+
+.app.dark .customers-content {
+}
+
+.app.dark .page-header h1 {
+  color: #fff;
+}
+
+.app.dark .page-header p {
+  color: #999;
+}
+
+.app.dark .customers-table {
+  background: #222;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.app.dark .customers-table thead {
+  background-color: #333;
+  border-bottom-color: #444;
+}
+
+.app.dark .customers-table th {
+  color: #aaa;
+}
+
+.app.dark .customers-table tbody tr {
+  border-bottom-color: #333;
+}
+
+.app.dark .customers-table tbody tr:hover {
+  background-color: #2a2a2a;
+}
+
+.app.dark .customers-table td {
+  color: #ddd;
+}
+
+.app.dark .modal {
+  background: #222;
+}
+
+.app.dark .modal-header {
+  border-bottom-color: #333;
+}
+
+.app.dark .modal-header h2 {
+  color: #fff;
+}
+
+.app.dark .modal-body {
+}
+
+.app.dark .form-group label {
+  color: #aaa;
+}
+
+.app.dark .form-group input {
+  background-color: #333;
+  border-color: #444;
+  color: #fff;
+}
+
+.app.dark .form-group input:focus {
+  border-color: #57a7b3;
+}
+
+.app.dark .modal-footer {
+  border-top-color: #333;
+}
+
+.app.dark .btn-secondary {
+  background-color: #333;
+  color: #fff;
+  border-color: #444;
+}
+
+.app.dark .btn-secondary:hover {
+  background-color: #3a3a3a;
+  border-color: #555;
+}
+
+/* Modal Large - for forms with pets */
+.modal.modal-large {
+  max-width: 800px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal.modal-large .modal-body {
+  overflow-y: auto;
+  flex: 1;
+}
+
+/* Form Section */
+.form-section {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.form-section:last-of-type {
+  border-bottom: none;
+}
+
+.form-section h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+  padding-top: 5px;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.section-header h3 {
+  margin: 0;
+}
+
+.btn.btn-sm {
+  padding: 6px 12px;
+  font-size: 12px;
+}
+
+/* Form Row - for multiple form groups in a row */
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+/* Pet Form Card */
+.pet-form-card {
+  background-color: #f9f9f9;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.pet-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 5px;
+}
+
+.pet-card-header h4 {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+.btn-remove {
+  background-color: #ffebee;
+  color: #d32f2f;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-remove:hover {
+  background-color: #ffcdd2;
+  color: #b71c1c;
+}
+
+/* Badge for pet count */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #ffffff;
+  color: rgb(0, 0, 0);
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* Empty message */
+.empty-message {
+  color: #999;
+  font-size: 13px;
+  text-align: center;
+  padding: 10px;
+}
+
+/* Form group select */
+.form-group select {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  background-color: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.form-group select:focus {
+  outline: none;
+  border-color: #57a7b3;
+  box-shadow: 0 0 0 3px rgba(87, 167, 179, 0.1);
+}
+
+.form-group textarea {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  font-family: inherit;
+  resize: vertical;
+}
+
+.form-group textarea:focus {
+  outline: none;
+  border-color: #57a7b3;
+  box-shadow: 0 0 0 3px rgba(87, 167, 179, 0.1);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .modal.modal-large {
+    max-width: 95%;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .customers-table th,
+  .customers-table td {
+    padding: 10px;
+    font-size: 12px;
+  }
+}
+
+/* Dark Mode Extensions */
+.app.dark .form-section {
+  border-bottom-color: #333;
+}
+
+.app.dark .form-section h3 {
+  color: #fff;
+}
+
+.app.dark .pet-form-card {
+  background-color: #2a2a2a;
+  border-color: #333;
+}
+
+.app.dark .pet-card-header h4 {
+  color: #fff;
+}
+
+.app.dark .form-group select {
+  background-color: #333;
+  border-color: #444;
+  color: #fff;
+}
+
+.app.dark .form-group select:focus {
+  border-color: #57a7b3;
+}
+
+.app.dark .form-group textarea {
+  background-color: #333;
+  border-color: #444;
+  color: #fff;
+}
+
+.app.dark .form-group textarea:focus {
+  border-color: #57a7b3;
+}
