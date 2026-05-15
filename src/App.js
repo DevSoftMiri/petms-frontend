@@ -1,5 +1,5 @@
 import { Fragment, useContext } from "react";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
 import { DarkModeContext } from "./context/darkModeContext";
 import { ClinicProvider } from "./context/clinicContext";
 import Home from "./pages/home/Home";
@@ -42,6 +42,7 @@ function App() {
             <Routes>
               <Route path="/login" element={<Login />} />
               <Route path="/unauthorized" element={<Unauthorized />} />
+              <Route path="/" element={<Navigate to="/login" />} />
 
               {/* Super Admin Only Routes */}
               <Route element={<RoleAccess roles={["SUPERADMIN"]} />}>
@@ -57,7 +58,6 @@ function App() {
               </Route>
 
               <Route path="/" element={<PrivateRoute />}>
-                <Route index element={<Home />} />
                 <Route path="/general-info" element={<GeneralInformation />} />
                 <Route path="/customers" element={<Customers />} />
                 <Route path="/events" element={<Events />} />
