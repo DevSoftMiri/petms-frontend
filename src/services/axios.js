@@ -6,7 +6,7 @@ import axios from "axios";
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "http://localhost:5000";
 
 const instance = axios.create({
-    baseURL: `${API_BASE_URL}/api/v1`,
+    baseURL: API_BASE_URL,
     headers: {
         "Content-Type": "application/json",
     },
@@ -33,7 +33,7 @@ instance.interceptors.response.use(
         if (error.response?.status === 401 && user?.refreshToken) {
             try {
                 const response = await axios.post(
-                    `${API_BASE_URL}/api/v1/auth/refresh-token`,
+                    `${API_BASE_URL}/auth/refresh-token`,
                     { refreshToken: user.refreshToken }
                 );
 
