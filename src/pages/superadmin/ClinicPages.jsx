@@ -4,7 +4,6 @@ import { useSnackbar } from "notistack";
 import SuperAdminNavbar from "../../components/superadmin/SuperAdminNavbar";
 import Sidebar from "../../components/sidebar/Sidebar";
 import HttpService from "../../services/HttpService";
-import AuthService from "../../services/AuthService";
 import { ClinicContext } from "../../context/clinicContext";
 import Dashboard from "../dashboard/Dashboard";
 import Customers from "../customers/Customers";
@@ -28,7 +27,6 @@ const ClinicPages = () => {
     const [clinic, setClinic] = useState(null);
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState("dashboard");
-    const [userRole, setUserRole] = useState(null);
 
     const fetchClinic = useCallback(async () => {
         try {
@@ -52,8 +50,6 @@ const ClinicPages = () => {
     }, [id, enqueueSnackbar, navigate, dispatchClinic]);
 
     useEffect(() => {
-        const user = AuthService.getCurrentUser();
-        setUserRole(user?.role);
         if (id) fetchClinic();
     }, [id, fetchClinic]);
 

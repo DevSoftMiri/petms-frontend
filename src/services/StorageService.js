@@ -26,7 +26,7 @@ export const uploadLabReport = async (file, clinicId, petId, labId) => {
   const fileName = `clinic-${clinicId}/pet-${petId}/lab-${labId}-${timestamp}.pdf`;
 
   // Upload the file
-  const { data, error } = await supabase.storage
+  const { error } = await supabase.storage
     .from('pet-reports')
     .upload(fileName, file, {
       cacheControl: '3600',

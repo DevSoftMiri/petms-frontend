@@ -15,7 +15,7 @@ const Laboratory = ({ clinicId: propClinicId, subView: propSubView }) => {
     const clinicId = propClinicId || clinicState?.selectedClinicId;
 
     // Determine which sub-view to display based on URL or prop
-    const getCurrentView = () => {
+    const getCurrentView = useCallback(() => {
         // If subView prop is provided (when used in ClinicPages), use it
         if (propSubView) {
             return propSubView;
@@ -25,7 +25,7 @@ const Laboratory = ({ clinicId: propClinicId, subView: propSubView }) => {
         if (path.includes("/parameters")) return "parameters";
         if (path.includes("/inpatient")) return "inpatient";
         return "lab-reports";
-    };
+    }, [location, propSubView]);
 
     const [currentView, setCurrentView] = useState(getCurrentView);
     const [labs, setLabs] = useState([]);
@@ -38,7 +38,6 @@ const Laboratory = ({ clinicId: propClinicId, subView: propSubView }) => {
     const [isViewModalOpen, setIsViewModalOpen] = useState(false);
     const [viewingReport, setViewingReport] = useState(null);
     const [editingLab, setEditingLab] = useState(null);
-    const [editingInpatient, setEditingInpatient] = useState(null);
     const [selectedFile, setSelectedFile] = useState(null);
     const [uploading, setUploading] = useState(false);
 
@@ -69,7 +68,6 @@ const Laboratory = ({ clinicId: propClinicId, subView: propSubView }) => {
     const [filteredPets, setFilteredPets] = useState([]);
     const [showCustomerDropdown, setShowCustomerDropdown] = useState(false);
     const [showPetDropdown, setShowPetDropdown] = useState(false);
-    const [selectedCustomerId, setSelectedCustomerId] = useState("");
     const [searchTerm, setSearchTerm] = useState("");
 
     const fetchPets = useCallback(async () => {
@@ -121,7 +119,7 @@ const Laboratory = ({ clinicId: propClinicId, subView: propSubView }) => {
 
     useEffect(() => {
         setCurrentView(getCurrentView());
-    }, [location, propSubView]);
+    }, [location, propSubView, getCurrentView]);
 
     useEffect(() => {
         if (clinicId) {
@@ -130,7 +128,7 @@ const Laboratory = ({ clinicId: propClinicId, subView: propSubView }) => {
             fetchLabs();
             fetchLabParameters();
         }
-    }, [clinicId, fetchPets, fetchCustomers, fetchLabs]);
+    }, [clinicId, fetchPets, fetchCustomers, fetchLabs, fetchLabParameters]);
 
     const onDrop = useCallback((acceptedFiles) => {
         if (acceptedFiles && acceptedFiles.length > 0) {
@@ -143,7 +141,7 @@ const Laboratory = ({ clinicId: propClinicId, subView: propSubView }) => {
         }
     }, [enqueueSnackbar]);
 
-    const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    useDropzone({
         onDrop,
         accept: { "application/pdf": [".pdf"] },
         multiple: false,
@@ -330,7 +328,6 @@ const Laboratory = ({ clinicId: propClinicId, subView: propSubView }) => {
 
     // Inpatient Test handlers
     const handleAddInpatient = () => {
-        setEditingInpatient(null);
         setIsInpatientModalOpen(true);
     };
 
@@ -352,7 +349,6 @@ const Laboratory = ({ clinicId: propClinicId, subView: propSubView }) => {
             petId: "",
             petName: "",
         }));
-        setSelectedCustomerId("");
 
         if (code.length >= 1) {
             const matchedCustomers = allCustomers.filter((customer) => {
@@ -378,7 +374,6 @@ const Laboratory = ({ clinicId: propClinicId, subView: propSubView }) => {
             return false;
         });
 
-        setSelectedCustomerId(customer.id);
         setFilteredCustomers([]);
         setShowCustomerDropdown(false);
 

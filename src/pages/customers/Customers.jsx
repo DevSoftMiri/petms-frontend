@@ -258,7 +258,6 @@ const Customers = ({ clinicId: propClinicId }) => {
 
     // View Customer Details
     const handleViewCustomer = (customer) => {
-        const customerId = customer.id || customer._id;
         console.log("Viewing customer:", customer);
 
         // Could open a detail view modal or navigate to detail page

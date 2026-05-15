@@ -84,7 +84,7 @@ const SuperAdminDashboard = () => {
             console.error("Error fetching customers:", error);
             setCustomers([]);
         }
-    }, []);
+    }, [clinics]);
 
     useEffect(() => {
         const view = searchParams.get("view");
