@@ -39,7 +39,7 @@ const PetsList = ({ clinicId: propClinicId }) => {
     const fetchCustomers = useCallback(async () => {
         try {
             const response = await HttpService.getWithAuth(
-                `/clinics/${clinicId}/customers?limit=1000`
+                `/clinics/${clinicId}/customers?limit=100`
             );
             const data = response?.data || response || [];
             const customersList = Array.isArray(data) ? data : data.data || [];
@@ -53,7 +53,7 @@ const PetsList = ({ clinicId: propClinicId }) => {
     const fetchPets = useCallback(async () => {
         try {
             setLoading(true);
-            let url = `/clinics/${clinicId}/pets?limit=1000`;
+            let url = `/clinics/${clinicId}/pets?limit=100`;
             if (customerFilter) {
                 url += `&search=${customerFilter}`;
             }

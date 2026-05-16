@@ -71,7 +71,7 @@ const SuperAdminDashboard = () => {
             const allCustomers = [];
             for (const clinic of clinics) {
                 try {
-                    const response = await HttpService.getWithAuth(`/clinics/${clinic.id}/customers?limit=1000`);
+                    const response = await HttpService.getWithAuth(`/clinics/${clinic.id}/customers?limit=100`);
                     const data = response?.data || response || [];
                     const customersArray = Array.isArray(data) ? data : data.data || [];
                     allCustomers.push(...customersArray);
@@ -443,7 +443,7 @@ const SuperAdminDashboard = () => {
                     {activeView === "clinics" && (
                         <>
                             {loading ? (
-                                <div className="loading">Loading clinics...</div>
+                                <div className="loading"><span className="loading-text">Loading clinics...</span></div>
                             ) : filteredClinics.length === 0 ? (
                                 <div className="empty-state">
                                     <p>No clinics found</p>
@@ -489,7 +489,7 @@ const SuperAdminDashboard = () => {
                     {activeView === "users" && (
                         <>
                             {loading ? (
-                                <div className="loading">Loading users...</div>
+                                <div className="loading"><span className="loading-text">Loading users...</span></div>
                             ) : filteredUsers.length === 0 ? (
                                 <div className="empty-state">
                                     <p>No users found</p>
