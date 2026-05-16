@@ -49,7 +49,7 @@ instance.interceptors.response.use(
                 return instance(error.config);
             } catch (err) {
                 localStorage.removeItem("user");
-                window.location.href = "/login";
+                window.location.href = window.location.origin + "/login";
             }
         }
 

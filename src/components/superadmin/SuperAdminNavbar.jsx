@@ -43,7 +43,7 @@ const SuperAdminNavbar = () => {
 
   const handleLogout = () => {
     AuthService.logout();
-    window.location.href = "/login";
+    window.location.href = window.location.origin + "/login";
   };
 
   const handleNavClick = (view) => {
