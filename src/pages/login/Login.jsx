@@ -51,8 +51,13 @@ const Login = () => {
 
             if (userRole === "SUPERADMIN") {
                 navigate("/superadmin/dashboard");
+            } else if ((response.data?.user?.clinics || []).length === 1) {
+                const clinic = response.data.user.clinics[0];
+                localStorage.setItem("selectedClinicId", clinic.id);
+                localStorage.setItem("selectedClinic", JSON.stringify(clinic));
+                navigate(`/clinics/${clinic.id}/dashboard`);
             } else {
-                navigate("/dashboard");
+                navigate("/select-clinic");
             }
         } catch (error) {
             const message = error.response?.data?.message || "Login failed. Please try again.";

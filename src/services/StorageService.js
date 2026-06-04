@@ -17,6 +17,8 @@ export const supabase = (supabaseUrl && supabaseKey)
  * @returns {Promise<string>} - The public URL of the uploaded file
  */
 export const uploadLabReport = async (file, clinicId, petId, labId) => {
+  console.log('[StorageService] Starting upload with:', { clinicId, petId, labId, fileName: file.name });
+
   if (!supabase) {
     throw new Error('Supabase is not configured. Please add your Supabase credentials to .env.local');
   }
@@ -25,24 +27,30 @@ export const uploadLabReport = async (file, clinicId, petId, labId) => {
   const timestamp = Date.now();
   const fileName = `clinic-${clinicId}/pet-${petId}/lab-${labId}-${timestamp}.pdf`;
 
+  console.log('[StorageService] Generated fileName:', fileName);
+
   // Upload the file
-  const { error } = await supabase.storage
+  const { data, error } = await supabase.storage
     .from('pet-reports')
     .upload(fileName, file, {
       cacheControl: '3600',
       upsert: false,
-      contentType: 'application/pdf'
+      contentType: file.type || 'application/pdf'
     });
 
   if (error) {
-    console.error('Supabase upload error:', error);
+    console.error('[StorageService] Upload error:', error);
     throw new Error(`Failed to upload file: ${error.message}`);
   }
+
+  console.log('[StorageService] Upload successful:', data);
 
   // Get public URL
   const { data: { publicUrl } } = supabase.storage
     .from('pet-reports')
     .getPublicUrl(fileName);
+
+  console.log('[StorageService] Generated public URL:', publicUrl);
 
   return publicUrl;
 };

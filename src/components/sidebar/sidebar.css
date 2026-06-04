@@ -21,6 +21,8 @@
 .sidebar {
   position: relative;
   width: 220px;
+  min-width: 220px;
+  flex: 0 0 220px;
   min-height: 100vh;
   background: var(--sidebar-bg);
   border-right: 1px solid var(--sidebar-border);
@@ -29,6 +31,7 @@
   font-family: 'Plus Jakarta Sans', sans-serif;
   overflow: hidden;
   transition: transform 0.3s ease, width 0.3s ease;
+  z-index: 999;
 }
 
 /* Collapsed state for mobile */
@@ -62,6 +65,7 @@
   flex-direction: column;
   height: 100%;
   padding-bottom: 16px;
+  overflow: hidden;
 }
 
 /* --- Logo / Brand --- */
@@ -123,6 +127,7 @@
   padding: 4px 12px;
   margin: 0;
   gap: 2px;
+  overflow: hidden;
 }
 
 /* --- Each nav item (Link or Button) --- */
@@ -144,6 +149,8 @@
   background: transparent;
   width: 100%;
   text-align: left;
+  pointer-events: auto;
+  z-index: 1;
 }
 
 .sidebar-item:hover {
@@ -253,6 +260,13 @@
   font-weight: 500;
   border-radius: var(--radius);
   transition: background 0.15s ease, color 0.15s ease;
+  cursor: pointer;
+  pointer-events: auto;
+  z-index: 1;
+  border: none;
+  background: transparent;
+  width: 100%;
+  text-align: left;
 }
 
 .sidebar-dropdown-item:hover {
@@ -294,21 +308,50 @@
 .sidebar-toggle-btn {
   display: none;
   position: fixed;
-  top: 16px;
+  top: 70px;
   left: 16px;
-  z-index: 1000;
-  background: transparent;
-  border: none;
+  z-index: 1001;
+  background: var(--accent-light);
+  border: 1px solid var(--accent);
   cursor: pointer;
-  color: var(--text-primary);
-  padding: 8px;
+  color: var(--accent);
+  padding: 10px;
   border-radius: var(--radius);
-  transition: background 0.2s ease;
+  transition: all 0.2s ease;
+  pointer-events: auto;
 }
 
 .sidebar-toggle-btn:hover {
-  background: var(--accent-light);
-  color: var(--accent);
+  background: var(--accent);
+  color: white;
+}
+
+.sidebar-toggle-btn.show {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Backdrop overlay when sidebar is open (mobile only) */
+.sidebar::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 220px;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0);
+  z-index: 997;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  display: none;
+}
+
+.sidebar:not(.collapsed)::before {
+  background: rgba(0, 0, 0, 0.5);
+  opacity: 1;
+  pointer-events: auto;
 }
 
 /* --- User profile at bottom --- */
@@ -370,9 +413,11 @@
     position: fixed;
     left: 0;
     top: 0;
+    width: 220px;
     height: 100vh;
     z-index: 999;
     box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+    transform: translateX(0);
   }
 
   .sidebar.collapsed {
@@ -383,6 +428,15 @@
     display: flex;
     align-items: center;
     justify-content: center;
+  }
+
+  /* Show backdrop only on mobile when sidebar is open */
+  .sidebar::before {
+    display: block;
+  }
+
+  .sidebar.collapsed::before {
+    display: none;
   }
 
   .sidebar-content {
@@ -401,7 +455,12 @@
     transform: translateX(0) !important;
   }
 
+  /* Hide toggle button and backdrop on desktop */
   .sidebar-toggle-btn {
+    display: none !important;
+  }
+
+  .sidebar::before {
     display: none !important;
   }
 }
@@ -410,6 +469,8 @@
 @media (max-width: 768px) {
   .sidebar {
     width: 100%;
+    min-width: 0;
+    flex-basis: auto;
     max-width: 280px;
   }
 

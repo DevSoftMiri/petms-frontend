@@ -23,20 +23,26 @@ const Laboratory = ({ clinicId: propClinicId, subView: propSubView }) => {
         // Otherwise, determine from URL
         const path = location.pathname;
         if (path.includes("/parameters")) return "parameters";
+        if (path.includes("/imaging")) return "imaging-reports";
         if (path.includes("/inpatient")) return "inpatient";
         return "lab-reports";
     }, [location, propSubView]);
 
     const [currentView, setCurrentView] = useState(getCurrentView);
     const [labs, setLabs] = useState([]);
+    const [imagingRecords, setImagingRecords] = useState([]);
     const [labParameters, setLabParameters] = useState([]);
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isImagingModalOpen, setIsImagingModalOpen] = useState(false);
     const [isParameterModalOpen, setIsParameterModalOpen] = useState(false);
     const [isInpatientModalOpen, setIsInpatientModalOpen] = useState(false);
     const [editingParameter, setEditingParameter] = useState(null);
+    const [editingImaging, setEditingImaging] = useState(null);
     const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+    const [isViewImagingModalOpen, setIsViewImagingModalOpen] = useState(false);
     const [viewingReport, setViewingReport] = useState(null);
+    const [viewingImaging, setViewingImaging] = useState(null);
     const [editingLab, setEditingLab] = useState(null);
     const [selectedFile, setSelectedFile] = useState(null);
     const [uploading, setUploading] = useState(false);
@@ -48,9 +54,22 @@ const Laboratory = ({ clinicId: propClinicId, subView: propSubView }) => {
         testType: "",
         date: "",
         result: "",
-        status: "Complete",
+        status: "COMPLETED",
         veterinarian: "",
         notes: "",
+        reportUrl: "",
+    });
+
+    const [imagingFormData, setImagingFormData] = useState({
+        caseId: "",
+        petId: "",
+        petName: "",
+        customerCode: "",
+        imagingType: "",
+        bodyPart: "",
+        imagingDate: new Date().toISOString().split("T")[0],
+        findings: "",
+        radiologistNotes: "",
         reportUrl: "",
     });
 
@@ -98,8 +117,13 @@ const Laboratory = ({ clinicId: propClinicId, subView: propSubView }) => {
             setLoading(true);
             const response = await HttpService.getWithAuth(`/clinics/${clinicId}/laboratory`);
             const data = Array.isArray(response) ? response : response.data || [];
+            console.log('[Laboratory] Fetched labs:', data);
+            data.forEach(lab => {
+                console.log(`[Laboratory] Lab ${lab._id}: reportUrl =`, lab.reportUrl);
+            });
             setLabs(data);
         } catch (error) {
+            console.error('[Laboratory] Error fetching labs:', error);
             enqueueSnackbar("Failed to load lab tests", { variant: "error" });
         } finally {
             setLoading(false);
@@ -117,6 +141,17 @@ const Laboratory = ({ clinicId: propClinicId, subView: propSubView }) => {
         }
     }, [clinicId]);
 
+    const fetchImagingRecords = useCallback(async () => {
+        if (!clinicId) return;
+        try {
+            const response = await HttpService.getWithAuth(`/clinics/${clinicId}/vet/imaging`);
+            const data = Array.isArray(response) ? response : response.data || [];
+            setImagingRecords(data);
+        } catch (error) {
+            console.error("Failed to load imaging records:", error);
+        }
+    }, [clinicId]);
+
     useEffect(() => {
         setCurrentView(getCurrentView());
     }, [location, propSubView, getCurrentView]);
@@ -127,8 +162,9 @@ const Laboratory = ({ clinicId: propClinicId, subView: propSubView }) => {
             fetchCustomers();
             fetchLabs();
             fetchLabParameters();
+            fetchImagingRecords();
         }
-    }, [clinicId, fetchPets, fetchCustomers, fetchLabs, fetchLabParameters]);
+    }, [clinicId, fetchPets, fetchCustomers, fetchLabs, fetchLabParameters, fetchImagingRecords]);
 
     const onDrop = useCallback((acceptedFiles) => {
         if (acceptedFiles && acceptedFiles.length > 0) {
@@ -141,9 +177,31 @@ const Laboratory = ({ clinicId: propClinicId, subView: propSubView }) => {
         }
     }, [enqueueSnackbar]);
 
-    useDropzone({
+    const onDropImaging = useCallback((acceptedFiles) => {
+        if (acceptedFiles && acceptedFiles.length > 0) {
+            const file = acceptedFiles[0];
+            // Accept PDF or image files
+            const validTypes = ["application/pdf", "image/jpeg", "image/jpg", "image/png", "image/gif", "image/webp"];
+            if (!validTypes.includes(file.type)) {
+                enqueueSnackbar("Please select a PDF or image file (JPG, PNG, GIF, WebP)", { variant: "error" });
+                return;
+            }
+            setSelectedFile(file);
+        }
+    }, [enqueueSnackbar]);
+
+    const { getRootProps, isDragActive, getInputProps } = useDropzone({
         onDrop,
         accept: { "application/pdf": [".pdf"] },
+        multiple: false,
+    });
+
+    const { getRootProps: getImagingRootProps, isDragActive: isImagingDragActive, getInputProps: getImagingInputProps } = useDropzone({
+        onDrop: onDropImaging,
+        accept: {
+            "application/pdf": [".pdf"],
+            "image/*": [".jpeg", ".jpg", ".png", ".gif", ".webp"]
+        },
         multiple: false,
     });
 
@@ -157,7 +215,7 @@ const Laboratory = ({ clinicId: propClinicId, subView: propSubView }) => {
             testType: "",
             date: new Date().toISOString().split("T")[0],
             result: "",
-            status: "Complete",
+            status: "COMPLETED",
             veterinarian: "",
             notes: "",
             reportUrl: "",
@@ -178,7 +236,7 @@ const Laboratory = ({ clinicId: propClinicId, subView: propSubView }) => {
             testType: lab.testType || "",
             date: formattedDate,
             result: lab.result || "",
-            status: lab.status || "Complete",
+            status: lab.status || "COMPLETED",
             veterinarian: lab.veterinarian || "",
             notes: lab.notes || "",
             reportUrl: lab.reportUrl || "",
@@ -195,6 +253,7 @@ const Laboratory = ({ clinicId: propClinicId, subView: propSubView }) => {
     };
 
     const handleViewReport = (lab) => {
+        console.log('[Laboratory] handleViewReport called for lab:', lab._id, 'reportUrl:', lab.reportUrl);
         if (lab.reportUrl) {
             setViewingReport(lab);
             setIsViewModalOpen(true);
@@ -217,8 +276,11 @@ const Laboratory = ({ clinicId: propClinicId, subView: propSubView }) => {
                 try {
                     const petId = formData.petId || "unknown";
                     const labId = editingLab?._id || "new";
+                    console.log('[Laboratory] Uploading file for labId:', labId);
                     reportUrl = await uploadLabReport(selectedFile, clinicId, petId, labId);
+                    console.log('[Laboratory] Upload completed, reportUrl:', reportUrl);
                 } catch (uploadError) {
+                    console.error('[Laboratory] Upload failed:', uploadError);
                     enqueueSnackbar(`Failed to upload PDF: ${uploadError.message}`, { variant: "error" });
                     setUploading(false);
                     return;
@@ -229,7 +291,11 @@ const Laboratory = ({ clinicId: propClinicId, subView: propSubView }) => {
             const payload = {
                 ...formData,
                 reportUrl,
+                // Automatically set status to COMPLETED if report is uploaded
+                status: reportUrl ? "COMPLETED" : formData.status,
             };
+
+            console.log('[Laboratory] Saving lab test with payload:', payload);
 
             if (editingLab) {
                 await HttpService.putWithAuth(`/clinics/${clinicId}/laboratory/${editingLab._id}`, payload);
@@ -243,6 +309,7 @@ const Laboratory = ({ clinicId: propClinicId, subView: propSubView }) => {
             setSelectedFile(null);
             fetchLabs();
         } catch (error) {
+            console.error('[Laboratory] Save error:', error);
             enqueueSnackbar("Failed to save lab test", { variant: "error" });
         }
     };
@@ -258,6 +325,126 @@ const Laboratory = ({ clinicId: propClinicId, subView: propSubView }) => {
             .catch(() => {
                 enqueueSnackbar("Delete failed", { variant: "error" });
             });
+    };
+
+    // Imaging handlers
+    const handleAddImaging = () => {
+        setEditingImaging(null);
+        setSelectedFile(null);
+        setImagingFormData({
+            caseId: "",
+            petId: "",
+            petName: "",
+            customerCode: "",
+            imagingType: "",
+            bodyPart: "",
+            imagingDate: new Date().toISOString().split("T")[0],
+            findings: "",
+            radiologistNotes: "",
+            reportUrl: "",
+        });
+        setShowPetDropdown(false);
+        setShowCustomerDropdown(false);
+        setIsImagingModalOpen(true);
+    };
+
+    const handleEditImaging = (imaging) => {
+        setEditingImaging(imaging);
+        setSelectedFile(null);
+        const formattedDate = imaging.imagingDate ? new Date(imaging.imagingDate).toISOString().split("T")[0] : "";
+        setImagingFormData({
+            caseId: imaging.caseId || "",
+            petId: imaging.petId || "",
+            petName: imaging.petName || "",
+            customerCode: imaging.customerCode || "",
+            imagingType: imaging.imagingType || "",
+            bodyPart: imaging.bodyPart || "",
+            imagingDate: formattedDate,
+            findings: imaging.findings || "",
+            radiologistNotes: imaging.radiologistNotes || "",
+            reportUrl: imaging.reportUrl || "",
+        });
+        if (imaging.petId) {
+            const existingPet = allPets.find(p => p.id === imaging.petId);
+            if (existingPet) {
+                setFilteredPets([existingPet]);
+            }
+        }
+        setShowCustomerDropdown(false);
+        setShowPetDropdown(false);
+        setIsImagingModalOpen(true);
+    };
+
+    const handleViewImaging = (imaging) => {
+        if (imaging.reportUrl) {
+            setViewingImaging(imaging);
+            setIsViewImagingModalOpen(true);
+        } else {
+            enqueueSnackbar("No imaging report attached to this record", { variant: "warning" });
+        }
+    };
+
+    const handleSaveImaging = async () => {
+        try {
+            if (!imagingFormData.petName || !imagingFormData.imagingType) {
+                enqueueSnackbar("Pet name and imaging type are required", { variant: "error" });
+                return;
+            }
+
+            let reportUrl = imagingFormData.reportUrl;
+
+            if (selectedFile) {
+                setUploading(true);
+                try {
+                    const petId = imagingFormData.petId || "unknown";
+                    const imagingId = editingImaging?._id || "new";
+                    reportUrl = await uploadLabReport(selectedFile, clinicId, petId, imagingId);
+                } catch (uploadError) {
+                    enqueueSnackbar(`Failed to upload file: ${uploadError.message}`, { variant: "error" });
+                    setUploading(false);
+                    return;
+                }
+                setUploading(false);
+            }
+
+            const payload = {
+                ...imagingFormData,
+                reportUrl,
+                status: reportUrl ? "COMPLETED" : "PENDING",
+            };
+
+            if (editingImaging) {
+                await HttpService.putWithAuth(`/clinics/${clinicId}/vet/imaging/${editingImaging._id}`, payload);
+                enqueueSnackbar("Imaging record updated", { variant: "success" });
+            } else {
+                await HttpService.postWithAuth(`/clinics/${clinicId}/vet/imaging`, payload);
+                enqueueSnackbar("Imaging record created", { variant: "success" });
+            }
+
+            setIsImagingModalOpen(false);
+            setSelectedFile(null);
+            fetchImagingRecords();
+        } catch (error) {
+            enqueueSnackbar("Failed to save imaging record", { variant: "error" });
+        }
+    };
+
+    const handleDeleteImaging = (id) => {
+        if (!window.confirm("Delete this imaging record?")) return;
+
+        HttpService.deleteWithAuth(`/clinics/${clinicId}/vet/imaging/${id}`)
+            .then(() => {
+                enqueueSnackbar("Imaging record deleted", { variant: "success" });
+                fetchImagingRecords();
+            })
+            .catch(() => {
+                enqueueSnackbar("Delete failed", { variant: "error" });
+            });
+    };
+
+    const handleImagingInputChange = (e) => {
+        const { name, value } = e.target;
+        setImagingFormData(prev => ({ ...prev, [name]: value }));
     };
 
     // Lab Parameters handlers
@@ -461,6 +648,49 @@ const Laboratory = ({ clinicId: propClinicId, subView: propSubView }) => {
                 <p>Loading...</p>
             ) : (
                 <div className="laboratory-table">
+                    {/* Pending Tests Section */}
+                    {(() => {
+                        const pendingTests = labs.filter(lab => lab.status === "Pending" || !lab.reportUrl);
+                        return pendingTests.length > 0 ? (
+                            <div className="pending-tests-section" style={{ marginBottom: "24px", padding: "16px", backgroundColor: "#fef9c3", borderLeft: "4px solid #a16207", borderRadius: "8px" }}>
+                                <h3 style={{ margin: "0 0 12px 0", color: "#a16207", fontSize: "16px", fontWeight: "600" }}>
+                                    ⚠️ Pending Tests Awaiting Report Upload ({pendingTests.length})
+                                </h3>
+                                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "12px" }}>
+                                    {pendingTests.map((test) => (
+                                        <div key={test._id} style={{ backgroundColor: "#fff", padding: "12px", borderRadius: "6px", border: "1px solid #d4a574" }}>
+                                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "start" }}>
+                                                <div>
+                                                    <p style={{ margin: "0 0 4px 0", fontWeight: "600", fontSize: "14px" }}>
+                                                        {test.petName}
+                                                    </p>
+                                                    <p style={{ margin: "0 0 4px 0", fontSize: "12px", color: "#6b7280" }}>
+                                                        <strong>Test:</strong> {test.testType}
+                                                    </p>
+                                                    <p style={{ margin: "0 0 4px 0", fontSize: "12px", color: "#6b7280" }}>
+                                                        <strong>Date:</strong> {test.date ? new Date(test.date).toLocaleDateString() : "-"}
+                                                    </p>
+                                                    {test.notes && (
+                                                        <p style={{ margin: "0 0 4px 0", fontSize: "12px", color: "#6b7280" }}>
+                                                            <strong>Notes:</strong> {test.notes}
+                                                        </p>
+                                                    )}
+                                                </div>
+                                                <button
+                                                    className="btn btn-sm btn-primary"
+                                                    onClick={() => handleEditLab(test)}
+                                                    style={{ whiteSpace: "nowrap", marginLeft: "8px" }}
+                                                >
+                                                    Add Report
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        ) : null;
+                    })()}
+
                     {/* Search Bar */}
                     <div className="search-bar">
                         <input
@@ -574,6 +804,143 @@ const Laboratory = ({ clinicId: propClinicId, subView: propSubView }) => {
         </>
     );
 
+    // Render Imaging Reports view
+    const renderImagingReportsView = () => (
+        <>
+            <div className="page-header">
+                <div>
+                    <h1>Imaging Reports</h1>
+                    <p>View and manage all imaging test results and reports</p>
+                </div>
+                <button className="btn btn-primary" onClick={handleAddImaging}>
+                    Add Imaging Report
+                </button>
+            </div>
+
+            {loading ? (
+                <p>Loading...</p>
+            ) : (
+                <div className="laboratory-table">
+                    {/* Pending Imaging Section */}
+                    {(() => {
+                        const pendingImaging = imagingRecords.filter(img => img.status === "Pending" || !img.reportUrl);
+                        return pendingImaging.length > 0 ? (
+                            <div className="pending-tests-section" style={{ marginBottom: "24px", padding: "16px", backgroundColor: "#fef9c3", borderLeft: "4px solid #a16207", borderRadius: "8px" }}>
+                                <h3 style={{ margin: "0 0 12px 0", color: "#a16207", fontSize: "16px", fontWeight: "600" }}>
+                                    ⚠️ Pending Imaging Awaiting Report Upload ({pendingImaging.length})
+                                </h3>
+                                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "12px" }}>
+                                    {pendingImaging.map((imaging) => (
+                                        <div key={imaging._id} style={{ backgroundColor: "#fff", padding: "12px", borderRadius: "6px", border: "1px solid #d4a574" }}>
+                                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "start" }}>
+                                                <div>
+                                                    <p style={{ margin: "0 0 4px 0", fontWeight: "600", fontSize: "14px" }}>
+                                                        {imaging.petName}
+                                                    </p>
+                                                    <p style={{ margin: "0 0 4px 0", fontSize: "12px", color: "#6b7280" }}>
+                                                        <strong>Type:</strong> {imaging.imagingType}
+                                                    </p>
+                                                    <p style={{ margin: "0 0 4px 0", fontSize: "12px", color: "#6b7280" }}>
+                                                        <strong>Body Part:</strong> {imaging.bodyPart}
+                                                    </p>
+                                                    <p style={{ margin: "0 0 4px 0", fontSize: "12px", color: "#6b7280" }}>
+                                                        <strong>Date:</strong> {imaging.imagingDate ? new Date(imaging.imagingDate).toLocaleDateString() : "-"}
+                                                    </p>
+                                                </div>
+                                                <button
+                                                    className="btn btn-sm btn-primary"
+                                                    onClick={() => handleEditImaging(imaging)}
+                                                    style={{ whiteSpace: "nowrap", marginLeft: "8px" }}
+                                                >
+                                                    Add Report
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        ) : null;
+                    })()}
+
+                    {/* All Imaging Records Table */}
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Customer Code</th>
+                                <th>Pet Name</th>
+                                <th>Imaging Type</th>
+                                <th>Body Part</th>
+                                <th>Date</th>
+                                <th>Findings</th>
+                                <th>Status</th>
+                                <th>Report</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {imagingRecords && imagingRecords.length > 0 ? (
+                                imagingRecords.map((imaging) => (
+                                    <tr key={imaging._id}>
+                                        <td>
+                                            <span className="customer-code-badge">
+                                                {imaging.customerCode || "-"}
+                                            </span>
+                                        </td>
+                                        <td className="pet-name">{imaging.petName}</td>
+                                        <td>{imaging.imagingType}</td>
+                                        <td>{imaging.bodyPart || "-"}</td>
+                                        <td>{imaging.imagingDate ? new Date(imaging.imagingDate).toLocaleDateString() : "-"}</td>
+                                        <td className="notes-cell">{imaging.findings || "-"}</td>
+                                        <td>
+                                            <span className={`badge ${imaging.status === "COMPLETED" ? "status-complete" : "status-pending"}`}>
+                                                {imaging.status || "PENDING"}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            {imaging.reportUrl ? (
+                                                <button
+                                                    className="btn btn-sm btn-view"
+                                                    onClick={() => handleViewImaging(imaging)}
+                                                    title="View Report"
+                                                >
+                                                    View Report
+                                                </button>
+                                            ) : (
+                                                <span className="muted">-</span>
+                                            )}
+                                        </td>
+                                        <td className="actions">
+                                            <button
+                                                className="btn-action edit"
+                                                onClick={() => handleEditImaging(imaging)}
+                                                title="Edit"
+                                            >
+                                                ✏️
+                                            </button>
+                                            <button
+                                                className="btn-action delete"
+                                                onClick={() => handleDeleteImaging(imaging._id)}
+                                                title="Delete"
+                                            >
+                                                🗑️
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))
+                            ) : (
+                                <tr key="empty">
+                                    <td colSpan="9" style={{ textAlign: "center", padding: "20px" }}>
+                                        No imaging records found
+                                    </td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
+                </div>
+            )}
+        </>
+    );
+
     // Render Test Parameters view
     const renderParametersView = () => (
         <>
@@ -672,6 +1039,7 @@ const Laboratory = ({ clinicId: propClinicId, subView: propSubView }) => {
                         {currentView === "parameters" && renderParametersView()}
                         {currentView === "inpatient" && renderInpatientView()}
                         {currentView === "lab-reports" && renderLabReportsView()}
+                        {currentView === "imaging-reports" && renderImagingReportsView()}
                     </div>
                 </div>
             </div>
@@ -777,16 +1145,29 @@ const Laboratory = ({ clinicId: propClinicId, subView: propSubView }) => {
                             <div className="form-row">
                                 <div className="form-group">
                                     <label>Test Type *</label>
-                                    <select name="testType" value={formData.testType} onChange={handleInputChange}>
-                                        <option value="">Select test type</option>
-                                        <option value="Blood Test">Blood Test</option>
-                                        <option value="Urinalysis">Urinalysis</option>
-                                        <option value="X-Ray">X-Ray</option>
-                                        <option value="Ultrasound">Ultrasound</option>
-                                        <option value="Allergy Test">Allergy Test</option>
-                                        <option value="Blood Culture">Blood Culture</option>
-                                        <option value="ECG">ECG</option>
-                                    </select>
+                                    <datalist id="test-types-list">
+                                        <option value="CBC (Complete Blood Count)" />
+                                        <option value="KFT (Kidney Function Test)" />
+                                        <option value="LFT (Liver Function Test)" />
+                                        <option value="Blood Test" />
+                                        <option value="Urinalysis" />
+                                        <option value="X-Ray" />
+                                        <option value="Ultrasound" />
+                                        <option value="Allergy Test" />
+                                        <option value="Blood Culture" />
+                                        <option value="ECG" />
+                                        <option value="Chemistry Panel" />
+                                        <option value="Thyroid Panel" />
+                                    </datalist>
+                                    <input
+                                        type="text"
+                                        name="testType"
+                                        value={formData.testType}
+                                        onChange={handleInputChange}
+                                        list="test-types-list"
+                                        placeholder="Select or type test name (CBC, KFT, LFT...)"
+                                        style={{ width: "100%" }}
+                                    />
                                 </div>
                                 <div className="form-group">
                                     <label>Date</label>
@@ -800,7 +1181,7 @@ const Laboratory = ({ clinicId: propClinicId, subView: propSubView }) => {
                             </div>
 
                             <div className="form-row">
-                                {/* <div className="form-group">
+                                <div className="form-group">
                                     <label>Result</label>
                                     <select name="result" value={formData.result} onChange={handleInputChange}>
                                         <option value="">Select result</option>
@@ -809,18 +1190,18 @@ const Laboratory = ({ clinicId: propClinicId, subView: propSubView }) => {
                                         <option value="Pending">Pending</option>
                                         <option value="Allergies Found">Allergies Found</option>
                                     </select>
-                                </div> */}
-                                {/* <div className="form-group">
+                                </div>
+                                <div className="form-group">
                                     <label>Status</label>
                                     <select name="status" value={formData.status} onChange={handleInputChange}>
                                         <option value="Complete">Complete</option>
                                         <option value="Pending Review">Pending Review</option>
                                         <option value="In Progress">In Progress</option>
                                     </select>
-                                </div> */}
+                                </div>
                             </div>
 
-                            {/* <div className="form-group">
+                            <div className="form-group">
                                 <label>Veterinarian</label>
                                 <input
                                     type="text"
@@ -829,9 +1210,9 @@ const Laboratory = ({ clinicId: propClinicId, subView: propSubView }) => {
                                     value={formData.veterinarian}
                                     onChange={handleInputChange}
                                 />
-                            </div> */}
+                            </div>
 
-                            {/* <div className="form-group">
+                            <div className="form-group">
                                 <label>Notes</label>
                                 <textarea
                                     name="notes"
@@ -839,9 +1220,9 @@ const Laboratory = ({ clinicId: propClinicId, subView: propSubView }) => {
                                     value={formData.notes}
                                     onChange={handleInputChange}
                                 ></textarea>
-                            </div> */}
+                            </div>
 
-                            {/* <div className="form-group">
+                            <div className="form-group">
                                 <label>Upload PDF Report</label>
                                 <div
                                     {...getRootProps()}
@@ -868,6 +1249,21 @@ const Laboratory = ({ clinicId: propClinicId, subView: propSubView }) => {
                                         <p>Drag & drop a PDF here, or click to select</p>
                                     )}
                                 </div>
+                                {selectedFile && (
+                                    <div style={{ marginTop: "10px", display: "flex", gap: "8px" }}>
+                                        <button
+                                            type="button"
+                                            className="btn btn-sm btn-view"
+                                            onClick={() => {
+                                                const fileUrl = URL.createObjectURL(selectedFile);
+                                                window.open(fileUrl, '_blank');
+                                            }}
+                                            title="Preview uploaded file"
+                                        >
+                                            👁️ View File
+                                        </button>
+                                    </div>
+                                )}
                                 {formData.reportUrl && !selectedFile && (
                                     <p className="existing-file">
                                         Existing report:{" "}
@@ -876,7 +1272,7 @@ const Laboratory = ({ clinicId: propClinicId, subView: propSubView }) => {
                                         </a>
                                     </p>
                                 )}
-                            </div> */}
+                            </div>
                         </div>
                         <div className="modal-footer">
                             <button className="btn btn-secondary" onClick={() => setIsModalOpen(false)}>
@@ -1023,6 +1419,228 @@ const Laboratory = ({ clinicId: propClinicId, subView: propSubView }) => {
                             <button className="btn btn-primary" onClick={handleSaveParameter}>
                                 {editingParameter ? "Update Parameter" : "Add Parameter"}
                             </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Imaging Add/Edit Modal */}
+            {isImagingModalOpen && (
+                <div className="modal-overlay" onClick={() => setIsImagingModalOpen(false)}>
+                    <div className="modal modal-large" onClick={(e) => e.stopPropagation()}>
+                        <div className="modal-header">
+                            <h2>{editingImaging ? "Edit Imaging Report" : "Add Imaging Report"}</h2>
+                            <button className="close-btn" onClick={() => setIsImagingModalOpen(false)}>
+                                ✕
+                            </button>
+                        </div>
+                        <div className="modal-body">
+                            <div className="form-row">
+                                <div className="form-group">
+                                    <label>Pet Name *</label>
+                                    <input
+                                        type="text"
+                                        name="petName"
+                                        placeholder="Enter pet name"
+                                        value={imagingFormData.petName}
+                                        onChange={handleImagingInputChange}
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <label>Customer Code</label>
+                                    <input
+                                        type="text"
+                                        name="customerCode"
+                                        placeholder="Enter customer code"
+                                        value={imagingFormData.customerCode}
+                                        onChange={handleImagingInputChange}
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="form-row">
+                                <div className="form-group">
+                                    <label>Imaging Type *</label>
+                                    <datalist id="imaging-types-list">
+                                        <option value="X-Ray" />
+                                        <option value="Ultrasound" />
+                                        <option value="CT Scan" />
+                                        <option value="MRI" />
+                                        <option value="Radiography" />
+                                        <option value="Fluoroscopy" />
+                                        <option value="Thermal Imaging" />
+                                    </datalist>
+                                    <input
+                                        type="text"
+                                        name="imagingType"
+                                        value={imagingFormData.imagingType}
+                                        onChange={handleImagingInputChange}
+                                        list="imaging-types-list"
+                                        placeholder="Select or type imaging type"
+                                        style={{ width: "100%" }}
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <label>Body Part</label>
+                                    <input
+                                        type="text"
+                                        name="bodyPart"
+                                        placeholder="e.g., Chest, Leg, Abdomen"
+                                        value={imagingFormData.bodyPart}
+                                        onChange={handleImagingInputChange}
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="form-row">
+                                <div className="form-group">
+                                    <label>Imaging Date</label>
+                                    <input
+                                        type="date"
+                                        name="imagingDate"
+                                        value={imagingFormData.imagingDate}
+                                        onChange={handleImagingInputChange}
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="form-group">
+                                <label>Findings</label>
+                                <textarea
+                                    name="findings"
+                                    placeholder="Enter imaging findings"
+                                    value={imagingFormData.findings}
+                                    onChange={handleImagingInputChange}
+                                ></textarea>
+                            </div>
+
+                            <div className="form-group">
+                                <label>Radiologist Notes</label>
+                                <textarea
+                                    name="radiologistNotes"
+                                    placeholder="Enter additional notes from radiologist"
+                                    value={imagingFormData.radiologistNotes}
+                                    onChange={handleImagingInputChange}
+                                ></textarea>
+                            </div>
+
+                            <div className="form-group">
+                                <label>Upload Imaging Report (PDF or Image)</label>
+                                <div
+                                    {...getImagingRootProps()}
+                                    className={`file-dropzone ${isImagingDragActive ? "active" : ""}`}
+                                >
+                                    <input {...getImagingInputProps()} />
+                                    {selectedFile ? (
+                                        <div className="selected-file">
+                                            <span>📄 {selectedFile.name}</span>
+                                            <button
+                                                type="button"
+                                                className="btn-remove-file"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    setSelectedFile(null);
+                                                }}
+                                            >
+                                                ✕
+                                            </button>
+                                        </div>
+                                    ) : isImagingDragActive ? (
+                                        <p>Drop the file here...</p>
+                                    ) : (
+                                        <p>Drag and drop a PDF or image file here, or click to select</p>
+                                    )}
+                                </div>
+                                {selectedFile && (
+                                    <div style={{ marginTop: "10px", display: "flex", gap: "8px" }}>
+                                        <button
+                                            type="button"
+                                            className="btn btn-sm btn-view"
+                                            onClick={() => {
+                                                const fileUrl = URL.createObjectURL(selectedFile);
+                                                window.open(fileUrl, '_blank');
+                                            }}
+                                            title="Preview uploaded file"
+                                        >
+                                            👁️ View File
+                                        </button>
+                                    </div>
+                                )}
+                                {imagingFormData.reportUrl && !selectedFile && (
+                                    <p className="existing-file">
+                                        Existing report:{" "}
+                                        <a href={imagingFormData.reportUrl} target="_blank" rel="noopener noreferrer">
+                                            View
+                                        </a>
+                                    </p>
+                                )}
+                            </div>
+                        </div>
+                        <div className="modal-footer">
+                            <button className="btn btn-secondary" onClick={() => setIsImagingModalOpen(false)}>
+                                Cancel
+                            </button>
+                            <button
+                                className="btn btn-primary"
+                                onClick={handleSaveImaging}
+                                disabled={uploading}
+                            >
+                                {uploading ? "Uploading..." : (editingImaging ? "Update Report" : "Save Report")}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* View Imaging Report Modal */}
+            {isViewImagingModalOpen && viewingImaging && (
+                <div className="modal-overlay" onClick={() => setIsViewImagingModalOpen(false)}>
+                    <div className="modal modal-large" onClick={(e) => e.stopPropagation()}>
+                        <div className="modal-header">
+                            <h2>Imaging Report - {viewingImaging.petName}</h2>
+                            <button className="close-btn" onClick={() => setIsViewImagingModalOpen(false)}>
+                                ✕
+                            </button>
+                        </div>
+                        <div className="modal-body" style={{ textAlign: "center" }}>
+                            <div style={{ marginBottom: "16px" }}>
+                                <p><strong>Imaging Type:</strong> {viewingImaging.imagingType}</p>
+                                <p><strong>Body Part:</strong> {viewingImaging.bodyPart}</p>
+                                <p><strong>Date:</strong> {new Date(viewingImaging.imagingDate).toLocaleDateString()}</p>
+                                {viewingImaging.findings && <p><strong>Findings:</strong> {viewingImaging.findings}</p>}
+                                {viewingImaging.radiologistNotes && <p><strong>Notes:</strong> {viewingImaging.radiologistNotes}</p>}
+                            </div>
+                            {viewingImaging.reportUrl && (
+                                <>
+                                    {viewingImaging.reportUrl.match(/\.(jpg|jpeg|png|gif|webp)$/i) ? (
+                                        <img
+                                            src={viewingImaging.reportUrl}
+                                            alt="Imaging Report"
+                                            style={{ maxWidth: "100%", maxHeight: "500px", borderRadius: "8px" }}
+                                        />
+                                    ) : (
+                                        <iframe
+                                            src={viewingImaging.reportUrl}
+                                            style={{ width: "100%", height: "600px", border: "1px solid #ccc", borderRadius: "8px" }}
+                                            title="Imaging Report"
+                                        ></iframe>
+                                    )}
+                                </>
+                            )}
+                        </div>
+                        <div className="modal-footer">
+                            <button className="btn btn-secondary" onClick={() => setIsViewImagingModalOpen(false)}>
+                                Close
+                            </button>
+                            {viewingImaging.reportUrl && (
+                                <a
+                                    href={viewingImaging.reportUrl}
+                                    download
+                                    className="btn btn-primary"
+                                >
+                                    Download Report
+                                </a>
+                            )}
                         </div>
                     </div>
                 </div>

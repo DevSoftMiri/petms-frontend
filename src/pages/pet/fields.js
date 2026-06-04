@@ -40,4 +40,11 @@ export const petColumns = [
     width: 160,
     valueGetter: (params) => params.row.breed || "-",
   },
+  {
+    field: "actions",
+    headerName: "Assigned Vet",
+    width: 160,
+    sortable: false,
+    renderCell: (params) => params.row.actions,
+  },
 ];

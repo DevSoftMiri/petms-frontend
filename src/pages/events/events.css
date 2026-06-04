@@ -391,3 +391,528 @@
   background-color: #3a3a3a;
   border-color: #555;
 }
+
+/* ---------- Appointment Scheduler ---------- */
+.appointments-page {
+  min-height: 100%;
+}
+
+.appointments-shell {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+}
+
+.appointments-content {
+  display: grid;
+  gap: 18px;
+  padding: 0;
+}
+
+.appointments-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 22px 24px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 2px 16px rgba(17, 24, 39, 0.06);
+}
+
+.appointments-header h1 {
+  margin: 0;
+  font-family: 'Sora', sans-serif;
+  font-size: 24px;
+  font-weight: 800;
+  color: #111827;
+}
+
+.appointments-header p {
+  margin: 6px 0 0;
+  color: #6b7280;
+  font-size: 13px;
+}
+
+.appointments-summary {
+  display: flex;
+  gap: 10px;
+}
+
+.appointments-summary div {
+  min-width: 86px;
+  padding: 10px 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  background: #f9fafb;
+}
+
+.appointments-summary span,
+.appointments-summary small {
+  display: block;
+}
+
+.appointments-summary span {
+  color: #111827;
+  font-family: 'Sora', sans-serif;
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.appointments-summary small {
+  margin-top: 2px;
+  color: #6b7280;
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+.vet-filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.vet-filter {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+  padding: 8px 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 9px;
+  background: #fff;
+  color: #4b5563;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.vet-filter:hover,
+.vet-filter.active {
+  border-color: #f4631e;
+  color: #111827;
+  background: #fff0e9;
+}
+
+.vet-color {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+}
+
+.scheduler-panel {
+  overflow: hidden;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 2px 16px rgba(17, 24, 39, 0.06);
+}
+
+.scheduler-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 20px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.scheduler-panel-header h2 {
+  margin: 0;
+  color: #111827;
+  font-family: 'Sora', sans-serif;
+  font-size: 17px;
+  font-weight: 800;
+}
+
+.scheduler-panel-header p {
+  margin: 4px 0 0;
+  color: #6b7280;
+  font-size: 13px;
+}
+
+.scheduler-loading {
+  display: grid;
+  min-height: 360px;
+  place-items: center;
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.schedule-controls {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.view-switcher,
+.date-controls {
+  display: inline-flex;
+  align-items: center;
+  overflow: hidden;
+  border: 1px solid #e5e7eb;
+  border-radius: 9px;
+  background: #fff;
+}
+
+.view-switcher button,
+.date-controls button {
+  min-height: 36px;
+  border: 0;
+  background: transparent;
+  color: #4b5563;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.view-switcher button {
+  padding: 0 12px;
+  text-transform: capitalize;
+}
+
+.view-switcher button.active {
+  background: #f4631e;
+  color: #fff;
+}
+
+.date-controls button {
+  width: 36px;
+  font-size: 22px;
+}
+
+.date-controls input {
+  min-height: 36px;
+  border: 0;
+  border-left: 1px solid #e5e7eb;
+  border-right: 1px solid #e5e7eb;
+  padding: 0 10px;
+  color: #111827;
+  font: inherit;
+}
+
+.custom-scheduler {
+  background: #fff;
+}
+
+.schedule-grid {
+  display: grid;
+  grid-template-columns: 84px 1fr;
+  overflow-x: auto;
+}
+
+.time-column {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  background: #fff;
+  border-right: 1px solid #e5e7eb;
+}
+
+.schedule-corner,
+.vet-column-header {
+  display: flex;
+  align-items: center;
+  height: 52px;
+  border-bottom: 1px solid #e5e7eb;
+  background: #f9fafb;
+}
+
+.time-cell {
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-start;
+  height: 72px;
+  padding: 8px 10px;
+  border-bottom: 1px solid #eef2f7;
+  color: #6b7280;
+  font-size: 12px;
+}
+
+.vet-columns {
+  display: grid;
+  min-width: 720px;
+}
+
+.vet-day-column {
+  min-width: 220px;
+  border-right: 1px solid #e5e7eb;
+}
+
+.vet-column-header {
+  gap: 8px;
+  padding: 0 12px;
+  color: #111827;
+  font-weight: 800;
+}
+
+.day-column-body {
+  position: relative;
+  height: 936px;
+  background: linear-gradient(to bottom, transparent 71px, #eef2f7 72px);
+  background-size: 100% 72px;
+}
+
+.hour-line {
+  height: 72px;
+}
+
+.timed-appointment {
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  min-height: 36px;
+}
+
+.appointment-block {
+  display: grid;
+  gap: 2px;
+  height: 100%;
+  min-width: 0;
+  padding: 8px 10px;
+  border-left: 4px solid var(--appointment-color);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--appointment-color) 12%, #ffffff);
+  color: #111827;
+  box-shadow: 0 6px 16px rgba(17, 24, 39, 0.08);
+}
+
+.appointment-block strong,
+.appointment-block span,
+.appointment-block small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.appointment-block strong {
+  font-size: 13px;
+}
+
+.appointment-block span,
+.appointment-block small,
+.appointment-block em {
+  font-size: 11px;
+}
+
+.appointment-block em {
+  width: fit-content;
+  margin-top: 2px;
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: rgba(17, 24, 39, 0.08);
+  font-style: normal;
+  font-weight: 800;
+}
+
+.appointment-block.compact {
+  min-height: 74px;
+  margin-bottom: 8px;
+}
+
+.week-schedule {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(150px, 1fr));
+  gap: 0;
+  overflow-x: auto;
+}
+
+.week-day-card {
+  min-width: 150px;
+  min-height: 420px;
+  border-right: 1px solid #e5e7eb;
+}
+
+.week-day-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 52px;
+  padding: 12px;
+  border-bottom: 1px solid #e5e7eb;
+  background: #f9fafb;
+  color: #111827;
+}
+
+.week-day-header span {
+  color: #6b7280;
+  font-size: 12px;
+}
+
+.week-day-list {
+  padding: 10px;
+}
+
+.week-day-list p {
+  margin: 18px 0;
+  color: #9ca3af;
+  font-size: 12px;
+  text-align: center;
+}
+
+.month-schedule {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(120px, 1fr));
+  overflow-x: auto;
+}
+
+.month-weekday {
+  padding: 12px;
+  border-right: 1px solid #e5e7eb;
+  border-bottom: 1px solid #e5e7eb;
+  background: #f9fafb;
+  color: #4b5563;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.month-day-cell {
+  min-height: 126px;
+  padding: 10px;
+  border-right: 1px solid #e5e7eb;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.month-day-cell.muted {
+  background: #fafafa;
+  color: #9ca3af;
+}
+
+.month-day-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.month-appointments {
+  display: grid;
+  gap: 5px;
+  margin-top: 8px;
+}
+
+.month-pill {
+  overflow: hidden;
+  padding: 5px 7px;
+  border-left: 3px solid var(--appointment-color);
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--appointment-color) 10%, #ffffff);
+  color: #111827;
+  font-size: 11px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.month-appointments small {
+  color: #6b7280;
+  font-size: 11px;
+}
+
+.app.dark .appointments-header,
+.app.dark .scheduler-panel,
+.app.dark .vet-filter {
+  background: #1C1C1A;
+  border-color: #2E2E2C;
+}
+
+.app.dark .appointments-summary div {
+  background: #111110;
+  border-color: #2E2E2C;
+}
+
+.app.dark .appointments-header h1,
+.app.dark .appointments-summary span,
+.app.dark .scheduler-panel-header h2 {
+  color: #F5F4F0;
+}
+
+.app.dark .appointments-header p,
+.app.dark .appointments-summary small,
+.app.dark .scheduler-panel-header p {
+  color: #9B9B95;
+}
+
+.app.dark .vet-filter {
+  color: #D5D4D0;
+}
+
+.app.dark .vet-filter.active,
+.app.dark .vet-filter:hover {
+  background: rgba(244, 99, 30, 0.12);
+}
+
+.app.dark .view-switcher,
+.app.dark .date-controls,
+.app.dark .custom-scheduler,
+.app.dark .time-column {
+  background: #1C1C1A;
+  border-color: #2E2E2C;
+}
+
+.app.dark .schedule-corner,
+.app.dark .vet-column-header,
+.app.dark .week-day-header,
+.app.dark .month-weekday {
+  background: #111110;
+  border-color: #2E2E2C;
+  color: #F5F4F0;
+}
+
+.app.dark .time-cell,
+.app.dark .vet-day-column,
+.app.dark .week-day-card,
+.app.dark .month-day-cell,
+.app.dark .month-weekday,
+.app.dark .date-controls input {
+  border-color: #2E2E2C;
+}
+
+.app.dark .day-column-body {
+  background: linear-gradient(to bottom, transparent 71px, #2E2E2C 72px);
+  background-size: 100% 72px;
+}
+
+.app.dark .appointment-block,
+.app.dark .month-pill {
+  color: #F5F4F0;
+  background: color-mix(in srgb, var(--appointment-color) 22%, #111110);
+}
+
+.app.dark .date-controls input {
+  background: #1C1C1A;
+  color: #F5F4F0;
+}
+
+@media (max-width: 768px) {
+  .appointments-header {
+    flex-direction: column;
+    padding: 18px 16px;
+  }
+
+  .appointments-summary {
+    width: 100%;
+  }
+
+  .appointments-summary div {
+    flex: 1;
+  }
+
+  .scheduler-panel-header {
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 16px;
+  }
+
+  .schedule-controls {
+    justify-content: flex-start;
+    width: 100%;
+  }
+}

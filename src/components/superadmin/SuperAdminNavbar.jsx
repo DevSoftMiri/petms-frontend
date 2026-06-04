@@ -7,6 +7,7 @@ import { Tooltip } from "@mui/material";
 import { useContext, useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { DarkModeContext } from "../../context/darkModeContext";
+import { ClinicContext } from "../../context/clinicContext";
 import AuthService from "../../services/AuthService";
 import "./superAdminNavbar.css";
 
@@ -16,6 +17,7 @@ const AVATAR_URL =
 
 const SuperAdminNavbar = () => {
   const { dispatch, state: darkState } = useContext(DarkModeContext);
+  const { dispatch: dispatchClinic } = useContext(ClinicContext);
   const location = useLocation();
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
@@ -25,6 +27,8 @@ const SuperAdminNavbar = () => {
   const user = AuthService.getCurrentUser();
   const username = user?.username || "Guest";
   const userRole = user?.role || "Super Admin";
+  const userClinics = user?.clinics || [];
+  const selectedClinicId = localStorage.getItem("selectedClinicId") || user?.clinicId || "";
 
   // Generate initials as fallback
   const initials = username
@@ -50,6 +54,14 @@ const SuperAdminNavbar = () => {
     navigate(`/superadmin/dashboard?view=${view}`, { replace: true });
   };
 
+  const handleClinicChange = (event) => {
+    const clinic = userClinics.find((item) => item.id === event.target.value);
+    if (!clinic) return;
+
+    dispatchClinic({ type: "SET_CLINIC", payload: clinic });
+    navigate(`/clinics/${clinic.id}/dashboard`);
+  };
+
   const isActive = (view) => {
     const params = new URLSearchParams(location.search);
     return params.get("view") === view;
@@ -71,20 +83,22 @@ const SuperAdminNavbar = () => {
         </div>
 
         {/* ── CENTER: Nav Menu ── */}
-        <div className="sa-nav-center">
-          <button
-            className={`sa-nav-link ${isActive("clinics") ? "sa-nav-link--active" : ""}`}
-            onClick={() => handleNavClick("clinics")}
-          >
-            Centers
-          </button>
-          <button
-            className={`sa-nav-link ${isActive("users") ? "sa-nav-link--active" : ""}`}
-            onClick={() => handleNavClick("users")}
-          >
-            Users
-          </button>
-        </div>
+        {userRole === "SUPERADMIN" && (
+          <div className="sa-nav-center">
+            <button
+              className={`sa-nav-link ${isActive("clinics") ? "sa-nav-link--active" : ""}`}
+              onClick={() => handleNavClick("clinics")}
+            >
+              Centers
+            </button>
+            <button
+              className={`sa-nav-link ${isActive("users") ? "sa-nav-link--active" : ""}`}
+              onClick={() => handleNavClick("users")}
+            >
+              Users
+            </button>
+          </div>
+        )}
 
         {/* ── RIGHT: Actions + Avatar + Logout ── */}
         <div className="sa-nav-right">
@@ -99,6 +113,22 @@ const SuperAdminNavbar = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
+
+          {/* Dark mode toggle */}
+          {userRole !== "SUPERADMIN" && userClinics.length > 1 && (
+            <select
+              className="sa-clinic-switcher"
+              value={selectedClinicId}
+              onChange={handleClinicChange}
+              aria-label="Switch clinic"
+            >
+              {userClinics.map((clinic) => (
+                <option key={clinic.id} value={clinic.id}>
+                  {clinic.clinicName}
+                </option>
+              ))}
+            </select>
+          )}
 
           {/* Dark mode toggle */}
           <Tooltip title={darkState?.darkMode ? "Light Mode" : "Dark Mode"} placement="bottom">

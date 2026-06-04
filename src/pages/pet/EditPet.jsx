@@ -33,12 +33,15 @@ const EditPet = () => {
     gender: "",
     age: "",
     weight: "",
+    dateOfBirth: "",
+    bloodGroup: "",
     medicalNotes: "",
   });
 
   // Initialize form with pet data from state
   useEffect(() => {
     if (state) {
+      const dobDate = state.dateOfBirth ? new Date(state.dateOfBirth).toISOString().split('T')[0] : "";
       setFormValues({
         name: state.name || "",
         species: state.species || "",
@@ -47,6 +50,8 @@ const EditPet = () => {
         gender: state.gender || "",
         age: state.age ? String(state.age) : "",
         weight: state.weight ? String(state.weight) : "",
+        dateOfBirth: dobDate || "",
+        bloodGroup: state.bloodGroup || "",
         medicalNotes: state.medicalNotes || "",
       });
     }
@@ -85,6 +90,8 @@ const EditPet = () => {
       breed: formValues.breed || undefined,
       age: formValues.age ? parseInt(formValues.age) : undefined,
       weight: formValues.weight ? parseFloat(formValues.weight) : undefined,
+      dateOfBirth: formValues.dateOfBirth ? new Date(formValues.dateOfBirth).toISOString() : undefined,
+      bloodGroup: formValues.bloodGroup || undefined,
       medicalNotes: formValues.medicalNotes || undefined,
     };
 
@@ -231,12 +238,40 @@ const EditPet = () => {
               <Grid item>
                 <TextField
                   sx={{ width: 240 }}
+                  id="dateOfBirth"
+                  name="dateOfBirth"
+                  label="Date of Birth"
+                  type="date"
+                  value={formValues.dateOfBirth}
+                  onChange={handleInputChange}
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                />
+              </Grid>
+
+              <Grid item>
+                <TextField
+                  sx={{ width: 240 }}
                   id="weight"
                   name="weight"
                   label="Weight (kg)"
                   type="number"
                   step="0.1"
                   value={formValues.weight}
+                  onChange={handleInputChange}
+                />
+              </Grid>
+
+              <Grid item>
+                <TextField
+                  sx={{ width: 240 }}
+                  id="bloodGroup"
+                  name="bloodGroup"
+                  label="Blood Group"
+                  type="text"
+                  placeholder="e.g., DEA 1.1+, A, B"
+                  value={formValues.bloodGroup}
                   onChange={handleInputChange}
                 />
               </Grid>

@@ -176,6 +176,18 @@
   justify-content: flex-end;
 }
 
+.sa-clinic-switcher {
+  height: 36px;
+  max-width: 220px;
+  border: 1px solid rgba(102, 112, 133, 0.28);
+  border-radius: 8px;
+  background: #fff;
+  color: #344054;
+  padding: 0 10px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
 /* Search */
 .sa-search {
   display: flex;

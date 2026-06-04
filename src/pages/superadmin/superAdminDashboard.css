@@ -707,6 +707,49 @@
   opacity: 0.6;
 }
 
+.clinic-checkbox-list {
+  display: grid;
+  gap: 8px;
+  max-height: 180px;
+  overflow-y: auto;
+  padding: 10px;
+  border: 1.5px solid #E2E2DC;
+  border-radius: var(--radius-sm);
+  background: var(--c-surface);
+}
+
+.clinic-checkbox-option {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 34px;
+  padding: 7px 9px;
+  border-radius: 8px;
+  cursor: pointer;
+  color: var(--c-text);
+  font-size: 13px;
+  line-height: 1.3;
+}
+
+.clinic-checkbox-option:hover {
+  background: var(--c-surface-2);
+}
+
+.clinic-checkbox-option input {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  padding: 0;
+  flex: 0 0 auto;
+  accent-color: var(--c-accent);
+}
+
+.field-hint {
+  margin: 7px 0 0;
+  color: #dc2626;
+  font-size: 12px;
+}
+
 .modal-footer {
   display: flex;
   justify-content: flex-end;

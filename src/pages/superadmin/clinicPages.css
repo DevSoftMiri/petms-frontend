@@ -49,6 +49,7 @@
 /* ---------- Container ---------- */
 .clinic-pages-container {
   flex: 1;
+  min-width: 0;
   padding: 32px 36px;
   background: var(--c-bg);
   font-family: 'DM Sans', sans-serif;
@@ -157,6 +158,8 @@
   border: 1.5px solid #ffffff;
   animation: tabSlide 0.28s cubic-bezier(0.4, 0, 0.2, 1) both;
   min-height: 400px;
+  min-width: 0;
+  overflow-x: auto;
 }
 
 /* ---------- Clinic Overview / Dashboard Tab ---------- */
@@ -321,8 +324,33 @@
 .app.dark .info-card .value { color: #F5F4F0; }
 
 /* ---------- Responsive ---------- */
+/* Tablets and small devices (max 1024px) */
+@media (max-width: 1024px) {
+  .clinic-pages-container {
+    padding: 20px 16px;
+    padding-top: 70px;
+  }
+
+  .clinic-pages-header {
+    gap: 12px;
+  }
+
+  .clinic-pages-header h1 {
+    font-size: 24px;
+  }
+
+  .back-to-clinics {
+    padding: 9px 16px;
+    font-size: 12px;
+  }
+}
+
+/* Mobile phones (max 768px) */
 @media (max-width: 768px) {
-  .clinic-pages-container { padding: 18px 16px; }
+  .clinic-pages-container { 
+    padding: 16px 12px;
+    padding-top: 70px;
+  }
 
   .clinic-pages-header {
     flex-direction: column;
@@ -330,7 +358,10 @@
     gap: 16px;
   }
 
-  .clinic-pages-header h1 { font-size: 22px; }
+  .clinic-pages-header h1 { 
+    font-size: 20px; 
+    word-break: break-word;
+  }
 
   .back-to-clinics {
     width: 100%;
@@ -349,6 +380,27 @@
   }
 
   .clinic-content {
-    padding: 20px 18px;
+    padding: 18px 14px;
+  }
+}
+
+/* Very small mobile devices (max 480px) */
+@media (max-width: 480px) {
+  .clinic-pages-container {
+    padding: 12px 8px;
+    padding-top: 60px;
+  }
+
+  .clinic-pages-header h1 {
+    font-size: 18px;
+  }
+
+  .back-to-clinics {
+    padding: 8px 12px;
+    font-size: 11px;
+  }
+
+  .clinic-content {
+    padding: 14px 10px;
   }
 }

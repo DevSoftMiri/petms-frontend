@@ -1,13 +1,17 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useSnackbar } from "notistack";
 
+import AuthService from "../../services/AuthService";
 import HttpService from "../../services/HttpService";
 import "./userManagement.css";
 
 const UserManagement = ({ clinicId }) => {
     const { enqueueSnackbar } = useSnackbar();
+    const currentUser = AuthService.getCurrentUser();
+    const canManageMultipleClinics = currentUser?.role === "SUPERADMIN";
 
     const [users, setUsers] = useState([]);
+    const [clinics, setClinics] = useState([]);
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingUser, setEditingUser] = useState(null);
@@ -20,6 +24,7 @@ const UserManagement = ({ clinicId }) => {
         lastName: "",
         phoneNumber: "",
         role: "STAFF",
+        clinicIds: clinicId ? [clinicId] : [],
     };
 
     const [formData, setFormData] = useState(initialFormState);
@@ -54,11 +59,33 @@ const UserManagement = ({ clinicId }) => {
         }
     }, [clinicId, enqueueSnackbar]);
 
+    const fetchClinics = useCallback(async () => {
+        if (!canManageMultipleClinics) {
+            setClinics([]);
+            return;
+        }
+
+        try {
+            const response = await HttpService.getWithAuth("/clinics?limit=100");
+            setClinics(Array.isArray(response) ? response : response?.data || []);
+        } catch (error) {
+            console.error(error);
+            enqueueSnackbar("Failed to load clinics", {
+                variant: "error",
+            });
+            setClinics([]);
+        }
+    }, [canManageMultipleClinics, enqueueSnackbar]);
+
     useEffect(() => {
         if (clinicId) {
             fetchUsers();
         }
     }, [clinicId, fetchUsers]);
+
+    useEffect(() => {
+        fetchClinics();
+    }, [fetchClinics]);
 
     // Add User
     const handleAddUser = () => {
@@ -79,6 +106,7 @@ const UserManagement = ({ clinicId }) => {
             lastName: user.lastName || "",
             phoneNumber: user.phoneNumber || "",
             role: user.role || "STAFF",
+            clinicIds: user.clinicIds?.length ? user.clinicIds : (user.clinicId ? [user.clinicId] : [clinicId]),
         });
 
         setIsModalOpen(true);
@@ -102,6 +130,17 @@ const UserManagement = ({ clinicId }) => {
                 return;
             }
 
+            if (canManageMultipleClinics && formData.clinicIds.length === 0) {
+                enqueueSnackbar(
+                    "Select at least one clinic",
+                    {
+                        variant: "error",
+                    }
+                );
+
+                return;
+            }
+
             if (editingUser) {
                 // UPDATE USER
                 const updateData = {
@@ -109,6 +148,8 @@ const UserManagement = ({ clinicId }) => {
                     lastName: formData.lastName,
                     phoneNumber: formData.phoneNumber,
                     role: formData.role,
+                    clinicId: formData.clinicIds[0] || clinicId,
+                    clinicIds: formData.clinicIds,
                 };
 
                 if (formData.password) {
@@ -144,7 +185,8 @@ const UserManagement = ({ clinicId }) => {
 
                 const createData = {
                     ...formData,
-                    clinicId,
+                    clinicId: formData.clinicIds[0] || clinicId,
+                    clinicIds: formData.clinicIds,
                 };
 
                 await HttpService.postWithAuth(
@@ -168,13 +210,48 @@ const UserManagement = ({ clinicId }) => {
         } catch (error) {
             console.error(error);
 
-            enqueueSnackbar(
-                error?.response?.data?.message ||
-                "Failed to save user",
-                {
-                    variant: "error",
+            // Handle validation errors with field details
+            if (error?.response?.data?.code === 'VALIDATION_ERROR' && error?.response?.data?.errors) {
+                const validationErrors = error.response.data.errors;
+
+                // Show all errors at once
+                if (validationErrors.length === 1) {
+                    // Single error
+                    enqueueSnackbar(
+                        `${validationErrors[0].field}: ${validationErrors[0].message}`,
+                        {
+                            variant: "error",
+                            autoHideDuration: 6000,
+                        }
+                    );
+                } else {
+                    // Multiple errors - show first few
+                    const errorSummary = validationErrors
+                        .slice(0, 3)
+                        .map(err => `• ${err.field}: ${err.message}`)
+                        .join(' | ');
+
+                    const fullMessage = validationErrors.length > 3
+                        ? `${errorSummary} and ${validationErrors.length - 3} more errors`
+                        : errorSummary;
+
+                    enqueueSnackbar(
+                        fullMessage,
+                        {
+                            variant: "error",
+                            autoHideDuration: 7000,
+                        }
+                    );
                 }
-            );
+            } else {
+                enqueueSnackbar(
+                    error?.response?.data?.message ||
+                    "Failed to save user",
+                    {
+                        variant: "error",
+                    }
+                );
+            }
         }
     };
 
@@ -220,6 +297,27 @@ const UserManagement = ({ clinicId }) => {
             ...prev,
             [name]: value,
         }));
+    };
+
+    const handleClinicToggle = (selectedClinicId) => {
+        setFormData((prev) => ({
+            ...prev,
+            clinicIds: prev.clinicIds.includes(selectedClinicId)
+                ? prev.clinicIds.filter((id) => id !== selectedClinicId)
+                : [...prev.clinicIds, selectedClinicId],
+        }));
+    };
+
+    const getUserClinicNames = (user) => {
+        if (user.clinics?.length) {
+            return user.clinics.map((clinic) => clinic.clinicName).join(", ");
+        }
+
+        if (user.clinicId) {
+            return clinics.find((clinic) => clinic.id === user.clinicId)?.clinicName || "Current clinic";
+        }
+
+        return "N/A";
     };
 
     if (!clinicId) {
@@ -272,6 +370,7 @@ const UserManagement = ({ clinicId }) => {
                                         <th>Username</th>
                                         <th>Phone</th>
                                         <th>Role</th>
+                                        <th>Clinics</th>
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
@@ -303,6 +402,10 @@ const UserManagement = ({ clinicId }) => {
                                                 >
                                                     {user.role}
                                                 </span>
+                                            </td>
+
+                                            <td title={getUserClinicNames(user)}>
+                                                {getUserClinicNames(user)}
                                             </td>
 
                                             <td className="actions">
@@ -534,6 +637,39 @@ const UserManagement = ({ clinicId }) => {
                                             </option>
                                         </select>
                                     </div>
+
+                                    {canManageMultipleClinics && (
+                                        <div className="form-group">
+                                            <label>
+                                                Assign to Clinics
+                                            </label>
+
+                                            <div className="clinic-checkbox-list">
+                                                {clinics.map((clinic) => (
+                                                    <label
+                                                        className="clinic-checkbox-option"
+                                                        key={clinic.id}
+                                                    >
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={formData.clinicIds.includes(clinic.id)}
+                                                            onChange={() => handleClinicToggle(clinic.id)}
+                                                        />
+
+                                                        <span>
+                                                            {clinic.clinicName} ({clinic.clinicCode})
+                                                        </span>
+                                                    </label>
+                                                ))}
+                                            </div>
+
+                                            {formData.clinicIds.length === 0 && (
+                                                <p className="field-hint">
+                                                    Select at least one clinic.
+                                                </p>
+                                            )}
+                                        </div>
+                                    )}
                                 </div>
 
                                 <div className="modal-footer">

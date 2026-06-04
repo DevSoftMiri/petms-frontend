@@ -2,18 +2,51 @@
    PET MODULE — pet.css
    ================================================ */
 
-/* ---- Legacy layouts ---- */
-.list { display: flex; width: 100%; }
-.list .listContainer { flex: 6; }
-.new { width: 100%; display: flex; }
-.new .newContainer { flex: 6; }
-.new .newContainer .top,
-.new .newContainer .bottom {
-    box-shadow: 2px 4px 10px 1px rgba(201, 201, 201, 0.47);
-    padding: 10px; margin: 20px; display: flex;
+/* ---- New Pet Form Layout ---- */
+.new { 
+    width: 100%; 
+    display: flex; 
+    min-height: 100vh;
+    background-color: #f5f5f5;
 }
-.new .newContainer .top h1,
-.new .newContainer .bottom h1 { color: lightgray; font-size: 20px; }
+
+.new .newContainer { 
+    flex: 1; 
+    display: flex;
+    flex-direction: column;
+}
+
+.new .newContainer .top {
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+    display: none;
+}
+
+.new .newContainer .bottom {
+    box-shadow: none;
+    padding: 24px 32px;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    overflow-y: auto;
+}
+
+.new .newContainer .bottom h1 { 
+    color: #1a1a2e; 
+    font-size: 28px;
+    font-weight: 700;
+    margin: 0 0 24px 0;
+    letter-spacing: -0.3px;
+}
+
+.new .newContainer form {
+    background: white;
+    padding: 24px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
 
 /* ================================================
    PETS LIST — no inner scroll, height = content

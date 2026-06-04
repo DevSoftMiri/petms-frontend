@@ -2,7 +2,6 @@ import { Fragment, useContext } from "react";
 import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
 import { DarkModeContext } from "./context/darkModeContext";
 import { ClinicProvider } from "./context/clinicContext";
-import Home from "./pages/home/Home";
 import GeneralInformation from "./pages/generalInformation/GeneralInformation";
 import Customers from "./pages/customers/Customers";
 import Events from "./pages/events/Events";
@@ -22,14 +21,33 @@ import Profile from "./pages/profile/Profile";
 import EditUser from "./pages/user/EditUser";
 import ListUser from "./pages/user/ListUser";
 import Login from "./pages/login/Login";
+import AuthService from "./services/AuthService";
+import ClinicSelect from "./pages/clinicSelect/ClinicSelect";
 import Unauthorized from "./pages/Unauthorized";
 import SuperAdminDashboard from "./pages/superadmin/SuperAdminDashboard";
 import AddClinic from "./pages/superadmin/AddClinic";
 import ClinicDetail from "./pages/superadmin/ClinicDetail";
 import ClinicPages from "./pages/superadmin/ClinicPages";
+import VetDashboard from "./pages/vet/VetDashboard";
+import PetCaseDetail from "./pages/vet/PetCaseDetail";
+import VetPetDetails from "./pages/vet/VetPetDetails";
 import PrivateRoute from "./PrivateRoute";
 import RoleAccess from "./RoleAccess";
 import "./style/dark.css";
+
+const ClinicEntry = () => {
+  const user = AuthService.getCurrentUser();
+  if (!user) return <Navigate to="/login" replace />;
+  if (user.role === "SUPERADMIN") return <Navigate to="/superadmin/dashboard" replace />;
+
+  const selectedClinicId = localStorage.getItem("selectedClinicId");
+  if (selectedClinicId) return <Navigate to={`/clinics/${selectedClinicId}/dashboard`} replace />;
+
+  const clinics = user.clinics || [];
+  if (clinics.length === 1) return <Navigate to={`/clinics/${clinics[0].id}/dashboard`} replace />;
+
+  return <Navigate to="/select-clinic" replace />;
+};
 
 function App() {
   const { darkMode } = useContext(DarkModeContext);
@@ -41,8 +59,10 @@ function App() {
           <Fragment>
             <Routes>
               <Route path="/login" element={<Login />} />
+              <Route path="/select-clinic" element={<ClinicSelect />} />
               <Route path="/unauthorized" element={<Unauthorized />} />
               <Route path="/" element={<Navigate to="/login" />} />
+              <Route path="/dashboard" element={<ClinicEntry />} />
 
               {/* Super Admin Only Routes */}
               <Route element={<RoleAccess roles={["SUPERADMIN"]} />}>
@@ -53,14 +73,33 @@ function App() {
               </Route>
 
               {/* Clinic Pages - Accessible to Super Admin, Admin, and Staff */}
-              <Route element={<RoleAccess roles={["SUPERADMIN", "ADMIN", "STAFF"]} />}>
+              <Route element={<RoleAccess roles={["SUPERADMIN", "ADMIN", "VET", "GROOMER", "RECEPTIONIST", "PHARMACIST", "STAFF", "USER"]} />}>
                 <Route path="/superadmin/clinic/:id/pages" element={<ClinicPages />} />
+
+                {/* Clinic-scoped routes for direct navigation */}
+                <Route path="/clinics/:id/dashboard" element={<ClinicPages />} />
+                <Route path="/clinics/:id/vet" element={<ClinicPages />} />
+                <Route path="/clinics/:id/customers" element={<ClinicPages />} />
+                <Route path="/clinics/:id/pets" element={<ClinicPages />} />
+                <Route path="/clinics/:id/appointments" element={<ClinicPages />} />
+                <Route path="/clinics/:id/events" element={<ClinicPages />} />
+                <Route path="/clinics/:id/laboratory" element={<ClinicPages />} />
+                <Route path="/clinics/:id/imaging-reports" element={<ClinicPages />} />
+                <Route path="/clinics/:id/inpatient" element={<ClinicPages />} />
+                <Route path="/clinics/:id/parameters" element={<ClinicPages />} />
+                <Route path="/clinics/:id/grooming" element={<ClinicPages />} />
+                <Route path="/clinics/:id/pharmacy" element={<ClinicPages />} />
+                <Route path="/clinics/:id/store" element={<ClinicPages />} />
+                <Route path="/clinics/:id/finance" element={<ClinicPages />} />
+                <Route path="/clinics/:id/supplies" element={<ClinicPages />} />
+                <Route path="/clinics/:id/settings" element={<ClinicPages />} />
               </Route>
 
               <Route path="/" element={<PrivateRoute />}>
                 <Route path="/general-info" element={<GeneralInformation />} />
                 <Route path="/customers" element={<Customers />} />
-                <Route path="/events" element={<Events />} />
+                <Route path="/appointments" element={<Events />} />
+                <Route path="/events" element={<Navigate to="/appointments" replace />} />
                 <Route path="/laboratory" element={<Laboratory />} />
                 <Route path="/laboratory/inpatient" element={<Laboratory />} />
                 <Route path="/laboratory/parameters" element={<Laboratory />} />
@@ -103,6 +142,19 @@ function App() {
                 </Route>
               </Route>
 
+              {/* Vet Dashboard - Accessible to VET role */}
+              <Route path="/vet" element={<PrivateRoute />}>
+                <Route element={<RoleAccess roles={["VET", "ADMIN", "SUPERADMIN"]} />} >
+                  <Route index element={<VetDashboard />} />
+                  <Route path="dashboard" element={<VetDashboard />} />
+                  <Route path="case/:caseId" element={<PetCaseDetail />} />
+                  <Route path="pet/:petId" element={<PetCaseDetail />} />
+                  <Route path="pet/:petId/details" element={<VetPetDetails />} />
+                  <Route path="medical-record/:medicalRecordNumber" element={<PetCaseDetail />} />
+                  <Route path="medical-record/:medicalRecordNumber/appointment/:appointmentId" element={<PetCaseDetail />} />
+                </Route>
+              </Route>
+
             </Routes>
           </Fragment>
         </BrowserRouter>
@@ -112,3 +164,4 @@ function App() {
 }
 
 export default App;
+

@@ -57,6 +57,8 @@ const logout = (userId) => {
     });
   }
   localStorage.removeItem("user");
+  localStorage.removeItem("selectedClinicId");
+  localStorage.removeItem("selectedClinic");
 };
 
 const getCurrentUser = () => {

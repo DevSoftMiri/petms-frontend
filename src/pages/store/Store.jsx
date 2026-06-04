@@ -1,34 +1,47 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useSnackbar } from "notistack";
-
+import AuthService from "../../services/AuthService";
 import HttpService from "../../services/HttpService";
 import "./store.css";
 
+const emptyDispense = {
+    storeItemId: "",
+    quantity: "",
+    dispensingType: "SALE",
+    petId: "",
+    customerId: "",
+    notes: "",
+};
+
+const parseArrayResponse = (response) => {
+    if (Array.isArray(response)) return response;
+    if (Array.isArray(response?.data)) return response.data;
+    if (Array.isArray(response?.data?.data)) return response.data.data;
+    return [];
+};
+
+const toCurrency = (value) => `Rs. ${Number(value || 0).toFixed(2)}`;
+
 const Store = ({ clinicId }) => {
     const { enqueueSnackbar } = useSnackbar();
-
+    const currentUser = AuthService.getCurrentUser();
+    const [activeTab, setActiveTab] = useState("give");
     const [items, setItems] = useState([]);
+    const [history, setHistory] = useState([]);
+    const [pets, setPets] = useState([]);
+    const [customers, setCustomers] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [editingItem, setEditingItem] = useState(null);
-    const [formData, setFormData] = useState({
-        name: "",
-        category: "Other",
-        description: "",
-        price: 0,
-        quantity: 0,
-        supplier: "",
-        expiryDate: "",
-    });
+    const [historyLoading, setHistoryLoading] = useState(true);
+    const [searchTerm, setSearchTerm] = useState("");
+    const [dispenseModalOpen, setDispenseModalOpen] = useState(false);
+    const [dispenseForm, setDispenseForm] = useState(emptyDispense);
 
     const fetchItems = useCallback(async () => {
+        if (!clinicId) return;
         try {
             setLoading(true);
-            const response = await HttpService.getWithAuth(
-                `/clinics/${clinicId}/store`
-            );
-            const data = Array.isArray(response) ? response : response.data || [];
-            setItems(data);
+            const response = await HttpService.getWithAuth(`/clinics/${clinicId}/store`);
+            setItems(parseArrayResponse(response));
         } catch (error) {
             enqueueSnackbar("Failed to load store items", { variant: "error" });
         } finally {
@@ -36,75 +49,106 @@ const Store = ({ clinicId }) => {
         }
     }, [clinicId, enqueueSnackbar]);
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    useEffect(() => {
-        if (clinicId) fetchItems();
-    }, [clinicId, fetchItems]);
-
-    const handleAddItem = () => {
-        setEditingItem(null);
-        setFormData({
-            name: "",
-            category: "Other",
-            description: "",
-            price: 0,
-            quantity: 0,
-            supplier: "",
-            expiryDate: "",
-        });
-        setIsModalOpen(true);
-    };
-
-    const handleEditItem = (item) => {
-        setEditingItem(item);
-        setFormData(item);
-        setIsModalOpen(true);
-    };
-
-    const handleSaveItem = async () => {
+    const fetchHistory = useCallback(async () => {
+        if (!clinicId) return;
         try {
-            if (!formData.name || !formData.price) {
-                enqueueSnackbar("Item name and price are required", { variant: "error" });
-                return;
-            }
-
-            if (editingItem) {
-                await HttpService.putWithAuth(
-                    `/clinics/${clinicId}/store/${editingItem._id}`,
-                    formData
-                );
-                enqueueSnackbar("Store item updated", { variant: "success" });
-            } else {
-                await HttpService.postWithAuth(
-                    `/clinics/${clinicId}/store`,
-                    formData
-                );
-                enqueueSnackbar("Store item created", { variant: "success" });
-            }
-
-            setIsModalOpen(false);
-            fetchItems();
-        } catch {
-            enqueueSnackbar("Failed to save store item", { variant: "error" });
+            setHistoryLoading(true);
+            const response = await HttpService.getWithAuth(`/clinics/${clinicId}/store/dispense`);
+            setHistory(parseArrayResponse(response));
+        } catch (error) {
+            enqueueSnackbar("Failed to load store history", { variant: "error" });
+        } finally {
+            setHistoryLoading(false);
         }
+    }, [clinicId, enqueueSnackbar]);
+
+    const fetchRecipients = useCallback(async () => {
+        if (!clinicId) return;
+        try {
+            const [petsResponse, customersResponse] = await Promise.all([
+                HttpService.getWithAuth(`/clinics/${clinicId}/pets?limit=100`),
+                HttpService.getWithAuth(`/clinics/${clinicId}/customers?limit=100`),
+            ]);
+            setPets(parseArrayResponse(petsResponse));
+            setCustomers(parseArrayResponse(customersResponse));
+        } catch (error) {
+            console.error("Failed to load store recipients:", error);
+        }
+    }, [clinicId]);
+
+    useEffect(() => {
+        fetchItems();
+        fetchHistory();
+        fetchRecipients();
+    }, [fetchItems, fetchHistory, fetchRecipients]);
+
+    const filteredItems = useMemo(() => {
+        const query = searchTerm.trim().toLowerCase();
+        if (!query) return items;
+        return items.filter((item) => (
+            item.name?.toLowerCase().includes(query)
+            || item.supplier?.toLowerCase().includes(query)
+            || item.category?.toLowerCase().includes(query)
+        ));
+    }, [items, searchTerm]);
+
+    const filteredHistory = useMemo(() => {
+        const query = searchTerm.trim().toLowerCase();
+        if (!query) return history;
+        return history.filter((entry) => (
+            entry.storeItem?.name?.toLowerCase().includes(query)
+            || entry.pet?.name?.toLowerCase().includes(query)
+            || entry.customer?.firstName?.toLowerCase().includes(query)
+            || entry.customer?.lastName?.toLowerCase().includes(query)
+        ));
+    }, [history, searchTerm]);
+
+    const openDispense = (item) => {
+        setDispenseForm({
+            ...emptyDispense,
+            storeItemId: item.id,
+        });
+        setDispenseModalOpen(true);
     };
 
-    const handleDeleteItem = (id) => {
-        if (!window.confirm("Delete this item?")) return;
+    const handleDispenseChange = (event) => {
+        const { name, value } = event.target;
+        setDispenseForm((prev) => ({ ...prev, [name]: value }));
+    };
 
-        HttpService.deleteWithAuth(`/clinics/${clinicId}/store/${id}`)
-            .then(() => {
-                enqueueSnackbar("Item deleted", { variant: "success" });
-                fetchItems();
-            })
-            .catch(() => {
-                enqueueSnackbar("Delete failed", { variant: "error" });
+    const handleGiveItem = async () => {
+        if (!currentUser?.id) {
+            enqueueSnackbar("Logged-in user not found", { variant: "error" });
+            return;
+        }
+        if (!dispenseForm.storeItemId || !dispenseForm.quantity || Number(dispenseForm.quantity) <= 0) {
+            enqueueSnackbar("Select an item and enter a valid quantity", { variant: "error" });
+            return;
+        }
+        if (dispenseForm.dispensingType === "SALE" && !dispenseForm.customerId) {
+            enqueueSnackbar("Customer is required for sale", { variant: "error" });
+            return;
+        }
+        if (dispenseForm.dispensingType === "CLINIC_USE" && !dispenseForm.petId) {
+            enqueueSnackbar("Pet is required for clinic use", { variant: "error" });
+            return;
+        }
+
+        try {
+            await HttpService.postWithAuth(`/clinics/${clinicId}/store/dispense`, {
+                ...dispenseForm,
+                quantity: Number(dispenseForm.quantity),
+                dispensedBy: currentUser.id,
+                petId: dispenseForm.dispensingType === "CLINIC_USE" ? dispenseForm.petId : null,
+                customerId: dispenseForm.dispensingType === "SALE" ? dispenseForm.customerId : null,
             });
-    };
-
-    const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        setFormData((prev) => ({ ...prev, [name]: value }));
+            enqueueSnackbar("Store item given successfully", { variant: "success" });
+            setDispenseModalOpen(false);
+            fetchItems();
+            fetchHistory();
+        } catch (error) {
+            enqueueSnackbar(error.response?.data?.message || "Failed to give store item", { variant: "error" });
+        }
     };
 
     if (!clinicId) return <div>No clinic selected</div>;
@@ -115,158 +159,139 @@ const Store = ({ clinicId }) => {
                 <div className="store-content">
                     <div className="page-header">
                         <div>
-                            <h1>Pet Store</h1>
-                            <p>Manage pet accessories and supplies inventory</p>
+                            <h1>Other Store</h1>
+                            <p>Give store items and review dispensing history</p>
                         </div>
-                        <button className="btn btn-primary" onClick={handleAddItem}>
-                            ➕ Add Item
-                        </button>
                     </div>
 
-                    {loading ? (
-                        <p>Loading...</p>
-                    ) : (
+                    <div className="store-tabs">
+                        <button className={`tab-btn ${activeTab === "give" ? "active" : ""}`} onClick={() => setActiveTab("give")}>Give Item</button>
+                        <button className={`tab-btn ${activeTab === "history" ? "active" : ""}`} onClick={() => setActiveTab("history")}>Given History</button>
+                    </div>
+
+                    <div className="inventory-toolbar">
+                        <input
+                            type="search"
+                            placeholder={activeTab === "give" ? "Search product, vendor, or type" : "Search history"}
+                            value={searchTerm}
+                            onChange={(event) => setSearchTerm(event.target.value)}
+                        />
+                    </div>
+
+                    {activeTab === "give" && (loading ? <p>Loading...</p> : (
                         <div className="store-table">
                             <table>
                                 <thead>
                                     <tr>
-                                        <th>Item Name</th>
-                                        <th>Category</th>
+                                        <th>Product Name</th>
+                                        <th>Vendor</th>
+                                        <th>Type</th>
+                                        <th>Expiry Date</th>
                                         <th>Price</th>
                                         <th>Quantity</th>
-                                        <th>Supplier</th>
-                                        <th>Expiry Date</th>
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {items.map((item) => (
-                                        <tr key={item._id}>
+                                    {filteredItems.map((item) => (
+                                        <tr key={item.id}>
                                             <td>{item.name}</td>
-                                            <td>{item.category}</td>
-                                            <td>${item.price?.toFixed(2)}</td>
-                                            <td>{item.quantity}</td>
-                                            <td>{item.supplier}</td>
-                                            <td>{item.expiryDate ? new Date(item.expiryDate).toLocaleDateString() : "N/A"}</td>
+                                            <td>{item.supplier || "-"}</td>
+                                            <td>{item.category || "-"}</td>
+                                            <td>{item.expiryDate ? new Date(item.expiryDate).toLocaleDateString() : "-"}</td>
+                                            <td>{toCurrency(item.price)}</td>
+                                            <td>{item.quantity || 0}</td>
                                             <td className="actions">
-                                                <button
-                                                    className="btn-action edit"
-                                                    onClick={() => handleEditItem(item)}
-                                                    title="Edit"
-                                                >
-                                                    ✏️
-                                                </button>
-                                                <button
-                                                    className="btn-action delete"
-                                                    onClick={() => handleDeleteItem(item._id)}
-                                                    title="Delete"
-                                                >
-                                                    🗑️
-                                                </button>
+                                                <button className="btn-action primary" onClick={() => openDispense(item)}>Give</button>
                                             </td>
                                         </tr>
                                     ))}
                                 </tbody>
                             </table>
                         </div>
-                    )}
+                    ))}
 
-                    {isModalOpen && (
-                        <div className="modal-overlay" onClick={() => setIsModalOpen(false)}>
-                            <div className="modal" onClick={(e) => e.stopPropagation()}>
+                    {activeTab === "history" && (historyLoading ? <p>Loading history...</p> : (
+                        <div className="store-table">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Item</th>
+                                        <th>Quantity</th>
+                                        <th>Type</th>
+                                        <th>Total</th>
+                                        <th>Pet</th>
+                                        <th>Customer</th>
+                                        <th>Given By</th>
+                                        <th>Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {filteredHistory.map((entry) => (
+                                        <tr key={entry.id}>
+                                            <td>{entry.storeItem?.name || "-"}</td>
+                                            <td>{entry.quantity}</td>
+                                            <td>{entry.dispensingType === "SALE" ? "Sale" : "Clinic Use"}</td>
+                                            <td>{toCurrency((entry.quantity || 0) * (entry.storeItem?.price || 0))}</td>
+                                            <td>{entry.pet?.name || "-"}</td>
+                                            <td>{entry.customer ? `${entry.customer.firstName || ""} ${entry.customer.lastName || ""}`.trim() : "-"}</td>
+                                            <td>{entry.staff ? `${entry.staff.firstName || ""} ${entry.staff.lastName || ""}`.trim() : "-"}</td>
+                                            <td>{entry.dispensingDate ? new Date(entry.dispensingDate).toLocaleDateString() : "-"}</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    ))}
+
+                    {dispenseModalOpen && (
+                        <div className="modal-overlay" onClick={() => setDispenseModalOpen(false)}>
+                            <div className="modal inventory-modal" onClick={(event) => event.stopPropagation()}>
                                 <div className="modal-header">
-                                    <h2>{editingItem ? "Edit Store Item" : "Add New Store Item"}</h2>
-                                    <button className="close-btn" onClick={() => setIsModalOpen(false)}>
-                                        ✕
-                                    </button>
+                                    <h2>Give Store Item</h2>
+                                    <button className="close-btn" onClick={() => setDispenseModalOpen(false)}>x</button>
                                 </div>
                                 <div className="modal-body">
-                                    <div className="form-group">
-                                        <label>Item Name *</label>
-                                        <input
-                                            type="text"
-                                            name="name"
-                                            placeholder="Enter item name"
-                                            value={formData.name}
-                                            onChange={handleInputChange}
-                                            required
-                                        />
-                                    </div>
-                                    <div className="form-group">
-                                        <label>Description</label>
-                                        <textarea
-                                            name="description"
-                                            placeholder="Enter description"
-                                            value={formData.description}
-                                            onChange={handleInputChange}
-                                            rows="2"
-                                        />
-                                    </div>
-                                    <div className="form-group">
-                                        <label>Category</label>
-                                        <select name="category" value={formData.category} onChange={handleInputChange}>
-                                            <option value="Other">Other</option>
-                                            <option value="Toys">Toys</option>
-                                            <option value="Collars">Collars</option>
-                                            <option value="Beds">Beds</option>
-                                            <option value="Leashes">Leashes</option>
-                                            <option value="Bowls">Bowls</option>
-                                            <option value="Treats">Treats</option>
-                                        </select>
-                                    </div>
-                                    <div className="form-row">
+                                    <div className="form-grid">
                                         <div className="form-group">
-                                            <label>Price *</label>
-                                            <input
-                                                type="number"
-                                                name="price"
-                                                placeholder="Enter price"
-                                                value={formData.price}
-                                                onChange={handleInputChange}
-                                                step="0.01"
-                                                min="0"
-                                                required
-                                            />
+                                            <label>Quantity *</label>
+                                            <input type="number" min="1" name="quantity" value={dispenseForm.quantity} onChange={handleDispenseChange} />
                                         </div>
                                         <div className="form-group">
-                                            <label>Quantity</label>
-                                            <input
-                                                type="number"
-                                                name="quantity"
-                                                placeholder="Enter quantity"
-                                                value={formData.quantity}
-                                                onChange={handleInputChange}
-                                                min="0"
-                                            />
+                                            <label>Type</label>
+                                            <select name="dispensingType" value={dispenseForm.dispensingType} onChange={handleDispenseChange}>
+                                                <option value="SALE">Sale to Customer</option>
+                                                <option value="CLINIC_USE">Clinic Use on Pet</option>
+                                            </select>
                                         </div>
-                                    </div>
-                                    <div className="form-group">
-                                        <label>Supplier</label>
-                                        <input
-                                            type="text"
-                                            name="supplier"
-                                            placeholder="Enter supplier name"
-                                            value={formData.supplier}
-                                            onChange={handleInputChange}
-                                        />
-                                    </div>
-                                    <div className="form-group">
-                                        <label>Expiry Date</label>
-                                        <input
-                                            type="date"
-                                            name="expiryDate"
-                                            value={formData.expiryDate}
-                                            onChange={handleInputChange}
-                                        />
+                                        {dispenseForm.dispensingType === "SALE" ? (
+                                            <div className="form-group">
+                                                <label>Customer *</label>
+                                                <select name="customerId" value={dispenseForm.customerId} onChange={handleDispenseChange}>
+                                                    <option value="">Select customer</option>
+                                                    {customers.map((customer) => (
+                                                        <option key={customer.id} value={customer.id}>{customer.firstName} {customer.lastName}</option>
+                                                    ))}
+                                                </select>
+                                            </div>
+                                        ) : (
+                                            <div className="form-group">
+                                                <label>Pet *</label>
+                                                <select name="petId" value={dispenseForm.petId} onChange={handleDispenseChange}>
+                                                    <option value="">Select pet</option>
+                                                    {pets.map((pet) => <option key={pet.id} value={pet.id}>{pet.name}</option>)}
+                                                </select>
+                                            </div>
+                                        )}
+                                        <div className="form-group form-grid-wide">
+                                            <label>Notes</label>
+                                            <textarea name="notes" rows="2" value={dispenseForm.notes} onChange={handleDispenseChange} />
+                                        </div>
                                     </div>
                                 </div>
                                 <div className="modal-footer">
-                                    <button className="btn btn-secondary" onClick={() => setIsModalOpen(false)}>
-                                        Cancel
-                                    </button>
-                                    <button className="btn btn-primary" onClick={handleSaveItem}>
-                                        {editingItem ? "Update Item" : "Add Item"}
-                                    </button>
+                                    <button className="btn btn-secondary" onClick={() => setDispenseModalOpen(false)}>Cancel</button>
+                                    <button className="btn btn-primary" onClick={handleGiveItem}>Give Item</button>
                                 </div>
                             </div>
                         </div>

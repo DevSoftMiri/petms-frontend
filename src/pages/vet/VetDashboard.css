@@ -1,0 +1,1638 @@
+/* ===========================
+   Vet Dashboard — Refined Styling
+   =========================== */
+
+/* Base */
+.vet-dashboard-container {
+  padding: 28px 32px;
+  background-color: #f0f4f8;
+  min-height: 100vh;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+/* Header */
+.vet-header {
+  margin-bottom: 28px;
+}
+
+.vet-header h1 {
+  font-size: 26px;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 6px;
+  letter-spacing: -0.3px;
+}
+
+.vet-header p {
+  color: #6b7280;
+  margin: 0;
+  font-size: 14px;
+}
+
+/* ===========================
+   Stats Grid
+   =========================== */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.stat-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.07), 0 4px 16px rgba(0,0,0,0.04);
+  border: 1px solid rgba(0,0,0,0.05);
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.stat-card:hover {
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  transform: translateY(-2px);
+}
+
+.stat-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  flex-shrink: 0;
+}
+
+.stat-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: #9ca3af;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  margin-bottom: 4px;
+}
+
+.stat-value {
+  font-size: 26px;
+  font-weight: 700;
+  color: #111827;
+  line-height: 1;
+}
+
+/* ===========================
+   Tabs
+   =========================== */
+.vet-tabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 24px;
+  background: #fff;
+  padding: 6px;
+  border-radius: 12px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+  border: 1px solid rgba(0,0,0,0.05);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.vet-tabs::-webkit-scrollbar { display: none; }
+
+.tab-btn {
+  padding: 10px 20px;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #6b7280;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.18s;
+  letter-spacing: 0.1px;
+}
+
+.tab-btn:hover {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.tab-btn.active {
+  background: #2563eb;
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(37,99,235,0.25);
+}
+
+/* ===========================
+   Tab / View Content
+   =========================== */
+.tab-content,
+.view-content {
+  background: #fff;
+  border-radius: 14px;
+  padding: 24px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.07), 0 4px 16px rgba(0,0,0,0.04);
+  border: 1px solid rgba(0,0,0,0.05);
+  margin-bottom: 24px;
+}
+
+.tab-content h2,
+.view-content h2 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ===========================
+   Status Badges
+   =========================== */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.status-badge.pending   { background: #fef9c3; color: #a16207; }
+.status-badge.confirmed { background: #dbeafe; color: #1d4ed8; }
+.status-badge.completed { background: #dcfce7; color: #15803d; }
+.status-badge.active    { background: #dbeafe; color: #1d4ed8; }
+.status-badge.closed    { background: #f3f4f6; color: #6b7280; }
+.status-badge.follow_up { background: #ffedd5; color: #c2410c; }
+.status-badge.in_progress { background: #ede9fe; color: #7c3aed; }
+
+/* ===========================
+   Search Bar
+   =========================== */
+.search-bar {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.search-bar input {
+  flex: 1;
+  padding: 11px 16px;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 10px;
+  font-size: 14px;
+  color: #111827;
+  background: #fff;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  font-family: inherit;
+}
+
+.search-bar input:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+}
+
+.search-bar button {
+  padding: 11px 22px;
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s;
+  white-space: nowrap;
+}
+
+.search-bar button:hover {
+  background: #1d4ed8;
+  transform: translateY(-1px);
+}
+
+/* ===========================
+   Filter Bar
+   =========================== */
+.filter-bar {
+  margin-bottom: 20px;
+}
+
+.filter-bar select {
+  padding: 10px 16px;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 10px;
+  font-size: 14px;
+  background: #fff;
+  color: #374151;
+  cursor: pointer;
+  font-family: inherit;
+  transition: border-color 0.2s;
+}
+
+.filter-bar select:focus {
+  outline: none;
+  border-color: #2563eb;
+}
+
+/* ===========================
+   Appointments
+   =========================== */
+.appointments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.appointment-card {
+  display: flex;
+  gap: 16px;
+  padding: 16px 18px;
+  background: #f8fafc;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  align-items: center;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.appointment-card:hover {
+  border-color: #93c5fd;
+  box-shadow: 0 2px 12px rgba(37,99,235,0.07);
+}
+
+.appointment-time {
+  font-size: 13px;
+  font-weight: 700;
+  color: #2563eb;
+  min-width: 72px;
+  padding-top: 2px;
+  white-space: nowrap;
+}
+
+.appointment-details {
+  flex: 1;
+  min-width: 0;
+}
+
+.appointment-details h3 {
+  font-size: 15px;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 6px;
+}
+
+.pet-info,
+.owner-info,
+.reason {
+  font-size: 13px;
+  color: #6b7280;
+  margin: 3px 0;
+}
+
+.appointment-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+/* ===========================
+   Buttons — Base Styles
+   =========================== */
+.view-btn {
+  padding: 8px 16px;
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.view-btn:hover {
+  background: #1d4ed8;
+  transform: translateY(-1px);
+}
+
+.view-btn.secondary {
+  background: #64748b;
+}
+
+.view-btn.secondary:hover {
+  background: #475569;
+}
+
+.assign-btn {
+  padding: 8px 14px;
+  background: #f97316;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.assign-btn:hover {
+  background: #ea580c;
+  transform: translateY(-1px);
+}
+
+/* Action buttons */
+.action-btn {
+  padding: 7px 14px;
+  border: none;
+  border-radius: 7px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.18s;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.action-btn.view-btn {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.action-btn.view-btn:hover {
+  background: #bfdbfe;
+  transform: translateY(-1px);
+}
+
+.action-btn.inpatient-btn {
+  background: #fef3c7;
+  color: #d97706;
+}
+
+.action-btn.inpatient-btn:hover {
+  background: #fde68a;
+  transform: translateY(-1px);
+}
+
+.action-btn.close-btn {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.action-btn.close-btn:hover {
+  background: #fecaca;
+  transform: translateY(-1px);
+}
+
+/* ===========================
+   Appointment Badge (shared)
+   =========================== */
+.appointment-badge {
+  display: inline-block;
+  padding: 3px 8px;
+  background: #dbeafe;
+  color: #1d4ed8;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* ===========================
+   Inpatient Table
+   =========================== */
+.inpatient-table {
+  border: 1px solid #fde68a;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.inpatient-row {
+  display: grid;
+  grid-template-columns: minmax(160px, 1.4fr) minmax(150px, 1fr) minmax(140px, 1fr) 120px 120px minmax(130px, auto);
+  gap: 14px;
+  align-items: center;
+  padding: 13px 16px;
+  border-bottom: 1px solid #fef3c7;
+  font-size: 13px;
+  color: #4b5563;
+  transition: background 0.15s;
+}
+
+.inpatient-row:last-child {
+  border-bottom: none;
+}
+
+.inpatient-row:not(.inpatient-header):hover {
+  background: #fffbeb;
+}
+
+.inpatient-header {
+  background: #fffbeb;
+  color: #92400e;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid #fde68a;
+}
+
+.inpatient-pet-name {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.inpatient-pet-name strong {
+  color: #111827;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.inpatient-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  background: #fef3c7;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.inpatient-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+/* ===========================
+   Cases — Actions Dropdown
+   =========================== */
+.case-actions-group {
+  position: relative;
+  z-index: 1001;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.case-actions-toggle {
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  padding: 6px 12px !important;
+  border-radius: 8px !important;
+  border-color: #e5e7eb !important;
+  color: #374151 !important;
+  background: #fff !important;
+  white-space: nowrap;
+  transition: all 0.18s !important;
+  font-family: inherit !important;
+}
+
+.case-actions-toggle:hover,
+.case-actions-toggle:focus,
+.case-actions-toggle:active,
+.case-actions-toggle.show {
+  background: #f3f4f6 !important;
+  border-color: #93c5fd !important;
+  color: #1d4ed8 !important;
+  box-shadow: 0 0 0 3px rgba(37,99,235,0.1) !important;
+}
+
+/* Remove Bootstrap caret default spacing */
+.case-actions-toggle::after {
+  margin-left: 6px;
+}
+
+.case-actions-menu {
+  border: 1.5px solid #e5e7eb !important;
+  border-radius: 10px !important;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12) !important;
+  padding: 4px !important;
+  min-width: 180px !important;
+  animation: dropdownIn 0.15s ease-out;
+}
+
+.case-dropdown-item {
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  padding: 9px 14px !important;
+  border-radius: 7px !important;
+  color: #374151 !important;
+  transition: background 0.15s !important;
+  font-family: inherit !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+}
+
+.case-dropdown-item:hover {
+  background: #f3f4f6 !important;
+  color: #111827 !important;
+}
+
+.case-dropdown-item.view-item:hover {
+  background: #dbeafe !important;
+  color: #1d4ed8 !important;
+}
+
+.case-dropdown-item.inpatient-item:hover {
+  background: #fef3c7 !important;
+  color: #d97706 !important;
+}
+
+.case-dropdown-item.close-item {
+  color: #dc2626 !important;
+}
+
+.case-dropdown-item.close-item:hover {
+  background: #fee2e2 !important;
+  color: #dc2626 !important;
+}
+
+/* ===========================
+   Assigned Pets Table
+   =========================== */
+.assigned-pets-table {
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.assigned-pets-row {
+  display: grid;
+  grid-template-columns: minmax(160px, 1.3fr) 90px 100px minmax(150px, 1fr) minmax(130px, 0.9fr) minmax(120px, auto) minmax(180px, auto);
+  gap: 12px;
+  align-items: center;
+  padding: 13px 16px;
+  border-bottom: 1px solid #f3f4f6;
+  font-size: 13px;
+  color: #4b5563;
+  transition: background 0.15s;
+}
+
+@media (max-width: 1024px) {
+  .assigned-pets-row {
+    grid-template-columns: minmax(130px, 1.2fr) 75px 85px minmax(130px, 1fr) minmax(110px, 0.8fr) minmax(100px, auto) minmax(150px, auto);
+    gap: 8px;
+    padding: 12px;
+  }
+}
+
+.assigned-pet-actions {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: nowrap;
+}
+
+.create-case-btn {
+  padding: 8px 14px;
+  background: #10b981;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.create-case-btn:hover {
+  background: #059669;
+  transform: translateY(-1px);
+}
+
+.assigned-pets-row:not(.assigned-pets-header):hover {
+  background: #f8fafc;
+}
+
+.assigned-pets-row:last-child {
+  border-bottom: none;
+}
+
+.assigned-pets-header {
+  background: #f9fafb;
+  color: #6b7280;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.assigned-pet-name {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.assigned-pet-name strong {
+  color: #111827;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+.assigned-pet-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  background: #dbeafe;
+  color: #1d4ed8;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  flex: 0 0 auto;
+}
+
+.assigned-pet-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.assigned-pet-badges .appointment-badge {
+  margin-top: 0;
+}
+
+.assigned-pet-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ===========================
+   Cases Table
+   =========================== */
+.cases-table {
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  overflow: visible;
+  background: #fff;
+  position: relative;
+}
+
+.cases-table-header {
+  background: #f9fafb;
+  font-size: 11px;
+  font-weight: 700;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.cases-table-row {
+  display: grid;
+  grid-template-columns: 80px 100px 1fr 150px 120px 120px 100px 1fr;
+  gap: 12px;
+  padding: 12px 16px;
+  align-items: center;
+  border-bottom: 1px solid #f3f4f6;
+  font-size: 13px;
+  color: #6b7280;
+  transition: background 0.15s;
+  position: relative;
+}
+
+/* Center align the last column (Actions) */
+.cases-table-row > :last-child {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.cases-table-row:last-child {
+  border-bottom: none;
+}
+
+.cases-table-row:not(.cases-table-header):hover {
+  background: #f8fafc;
+}
+
+.case-number {
+  font-weight: 700;
+  color: #2563eb;
+}
+
+.client-id {
+  font-weight: 600;
+  color: #059669;
+  font-size: 0.9em;
+  font-family: 'Courier New', monospace;
+}
+
+.pet-id {
+  font-weight: 600;
+  color: #059669;
+  font-size: 0.9em;
+  font-family: 'Courier New', monospace;
+}
+
+.medical-record-number {
+  font-weight: 700;
+  color: #7c3aed;
+  font-size: 0.95em;
+}
+
+.case-pet-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.case-avatar {
+  font-size: 18px;
+}
+
+.case-records {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.record-count {
+  background: #ede9fe;
+  color: #7c3aed;
+  padding: 2px 8px;
+  border-radius: 5px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+/* .case-actions-group — styled in Inpatient/Dropdown block above */
+
+/* ===========================
+   Closed Cases
+   =========================== */
+.closed-cases-table {
+  border: 1px solid #d1fae5;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.closed-cases-row {
+  display: grid;
+  grid-template-columns: minmax(180px, 1.2fr) 110px minmax(150px, 1fr) 120px 120px 90px minmax(190px, auto);
+  gap: 16px;
+  align-items: center;
+  padding: 13px 16px;
+  border-bottom: 1px solid #ecfdf5;
+  font-size: 13px;
+  color: #4b5563;
+  transition: background 0.15s;
+}
+
+.closed-cases-row:last-child {
+  border-bottom: none;
+}
+
+.closed-cases-row:not(.closed-cases-header):hover {
+  background: #f0fdf4;
+}
+
+.closed-cases-header {
+  background: #f0fdf4;
+  color: #047857;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.closed-case-pet {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.closed-case-pet div {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.closed-case-pet strong {
+  color: #111827;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+.closed-case-pet span:last-child {
+  color: #6b7280;
+  font-size: 12px;
+}
+
+.closed-case-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  background: #d1fae5;
+  color: #047857;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  flex: 0 0 auto;
+}
+
+.closed-case-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: nowrap;
+}
+
+/* ===========================
+   Today's Schedule
+   =========================== */
+.todays-schedule-section {
+  background: #fff;
+  border-radius: 14px;
+  padding: 24px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.07), 0 4px 16px rgba(0,0,0,0.04);
+  border: 1px solid rgba(0,0,0,0.05);
+}
+
+.todays-schedule-section h2 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 20px;
+}
+
+/* ===========================
+   Inpatient / Closed Case Pet Cards
+   =========================== */
+.pet-card.closed-case {
+  border-left: 3px solid #10b981;
+  background: #f0fdf4;
+}
+
+.closed-case-info {
+  font-size: 12px !important;
+  color: #047857 !important;
+}
+
+/* ===========================
+   Empty State
+   =========================== */
+.empty-state {
+  text-align: center;
+  padding: 48px 24px;
+  color: #9ca3af;
+  background: #f9fafb;
+  border-radius: 10px;
+}
+
+.empty-state p {
+  font-size: 15px;
+  margin: 0;
+}
+
+/* ===========================
+   Loading Spinner
+   =========================== */
+.vet-dashboard-container .loading-spinner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.vet-dashboard-container .spinner {
+  width: 44px;
+  height: 44px;
+  border: 3px solid #e5e7eb;
+  border-top: 3px solid #2563eb;
+  border-radius: 50%;
+  animation: spin 0.75s linear infinite;
+  margin-bottom: 14px;
+}
+
+@keyframes spin {
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* ===========================
+   Modal
+   =========================== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 16px;
+}
+
+.modal {
+  background: #fff;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 480px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.18);
+  overflow: hidden;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.modal-header h2 {
+  font-size: 17px;
+  font-weight: 700;
+  color: #111827;
+  margin: 0;
+}
+
+.modal-header .close-btn {
+  background: #f3f4f6;
+  border: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  font-size: 14px;
+  cursor: pointer;
+  color: #6b7280;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+
+.modal-header .close-btn:hover {
+  background: #e5e7eb;
+}
+
+.modal-body {
+  padding: 20px 24px;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.modal-footer {
+  padding: 16px 24px;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.btn-secondary {
+  padding: 10px 20px;
+  background: #f3f4f6;
+  color: #374151;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-secondary:hover {
+  background: #e5e7eb;
+}
+
+/* ===========================
+   RESPONSIVE — TABLET (1024px)
+   =========================== */
+@media (max-width: 1024px) {
+  .vet-dashboard-container {
+    padding: 20px;
+  }
+
+  /* Cases table: tighter columns */
+  .cases-table-row {
+    grid-template-columns: 70px 90px 1fr 120px 100px 100px 80px auto;
+    font-size: 12px;
+    gap: 8px;
+    padding: 10px 12px;
+  }
+
+  .action-btn {
+    padding: 6px 10px;
+    font-size: 11px;
+  }
+
+  /* Assigned pets: tighter */
+  .assigned-pets-row {
+    grid-template-columns: minmax(140px, 1.2fr) 90px minmax(140px, 1fr) minmax(130px, 1fr) minmax(110px, 0.8fr) minmax(160px, auto);
+    gap: 10px;
+    padding: 12px;
+  }
+
+  /* Closed cases: tighter */
+  .closed-cases-row {
+    grid-template-columns: minmax(160px, 1.2fr) 90px minmax(130px, 1fr) 100px 100px 80px minmax(160px, auto);
+    gap: 10px;
+    padding: 12px;
+  }
+
+  /* Inpatient table: tighter columns */
+  .inpatient-row {
+    grid-template-columns: minmax(140px, 1.3fr) minmax(130px, 1fr) minmax(120px, 1fr) 100px 110px minmax(110px, auto);
+    gap: 10px;
+    padding: 10px 12px;
+    font-size: 12px;
+  }
+}
+
+/* ===========================
+   RESPONSIVE — LARGE MOBILE / SMALL TABLET (768px)
+   =========================== */
+@media (max-width: 768px) {
+  .vet-dashboard-container {
+    padding: 14px 12px;
+  }
+
+  .vet-header h1 {
+    font-size: 20px;
+  }
+
+  /* Stats: 2 columns */
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-bottom: 18px;
+  }
+
+  .stat-card {
+    padding: 14px;
+    gap: 10px;
+  }
+
+  .stat-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+    border-radius: 10px;
+  }
+
+  .stat-value {
+    font-size: 20px;
+  }
+
+  .stat-label {
+    font-size: 10px;
+  }
+
+  /* Tabs scrollable pill row */
+  .vet-tabs {
+    padding: 4px;
+    gap: 4px;
+  }
+
+  .tab-btn {
+    padding: 9px 14px;
+    font-size: 12px;
+  }
+
+  /* View/tab content */
+  .tab-content,
+  .view-content,
+  .todays-schedule-section {
+    padding: 16px;
+    border-radius: 10px;
+  }
+
+  /* Search bar stacks */
+  .search-bar {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .search-bar input,
+  .search-bar button {
+    width: 100%;
+  }
+
+  /* ── Appointment cards: mobile card layout ── */
+  .appointment-card {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    padding: 14px;
+  }
+
+  .appointment-time {
+    font-size: 12px;
+    font-weight: 800;
+    color: #2563eb;
+    min-width: unset;
+  }
+
+  .appointment-details h3 {
+    font-size: 14px;
+  }
+
+  .appointment-actions {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .appointment-actions .view-btn {
+    flex: 1;
+    min-width: 120px;
+    justify-content: center;
+  }
+
+  /* ── Inpatient table: hide header, convert to cards on mobile ── */
+  .inpatient-header {
+    display: none;
+  }
+
+  .inpatient-table {
+    border: none;
+    background: transparent;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    overflow: visible;
+  }
+
+  .inpatient-row {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 14px;
+    border: 1.5px solid #fde68a;
+    border-radius: 12px;
+    background: #fffbeb;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+  }
+
+  .inpatient-pet-name strong {
+    font-size: 15px;
+    white-space: normal;
+  }
+
+  .inpatient-actions {
+    justify-content: flex-start;
+    margin-top: 4px;
+  }
+
+  .inpatient-actions .view-btn {
+    width: 100%;
+    justify-content: center;
+    padding: 10px;
+  }
+
+  /* ── Case actions dropdown — stays compact, just ensure it doesn't overflow ── */
+  .case-actions-group {
+    justify-content: flex-start;
+    margin-top: 4px;
+  }
+
+  .case-actions-toggle {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+
+  /* ── Hide table headers, convert rows to cards ── */
+  .assigned-pets-header,
+  .closed-cases-header,
+  .cases-table-header {
+    display: none;
+  }
+
+  .assigned-pets-table,
+  .closed-cases-table,
+  .cases-table {
+    border: none;
+    background: transparent;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    overflow: visible;
+  }
+
+  /* Assigned Pets — Card Layout */
+  .assigned-pets-row {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 14px;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+  }
+
+  .assigned-pet-name {
+    font-size: 15px;
+  }
+
+  .assigned-pet-name strong {
+    font-size: 15px;
+    white-space: normal;
+  }
+
+  /* Label + value pairs for mobile table cells */
+  .assigned-pets-row > span {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    font-size: 13px;
+    color: #374151;
+  }
+
+  .assigned-pet-badges {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .assigned-pet-actions {
+    display: flex;
+    flex-direction: row;
+    justify-content: stretch;
+    gap: 8px;
+    margin-top: 4px;
+  }
+
+  .assigned-pet-actions .assign-btn,
+  .assigned-pet-actions .view-btn {
+    flex: 1;
+    justify-content: center;
+    padding: 10px 8px;
+    font-size: 13px;
+  }
+
+  /* Cases Table — Card Layout */
+  .cases-table-row {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 14px;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+  }
+
+  .case-number {
+    font-size: 12px;
+  }
+
+  .case-pet-info {
+    font-size: 14px;
+  }
+
+  /* Closed Cases — Card Layout */
+  .closed-cases-row {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 14px;
+    border: 1px solid #d1fae5;
+    border-radius: 12px;
+    background: #fafff9;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  }
+
+  .closed-case-pet {
+    align-items: flex-start;
+  }
+
+  .closed-case-actions {
+    display: flex;
+    flex-direction: row;
+    justify-content: stretch;
+    gap: 8px;
+    margin-top: 4px;
+    flex-wrap: nowrap;
+  }
+
+  .closed-case-actions .view-btn {
+    flex: 1;
+    justify-content: center;
+    padding: 10px 8px;
+    font-size: 13px;
+  }
+
+  /* Modal on mobile */
+  .modal {
+    border-radius: 12px;
+    max-width: 100%;
+  }
+
+  .modal-body {
+    max-height: 50vh;
+  }
+}
+
+/* ===========================
+   RESPONSIVE — SMALL MOBILE (480px)
+   =========================== */
+@media (max-width: 480px) {
+  .vet-dashboard-container {
+    padding: 12px 10px;
+  }
+
+  .vet-header h1 {
+    font-size: 18px;
+  }
+
+  .vet-header p {
+    font-size: 12px;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+
+  .stat-card {
+    padding: 12px;
+    gap: 8px;
+    border-radius: 10px;
+  }
+
+  .stat-icon {
+    width: 36px;
+    height: 36px;
+    font-size: 18px;
+  }
+
+  .stat-value {
+    font-size: 18px;
+  }
+
+  .tab-btn {
+    padding: 8px 12px;
+    font-size: 11px;
+  }
+
+  .tab-content h2,
+  .view-content h2,
+  .todays-schedule-section h2 {
+    font-size: 15px;
+    margin-bottom: 14px;
+  }
+
+  /* Keep dropdown full-width on small phones */
+  .case-actions-toggle {
+    width: 100% !important;
+  }
+
+  .assigned-pet-actions,
+  .closed-case-actions {
+    flex-direction: column;
+  }
+
+  .assigned-pet-actions .assign-btn,
+  .assigned-pet-actions .view-btn,
+  .closed-case-actions .view-btn {
+    width: 100%;
+    padding: 11px 8px;
+  }
+
+  .appointment-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .appointment-actions .view-btn {
+    width: 100%;
+  }
+
+  .modal-header {
+    padding: 16px 18px;
+  }
+
+  .modal-body {
+    padding: 14px 18px;
+  }
+
+  .modal-footer {
+    padding: 12px 18px;
+  }
+}
+
+/* ===========================
+   RESPONSIVE — EXTRA SMALL (360px)
+   =========================== */
+@media (max-width: 360px) {
+  .stats-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+  }
+
+  .stat-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    padding: 10px;
+  }
+
+  /* No case-actions-group grid needed — dropdown handles layout */
+}
+
+/* ===========================
+   Three-Dot Actions Button
+   =========================== */
+.three-dot-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  background: #fff;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: background 0.18s, border-color 0.18s, box-shadow 0.18s;
+  position: relative;
+  z-index: 100;
+  margin: 0 auto;
+}
+
+.three-dot-btn:hover {
+  background: #f3f4f6;
+  border-color: #93c5fd;
+  box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+}
+
+.three-dot-btn span {
+  display: block;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #6b7280;
+  flex-shrink: 0;
+}
+
+.three-dot-btn:hover span {
+  background: #1d4ed8;
+}
+
+/* ===========================
+   Three-Dot Dropdown Menu
+   =========================== */
+.three-dot-menu {
+  position: absolute;
+  left: 50%;
+  /* 1. REMOVE or comment out the top property: */
+  /* top: calc(100% + 8px); */
+
+  /* 2. ADD bottom positioning to push it above the button: */
+  bottom: calc(100% + 8px); 
+  
+  /* 3. COMBINE your center transform and animation starter values */
+  transform: translateX(-50%); 
+  
+  background: #fff;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 10px;
+  box-shadow: 0 10px 32px rgba(0,0,0,0.15);
+  padding: 6px 4px;
+  min-width: 200px;
+  z-index: 1000;  
+  display: flex;
+  flex-direction: column;
+  
+  /* 4. UPDATE the animation name to match your new upward fade (defined below) */
+  animation: dropdownUp 0.15s ease-out; 
+  
+  pointer-events: auto;
+  visibility: visible;
+  opacity: 1;
+}
+
+@keyframes dropdownUp {
+  from { 
+    opacity: 0; 
+    /* Keeps horizontal centering while shifting slightly downwards at start */
+    transform: translateX(-50%) translateY(6px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateX(-50%) translateY(0); 
+  }
+}
+
+.three-dot-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 9px 14px;
+  background: none;
+  border: none;
+  border-radius: 7px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #374151;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s;
+  font-family: inherit;
+}
+
+.three-dot-item:hover {
+  background: #f3f4f6;
+  color: #111827;
+}
+
+.three-dot-item.view-item:hover {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.three-dot-item.inpatient-item:hover {
+  background: #fef3c7;
+  color: #d97706;
+}
+
+.three-dot-item.close-item {
+  color: #dc2626;
+}
+
+.three-dot-item.close-item:hover {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+/* .three-dot-divider {
+  height: 1px;
+  background: #e5e7eb;
+  margin: 4px 8px;
+} */
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+  .case-actions-group {
+    justify-content: flex-start;
+    margin-top: 4px;
+  }
+
+  .three-dot-menu {
+    right: auto;
+    left: 0;
+  }
+}

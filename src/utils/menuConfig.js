@@ -13,6 +13,7 @@ import StorefrontIcon from "@mui/icons-material/Storefront";
 import ContentCutIcon from "@mui/icons-material/ContentCut";
 import InventoryIcon from "@mui/icons-material/Inventory";
 import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
+import LocalHospitalIcon from "@mui/icons-material/LocalHospital";
 import SettingsIcon from "@mui/icons-material/Settings";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
@@ -51,7 +52,7 @@ export const regularMenuItems = [
         path: "/customers",
         hasArrow: true,
     },
-    { label: "Events", icon: <EventIcon />, path: "/events" },
+    { label: "Appointments", icon: <EventIcon />, path: "/appointments" },
     {
         label: "Laboratory",
         icon: <ScienceIcon />,
@@ -102,6 +103,13 @@ export const getMenuItemsByRole = (userRole) => {
     if (userRole === "ROLE_SUPERADMIN" || userRole === "SUPERADMIN") {
         return superAdminMenuItems;
     }
+    if (userRole === "VET" || userRole === "ROLE_VET") {
+        // Add Vet Dashboard to regular menu items for VET role
+        return [
+            { label: "Vet Dashboard", icon: <LocalHospitalIcon />, path: "/vet" },
+            ...regularMenuItems,
+        ];
+    }
     return regularMenuItems;
 };
 
@@ -114,7 +122,7 @@ export const getClinicMenuItems = (clinicId, userRole) => {
         { label: "Dashboard", value: "dashboard", icon: <DashboardIcon /> },
         { label: "Clients", value: "customers", icon: <PeopleAltIcon /> },
         { label: "Pets", value: "pets", icon: <DashboardIcon /> },
-        { label: "Appointments", value: "events", icon: <EventIcon /> },
+        { label: "Appointments", value: "appointments", icon: <EventIcon /> },
         {
             label: "Laboratory",
             value: "laboratory",
@@ -122,7 +130,8 @@ export const getClinicMenuItems = (clinicId, userRole) => {
             hasDropdown: true,
             children: [
                 { label: "Lab Reports", value: "laboratory", icon: <ScienceIcon /> },
-                { label: "Imaging Reports", value: "inpatient", icon: <MedicalServicesIcon /> },
+                { label: "Imaging Reports", value: "imaging-reports", icon: <MedicalServicesIcon /> },
+                { label: "Inpatient Reports", value: "inpatient", icon: <MedicalServicesIcon /> },
                 { label: "Test Parameters", value: "parameters", icon: <SettingsIcon /> },
             ],
         },
@@ -132,6 +141,11 @@ export const getClinicMenuItems = (clinicId, userRole) => {
         { label: "Supplies", value: "supplies", icon: <InventoryIcon /> },
         { label: "Finance", value: "finance", icon: <AccountBalanceWalletIcon /> },
     ];
+
+    // Add Vet Dashboard for VET and SUPERADMIN roles
+    if (userRole === "VET" || userRole === "ROLE_VET" || userRole === "SUPERADMIN" || userRole === "ROLE_SUPERADMIN" || userRole === "ADMIN" || userRole === "ROLE_ADMIN") {
+        baseMenuItems.unshift({ label: "Vet Dashboard", value: "vet", icon: <LocalHospitalIcon /> });
+    }
 
     // Add Users tab only for super admin and admin
     if (userRole === "ROLE_SUPERADMIN" || userRole === "ROLE_ADMIN") {

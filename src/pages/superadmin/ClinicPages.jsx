@@ -1,9 +1,10 @@
 import { useEffect, useState, useCallback, useContext } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { useSnackbar } from "notistack";
 import SuperAdminNavbar from "../../components/superadmin/SuperAdminNavbar";
 import Sidebar from "../../components/sidebar/Sidebar";
 import HttpService from "../../services/HttpService";
+import AuthService from "../../services/AuthService";
 import { ClinicContext } from "../../context/clinicContext";
 import Dashboard from "../dashboard/Dashboard";
 import Customers from "../customers/Customers";
@@ -17,16 +18,45 @@ import Supplies from "../supplies/Supplies";
 import ListPet from "../pet/ListPet";
 import Settings from "../settings/Settings";
 import UserManagement from "./UserManagement";
+import VetDashboard from "../vet/VetDashboard";
 import "./clinicPages.css";
 
 const ClinicPages = () => {
     const { id } = useParams();
     const navigate = useNavigate();
+    const location = useLocation();
     const { enqueueSnackbar } = useSnackbar();
     const { dispatch: dispatchClinic } = useContext(ClinicContext);
+    const user = AuthService.getCurrentUser();
     const [clinic, setClinic] = useState(null);
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState("dashboard");
+
+    // Determine active tab from current URL pathname
+    useEffect(() => {
+        const pathname = location.pathname;
+        let tab = "dashboard";
+
+        if (pathname.includes("/events")) {
+            navigate(`/clinics/${id}/appointments`, { replace: true });
+            return;
+        }
+
+        if (pathname.includes("/vet")) tab = "vet";
+        else if (pathname.includes("/customers")) tab = "customers";
+        else if (pathname.includes("/pets")) tab = "pets";
+        else if (pathname.includes("/appointments")) tab = "appointments";
+        else if (pathname.includes("/imaging-reports")) tab = "imaging-reports";
+        else if (pathname.includes("/laboratory")) tab = "laboratory";
+        else if (pathname.includes("/grooming")) tab = "grooming";
+        else if (pathname.includes("/pharmacy")) tab = "pharmacy";
+        else if (pathname.includes("/store")) tab = "store";
+        else if (pathname.includes("/supplies")) tab = "supplies";
+        else if (pathname.includes("/finance")) tab = "finance";
+        else if (pathname.includes("/settings")) tab = "settings";
+
+        setActiveTab(tab);
+    }, [id, location.pathname, navigate]);
 
     const fetchClinic = useCallback(async () => {
         try {
@@ -34,6 +64,9 @@ const ClinicPages = () => {
             const response = await HttpService.getWithAuth(`/clinics/${id}`);
             const clinicData = response.data || response;
             setClinic(clinicData);
+
+            // Store clinicId in localStorage for child components
+            localStorage.setItem('selectedClinicId', id);
 
             // Set the clinic context
             dispatchClinic({
@@ -64,16 +97,20 @@ const ClinicPages = () => {
 
     const renderContent = () => {
         switch (activeTab) {
+            case "vet":
+                return <VetDashboard clinicId={id} />;
             case "dashboard":
                 return <Dashboard clinicId={id} />;
             case "customers":
                 return <Customers clinicId={id} />;
             case "pets":
                 return <ListPet clinicId={id} />;
-            case "events":
+            case "appointments":
                 return <Events clinicId={id} />;
             case "laboratory":
                 return <Laboratory clinicId={id} subView="lab-reports" />;
+            case "imaging-reports":
+                return <Laboratory clinicId={id} subView="imaging-reports" />;
             case "inpatient":
                 return <Laboratory clinicId={id} subView="inpatient" />;
             case "parameters":
@@ -97,17 +134,23 @@ const ClinicPages = () => {
         }
     };
 
+    const handleTabChange = (tab) => {
+        setActiveTab(tab);
+        // Navigate to the clinic-scoped route for this tab
+        navigate(`/clinics/${id}/${tab}`);
+    };
+
     return (
         <div>
             <SuperAdminNavbar />
             <div style={{ display: "flex" }}>
-                <Sidebar activeClinicTab={activeTab} onTabChange={setActiveTab} />
+                <Sidebar activeClinicTab={activeTab} onTabChange={handleTabChange} />
                 <div className="clinic-pages-container">
                     <div className="clinic-pages-header">
                         <h1>{clinic.clinicName}</h1>
                         <button
                             className="back-to-clinics"
-                            onClick={() => navigate("/superadmin/dashboard")}
+                            onClick={() => navigate(user?.role === "SUPERADMIN" ? "/superadmin/dashboard" : "/select-clinic")}
                         >
                             ← Back to Clinics
                         </button>

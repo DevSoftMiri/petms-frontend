@@ -485,14 +485,102 @@
 .app.dark .user-info p { color: #8B8B85; }
 
 /* ---------- Responsive ---------- */
-@media (max-width: 768px) {
-  .clinic-detail-container { padding: 20px 16px; }
-  .clinic-detail-header { flex-direction: column; }
+/* Tablets and small devices (max 1024px) */
+@media (max-width: 1024px) {
+  .clinic-detail-container { 
+    padding: 18px 16px;
+    padding-top: 70px;
+  }
+  .clinic-detail-header { 
+    flex-direction: column;
+    gap: 14px;
+  }
+  .clinic-detail-header h1 { font-size: 22px; }
+  .back-btn { width: 100%; }
   .section-header { flex-direction: column; align-items: flex-start; }
-  .add-btn { width: 100%; justify-content: center; }
-  .info-grid { grid-template-columns: 1fr; }
+  .add-btn { width: auto; }
+  .info-grid { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
   .user-item { flex-direction: column; align-items: flex-start; gap: 12px; }
-  .remove-btn { width: 100%; justify-content: center; }
-  .form-actions { flex-direction: column-reverse; }
+  .remove-btn { width: auto; }
+  .form-actions { flex-direction: column-reverse; gap: 10px; }
   .cancel-btn, .submit-btn { width: 100%; }
+}
+
+/* Mobile phones (max 768px) */
+@media (max-width: 768px) { 
+  .clinic-detail-container { 
+    padding: 14px 12px;
+    padding-top: 70px;
+  }
+  .clinic-detail-header h1 { 
+    font-size: 18px;
+    word-break: break-word;
+  }
+  .clinic-code { font-size: 12px; }
+  .back-btn { 
+    padding: 8px 14px;
+    font-size: 12px;
+  }
+  .clinic-info-section { 
+    padding: 20px 16px;
+    margin-bottom: 16px;
+  }
+  .clinic-info-section h2 { font-size: 13px; }
+  .info-grid { 
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .info-item { padding: 10px 12px; }
+  .info-item .label { font-size: 10px; }
+  .info-item .value { font-size: 13px; }
+  .add-btn { 
+    width: 100%;
+    justify-content: center;
+    padding: 10px 14px;
+  }
+  .access-section { padding: 20px 16px; }
+  .section-header { 
+    flex-direction: column; 
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .section-header h2 { font-size: 13px; }
+  .user-item { 
+    flex-direction: column; 
+    align-items: flex-start; 
+    gap: 12px;
+    padding: 12px;
+  }
+  .user-info { flex: 1; }
+  .remove-btn { 
+    width: 100%;
+    justify-content: center;
+  }
+  .form-actions { 
+    flex-direction: column-reverse;
+    gap: 10px;
+  }
+  .cancel-btn, .submit-btn { 
+    width: 100%;
+    padding: 11px 16px;
+  }
+}
+
+/* Very small mobile devices (max 480px) */
+@media (max-width: 480px) {
+  .clinic-detail-container {
+    padding: 10px 8px;
+    padding-top: 60px;
+  }
+  .clinic-detail-header h1 {
+    font-size: 16px;
+  }
+  .back-btn {
+    padding: 7px 12px;
+    font-size: 11px;
+  }
+  .clinic-info-section {
+    padding: 16px 12px;
+    margin-bottom: 12px;
+  }
 }

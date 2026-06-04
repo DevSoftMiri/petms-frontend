@@ -37,6 +37,7 @@ const SuperAdminDashboard = () => {
         phoneNumber: "",
         role: "STAFF",
         clinicId: "",
+        clinicIds: [],
     });
 
     const userRoles = ["ALL", "ADMIN", "VET", "GROOMER", "RECEPTIONIST", "PHARMACIST", "STAFF", "USER"];
@@ -123,6 +124,7 @@ const SuperAdminDashboard = () => {
             phoneNumber: "",
             role: "STAFF",
             clinicId: "",
+            clinicIds: [],
         });
         setIsUserModalOpen(true);
     };
@@ -138,6 +140,7 @@ const SuperAdminDashboard = () => {
             phoneNumber: user.phoneNumber,
             role: user.role,
             clinicId: user.clinicId || "",
+            clinicIds: user.clinicIds?.length ? user.clinicIds : (user.clinicId ? [user.clinicId] : []),
         });
         setIsUserModalOpen(true);
     };
@@ -149,6 +152,11 @@ const SuperAdminDashboard = () => {
                 return;
             }
 
+            if (userFormData.role !== "SUPERADMIN" && userFormData.clinicIds.length === 0) {
+                enqueueSnackbar("Select at least one clinic", { variant: "error" });
+                return;
+            }
+
             if (editingUser) {
                 const updateData = {
                     firstName: userFormData.firstName,
@@ -156,6 +164,7 @@ const SuperAdminDashboard = () => {
                     phoneNumber: userFormData.phoneNumber,
                     role: userFormData.role,
                     clinicId: userFormData.clinicId || null,
+                    clinicIds: userFormData.clinicIds,
                 };
                 if (userFormData.password) {
                     updateData.password = userFormData.password;
@@ -169,7 +178,8 @@ const SuperAdminDashboard = () => {
                 }
                 const createData = {
                     ...userFormData,
-                    clinicId: userFormData.clinicId || null,
+                    clinicId: userFormData.clinicIds[0] || userFormData.clinicId || null,
+                    clinicIds: userFormData.clinicIds,
                 };
                 await HttpService.postWithAuth("/users", createData);
                 enqueueSnackbar("User created successfully", { variant: "success" });
@@ -178,10 +188,45 @@ const SuperAdminDashboard = () => {
             setIsUserModalOpen(false);
             fetchUsers();
         } catch (error) {
-            enqueueSnackbar(
-                error.response?.data?.message || "Failed to save user",
-                { variant: "error" }
-            );
+            // Handle validation errors with field details
+            if (error?.response?.data?.code === 'VALIDATION_ERROR' && error?.response?.data?.errors) {
+                const validationErrors = error.response.data.errors;
+
+                // Show all errors at once
+                if (validationErrors.length === 1) {
+                    // Single error
+                    enqueueSnackbar(
+                        `${validationErrors[0].field}: ${validationErrors[0].message}`,
+                        {
+                            variant: "error",
+                            autoHideDuration: 6000,
+                        }
+                    );
+                } else {
+                    // Multiple errors - show first few
+                    const errorSummary = validationErrors
+                        .slice(0, 3)
+                        .map(err => `• ${err.field}: ${err.message}`)
+                        .join(' | ');
+
+                    const fullMessage = validationErrors.length > 3
+                        ? `${errorSummary} and ${validationErrors.length - 3} more errors`
+                        : errorSummary;
+
+                    enqueueSnackbar(
+                        fullMessage,
+                        {
+                            variant: "error",
+                            autoHideDuration: 7000,
+                        }
+                    );
+                }
+            } else {
+                enqueueSnackbar(
+                    error.response?.data?.message || "Failed to save user",
+                    { variant: "error" }
+                );
+            }
         }
     };
 
@@ -202,6 +247,27 @@ const SuperAdminDashboard = () => {
     const handleUserFormChange = (e) => {
         const { name, value } = e.target;
         setUserFormData((prev) => ({ ...prev, [name]: value }));
+    };
+
+    const handleClinicToggle = (selectedClinicId) => {
+        setUserFormData((prev) => ({
+            ...prev,
+            clinicIds: prev.clinicIds.includes(selectedClinicId)
+                ? prev.clinicIds.filter((id) => id !== selectedClinicId)
+                : [...prev.clinicIds, selectedClinicId],
+        }));
+    };
+
+    const getUserClinicNames = (user) => {
+        if (user.clinics?.length) {
+            return user.clinics.map((clinic) => clinic.clinicName).join(", ");
+        }
+
+        if (user.clinicId) {
+            return clinics.find((clinic) => clinic.id === user.clinicId)?.clinicName || "Clinic Not Found";
+        }
+
+        return "No Clinic";
     };
 
     const handleDeleteClinic = async (clinicId) => {
@@ -379,7 +445,9 @@ const SuperAdminDashboard = () => {
                                 <h3>Centres Overview</h3>
                                 <div className="clinics-overview-grid">
                                     {clinics.map((clinic) => {
-                                        const clinicUsers = users.filter(u => u.clinicId === clinic.id).length;
+                                        const clinicUsers = users.filter((u) =>
+                                            u.clinicId === clinic.id || u.clinicIds?.includes(clinic.id)
+                                        ).length;
                                         return (
                                             <div key={clinic.id} className="clinic-overview-card">
                                                 <div className="clinic-overview-header">
@@ -498,19 +566,14 @@ const SuperAdminDashboard = () => {
                             ) : (
                                 <div className="users-table-container">
                                     <table className="users-table">
-                                        {/*
-                                            colgroup tells the browser the column count and widths.
-                                            CSS targets these via .users-table col:nth-child(n).
-                                            Order must match th/td order exactly.
-                                        */}
                                         <colgroup>
-                                            <col /> {/* 1 Name    */}
-                                            <col /> {/* 2 Email   */}
-                                            <col /> {/* 3 Username*/}
-                                            <col /> {/* 4 Phone   */}
-                                            <col /> {/* 5 Role    */}
-                                            <col /> {/* 6 Clinic  */}
-                                            <col /> {/* 7 Actions */}
+                                            <col />
+                                            <col />
+                                            <col />
+                                            <col />
+                                            <col />
+                                            <col />
+                                            <col />
                                         </colgroup>
                                         <thead>
                                             <tr>
@@ -540,13 +603,9 @@ const SuperAdminDashboard = () => {
                                                         </span>
                                                     </td>
                                                     <td title={
-                                                        user.clinicId
-                                                            ? clinics.find((c) => c.id === user.clinicId)?.clinicName
-                                                            : "No Clinic"
+                                                        getUserClinicNames(user)
                                                     }>
-                                                        {user.clinicId
-                                                            ? clinics.find((c) => c.id === user.clinicId)?.clinicName || "Clinic Not Found"
-                                                            : "No Clinic"}
+                                                        {getUserClinicNames(user)}
                                                     </td>
                                                     <td className="user-actions">
                                                         <button
@@ -695,19 +754,26 @@ const SuperAdminDashboard = () => {
                                     </div>
 
                                     <div className="form-group">
-                                        <label>Assign to Clinic</label>
-                                        <select
-                                            name="clinicId"
-                                            value={userFormData.clinicId}
-                                            onChange={handleUserFormChange}
-                                        >
-                                            <option value="">-- Select Clinic (Optional) --</option>
+                                        <label>Assign to Clinics</label>
+                                        <div className="clinic-checkbox-list">
                                             {clinics.map((clinic) => (
-                                                <option key={clinic.id} value={clinic.id}>
-                                                    {clinic.clinicName} ({clinic.clinicCode})
-                                                </option>
+                                                <label className="clinic-checkbox-option" key={clinic.id}>
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={userFormData.clinicIds.includes(clinic.id)}
+                                                        onChange={() => handleClinicToggle(clinic.id)}
+                                                    />
+
+                                                    <span>
+                                                        {clinic.clinicName} ({clinic.clinicCode})
+                                                    </span>
+                                                </label>
                                             ))}
-                                        </select>
+                                        </div>
+
+                                        {userFormData.clinicIds.length === 0 && (
+                                            <p className="field-hint">Select at least one clinic.</p>
+                                        )}
                                     </div>
                                 </div>
 

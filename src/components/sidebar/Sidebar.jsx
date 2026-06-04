@@ -28,11 +28,15 @@ const Sidebar = ({ activeClinicTab = null, onTabChange = null }) => {
 
   // Current user
   const user = AuthService.getCurrentUser();
-  const userRole = user?.user?.role;
+  const userRole = user?.role;
 
   // Detect if we're on a clinic page
-  const isClinicPage = location.pathname.includes("/superadmin/clinic/") && location.pathname.includes("/pages");
-  const clinicId = params.id;
+  // Check both URL pattern AND if clinicId is provided via props or localStorage
+  const storedClinicId = localStorage.getItem('selectedClinicId');
+  const isClinicPageFromUrl = location.pathname.includes("/superadmin/clinic/") && location.pathname.includes("/pages");
+  const isClinicPageFromContext = (activeClinicTab !== null && onTabChange !== null) || !!storedClinicId;
+  const isClinicPage = isClinicPageFromUrl || isClinicPageFromContext;
+  const clinicId = params.id || storedClinicId;
 
   // Get appropriate menu items
   let menuItems = [];
@@ -56,6 +60,9 @@ const Sidebar = ({ activeClinicTab = null, onTabChange = null }) => {
   const isActiveItem = (item) => {
     if (isClinicPage) {
       // For clinic pages, check if the tab value matches
+      if (activeClinicTab !== null) {
+        return item.value === activeClinicTab;
+      }
       return activeClinicTab ? item.value === activeClinicTab : false;
     } else {
       // For regular pages, check if the path matches (with query param support)
@@ -98,6 +105,25 @@ const Sidebar = ({ activeClinicTab = null, onTabChange = null }) => {
     return () => clearInterval(interval);
   }, []);
 
+  // Handle window resize to auto-collapse sidebar on mobile
+  useEffect(() => {
+    const handleResize = () => {
+      // Auto-collapse when going to mobile (< 1024px)
+      if (window.innerWidth < 1024) {
+        setIsCollapsed(true);
+      } else {
+        // Auto-expand when going back to desktop (>= 1024px)
+        setIsCollapsed(false);
+      }
+    };
+
+    // Run on mount
+    handleResize();
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   const handleItemClick = (item) => {
     if (isClinicPage && onTabChange) {
       onTabChange(item.value);
@@ -109,23 +135,10 @@ const Sidebar = ({ activeClinicTab = null, onTabChange = null }) => {
   };
 
   return (
-    <div className={`sidebar ${isCollapsed ? "collapsed" : ""}`}>
-
-      {/* Background Image */}
-      <div
-        className={`sidebar-bg ${fade ? "fade-in" : "fade-out"
-          }`}
-        style={{
-          backgroundImage: `url(${DOG_IMAGES[currentImageIndex]})`,
-        }}
-      />
-
-      {/* Overlay */}
-      <div className="sidebar-overlay" />
-
-      {/* Mobile Toggle Button */}
+    <>
+      {/* Mobile Toggle Button - Outside sidebar to always be visible */}
       <button
-        className="sidebar-toggle-btn"
+        className={`sidebar-toggle-btn ${isCollapsed ? "show" : ""}`}
         onClick={() => setIsCollapsed(!isCollapsed)}
         aria-label="Toggle sidebar"
       >
@@ -136,96 +149,54 @@ const Sidebar = ({ activeClinicTab = null, onTabChange = null }) => {
         )}
       </button>
 
-      {/* Sidebar Content */}
-      <div className="sidebar-content">
+      <div
+        className={`sidebar ${isCollapsed ? "collapsed" : ""}`}
+        onClick={(e) => {
+          // Close sidebar when clicking on the backdrop (the ::before overlay)
+          if (window.innerWidth <= 1024 && !isCollapsed && e.target === e.currentTarget) {
+            setIsCollapsed(true);
+          }
+        }}
+      >
 
-        {/* Logo */}
-        <div className="sidebar-logo">
-          <span className="logo-vet">vet</span>
-          <span className="logo-pms">Managment</span>
-        </div>
+        {/* Background Image */}
+        <div
+          className={`sidebar-bg ${fade ? "fade-in" : "fade-out"
+            }`}
+          style={{
+            backgroundImage: `url(${DOG_IMAGES[currentImageIndex]})`,
+          }}
+        />
 
-        {/* Navigation */}
-        <nav className="sidebar-nav">
-          {menuItems.map((item) => {
-            const isActive = isActiveItem(item);
-            const isClinicItem = isClinicPage;
-            const key = item.value || item.label;
-            const hasDropdown = item.hasDropdown && item.children;
+        {/* Overlay */}
+        <div className="sidebar-overlay" />
 
-            // Check if any child is active
-            const isChildActive = hasDropdown && item.children.some(child => isDropdownItemActive(child));
+        {/* Sidebar Content */}
+        <div className="sidebar-content">
 
-            if (isClinicItem) {
-              // For clinic pages, render with dropdown support
-              if (hasDropdown) {
-                // Render dropdown for clinic items
-                return (
-                  <div key={key} className="sidebar-item-wrapper">
-                    <button
-                      className={`sidebar-item ${isChildActive ? "active" : ""}`}
-                      onClick={() => toggleDropdown(item.label)}
-                    >
-                      <span className="sidebar-icon">
-                        {item.icon}
-                      </span>
-                      <span className="sidebar-label">
-                        {item.label}
-                      </span>
-                      <span className="sidebar-dropdown-arrow">
-                        {openDropdowns[item.label] ? <ExpandLessIcon sx={{ fontSize: 18 }} /> : <ExpandMoreIcon sx={{ fontSize: 18 }} />}
-                      </span>
-                    </button>
-                    {openDropdowns[item.label] && (
-                      <div className="sidebar-dropdown">
-                        {item.children.map((child, index) => (
-                          <button
-                            key={`${child.label}-${index}`}
-                            className={`sidebar-dropdown-item ${isActive && activeClinicTab === child.value ? "active" : ""}`}
-                            onClick={() => onTabChange && onTabChange(child.value)}
-                          >
-                            <span className="sidebar-dropdown-icon">
-                              {child.icon}
-                            </span>
-                            <span className="sidebar-dropdown-label">
-                              {child.label}
-                            </span>
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                );
-              } else {
-                // Render simple button for non-dropdown clinic items
-                return (
-                  <button
-                    key={key}
-                    className={`sidebar-item ${isActive ? "active" : ""}`}
-                    onClick={() => handleItemClick(item)}
-                  >
-                    <span className="sidebar-icon">
-                      {item.icon}
-                    </span>
+          {/* Logo */}
+          <div className="sidebar-logo">
+            <span className="logo-vet">vet</span>
+            <span className="logo-pms">Managment</span>
+          </div>
 
-                    <span className="sidebar-label">
-                      {item.label}
-                    </span>
+          {/* Navigation */}
+          <nav className="sidebar-nav">
+            {menuItems.map((item) => {
+              const isActive = isActiveItem(item);
+              const isClinicItem = isClinicPage;
+              const key = item.value || item.label;
+              const hasDropdown = item.hasDropdown && item.children;
 
-                    {item.hasArrow && (
-                      <span className="sidebar-arrow">
-                        &#8250;
-                      </span>
-                    )}
-                  </button>
-                );
-              }
-            } else {
-              // For regular pages, use links
-              return (
-                <div key={key} className="sidebar-item-wrapper">
-                  {hasDropdown ? (
-                    <>
+              // Check if any child is active
+              const isChildActive = hasDropdown && item.children.some(child => isDropdownItemActive(child));
+
+              if (isClinicItem) {
+                // For clinic pages, render with dropdown support
+                if (hasDropdown) {
+                  // Render dropdown for clinic items
+                  return (
+                    <div key={key} className="sidebar-item-wrapper">
                       <button
                         className={`sidebar-item ${isChildActive ? "active" : ""}`}
                         onClick={() => toggleDropdown(item.label)}
@@ -243,10 +214,10 @@ const Sidebar = ({ activeClinicTab = null, onTabChange = null }) => {
                       {openDropdowns[item.label] && (
                         <div className="sidebar-dropdown">
                           {item.children.map((child, index) => (
-                            <Link
+                            <button
                               key={`${child.label}-${index}`}
-                              to={child.path}
-                              className={`sidebar-dropdown-item ${isDropdownItemActive(child) ? "active" : ""}`}
+                              className={`sidebar-dropdown-item ${isActive && activeClinicTab === child.value ? "active" : ""}`}
+                              onClick={() => onTabChange && onTabChange(child.value)}
                             >
                               <span className="sidebar-dropdown-icon">
                                 {child.icon}
@@ -254,14 +225,17 @@ const Sidebar = ({ activeClinicTab = null, onTabChange = null }) => {
                               <span className="sidebar-dropdown-label">
                                 {child.label}
                               </span>
-                            </Link>
+                            </button>
                           ))}
                         </div>
                       )}
-                    </>
-                  ) : (
-                    <Link
-                      to={item.path}
+                    </div>
+                  );
+                } else {
+                  // Render simple button for non-dropdown clinic items
+                  return (
+                    <button
+                      key={key}
                       className={`sidebar-item ${isActive ? "active" : ""}`}
                       onClick={() => handleItemClick(item)}
                     >
@@ -278,15 +252,77 @@ const Sidebar = ({ activeClinicTab = null, onTabChange = null }) => {
                           &#8250;
                         </span>
                       )}
-                    </Link>
-                  )}
-                </div>
-              );
-            }
-          })}
-        </nav>
+                    </button>
+                  );
+                }
+              } else {
+                // For regular pages, use links
+                return (
+                  <div key={key} className="sidebar-item-wrapper">
+                    {hasDropdown ? (
+                      <>
+                        <button
+                          className={`sidebar-item ${isChildActive ? "active" : ""}`}
+                          onClick={() => toggleDropdown(item.label)}
+                        >
+                          <span className="sidebar-icon">
+                            {item.icon}
+                          </span>
+                          <span className="sidebar-label">
+                            {item.label}
+                          </span>
+                          <span className="sidebar-dropdown-arrow">
+                            {openDropdowns[item.label] ? <ExpandLessIcon sx={{ fontSize: 18 }} /> : <ExpandMoreIcon sx={{ fontSize: 18 }} />}
+                          </span>
+                        </button>
+                        {openDropdowns[item.label] && (
+                          <div className="sidebar-dropdown">
+                            {item.children.map((child, index) => (
+                              <Link
+                                key={`${child.label}-${index}`}
+                                to={child.path}
+                                className={`sidebar-dropdown-item ${isDropdownItemActive(child) ? "active" : ""}`}
+                              >
+                                <span className="sidebar-dropdown-icon">
+                                  {child.icon}
+                                </span>
+                                <span className="sidebar-dropdown-label">
+                                  {child.label}
+                                </span>
+                              </Link>
+                            ))}
+                          </div>
+                        )}
+                      </>
+                    ) : (
+                      <Link
+                        to={item.path}
+                        className={`sidebar-item ${isActive ? "active" : ""}`}
+                        onClick={() => handleItemClick(item)}
+                      >
+                        <span className="sidebar-icon">
+                          {item.icon}
+                        </span>
+
+                        <span className="sidebar-label">
+                          {item.label}
+                        </span>
+
+                        {item.hasArrow && (
+                          <span className="sidebar-arrow">
+                            &#8250;
+                          </span>
+                        )}
+                      </Link>
+                    )}
+                  </div>
+                );
+              }
+            })}
+          </nav>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

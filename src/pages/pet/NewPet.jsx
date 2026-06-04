@@ -24,7 +24,15 @@ const NewPet = () => {
   const clinicId = clinicState?.selectedClinicId;
   const defaultValues = {
     name: "",
-    typeId: "",
+    species: "",
+    breed: "",
+    colour: "",
+    gender: "",
+    age: "",
+    weight: "",
+    dateOfBirth: "",
+    bloodGroup: "",
+    medicalNotes: "",
     userId: AuthService.getCurrentUser()?.id,
   };
 
@@ -56,7 +64,20 @@ const NewPet = () => {
       enqueueSnackbar("No clinic selected", { variant: "error" });
       return;
     }
-    HttpService.postWithAuth(`/clinics/${clinicId}/pets`, formValues)
+    const submittedData = {
+      name: formValues.name,
+      species: formValues.species,
+      breed: formValues.breed || undefined,
+      colour: formValues.colour || undefined,
+      gender: formValues.gender || undefined,
+      age: formValues.age ? parseInt(formValues.age) : undefined,
+      weight: formValues.weight ? parseFloat(formValues.weight) : undefined,
+      dateOfBirth: formValues.dateOfBirth ? new Date(formValues.dateOfBirth).toISOString() : undefined,
+      bloodGroup: formValues.bloodGroup || undefined,
+      medicalNotes: formValues.medicalNotes || undefined,
+      userId: formValues.userId,
+    };
+    HttpService.postWithAuth(`/clinics/${clinicId}/pets`, submittedData)
       .then((response) => {
         enqueueSnackbar("Pet created successfully", { variant: "success" });
         navigate("/pets");
@@ -96,32 +117,144 @@ const NewPet = () => {
                   required
                   id="name"
                   name="name"
-                  label="Name"
+                  label="Pet Name"
                   type="text"
                   value={formValues.name}
                   onChange={handleInputChange}
                 />
               </Grid>
+
               <Grid item>
                 <FormControl sx={{ width: 240 }}>
-                  <InputLabel id="demo-select-small">Type</InputLabel>
+                  <InputLabel id="species-label">Species *</InputLabel>
                   <Select
                     required
-                    name="typeId"
-                    label="Type"
-                    value={formValues.typeId}
+                    name="species"
+                    label="Species *"
+                    value={formValues.species}
                     onChange={handleInputChange}
                   >
                     <MenuItem value="">
-                      <em>------------ none ------------</em>
+                      <em>Select species</em>
                     </MenuItem>
-                    {types.map((type) => (
-                      <MenuItem key={type.id} value={type.id}>
-                        {type.name}
-                      </MenuItem>
-                    ))}
+                    <MenuItem value="Dog">Dog</MenuItem>
+                    <MenuItem value="Cat">Cat</MenuItem>
+                    <MenuItem value="Bird">Bird</MenuItem>
+                    <MenuItem value="Rabbit">Rabbit</MenuItem>
+                    <MenuItem value="Hamster">Hamster</MenuItem>
+                    <MenuItem value="Guinea Pig">Guinea Pig</MenuItem>
+                    <MenuItem value="Other">Other</MenuItem>
                   </Select>
                 </FormControl>
+              </Grid>
+
+              <Grid item>
+                <FormControl sx={{ width: 240 }}>
+                  <InputLabel id="gender-label">Gender</InputLabel>
+                  <Select
+                    name="gender"
+                    label="Gender"
+                    value={formValues.gender}
+                    onChange={handleInputChange}
+                  >
+                    <MenuItem value="">
+                      <em>Select gender</em>
+                    </MenuItem>
+                    <MenuItem value="Male">Male</MenuItem>
+                    <MenuItem value="Female">Female</MenuItem>
+                    <MenuItem value="Unknown">Unknown</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+
+              <Grid item>
+                <TextField
+                  sx={{ width: 240 }}
+                  id="colour"
+                  name="colour"
+                  label="Colour"
+                  type="text"
+                  value={formValues.colour}
+                  onChange={handleInputChange}
+                />
+              </Grid>
+
+              <Grid item>
+                <TextField
+                  sx={{ width: 240 }}
+                  id="breed"
+                  name="breed"
+                  label="Breed"
+                  type="text"
+                  value={formValues.breed}
+                  onChange={handleInputChange}
+                />
+              </Grid>
+
+              <Grid item>
+                <TextField
+                  sx={{ width: 240 }}
+                  id="age"
+                  name="age"
+                  label="Age (months)"
+                  type="number"
+                  value={formValues.age}
+                  onChange={handleInputChange}
+                />
+              </Grid>
+
+              <Grid item>
+                <TextField
+                  sx={{ width: 240 }}
+                  id="dateOfBirth"
+                  name="dateOfBirth"
+                  label="Date of Birth"
+                  type="date"
+                  value={formValues.dateOfBirth}
+                  onChange={handleInputChange}
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                />
+              </Grid>
+
+              <Grid item>
+                <TextField
+                  sx={{ width: 240 }}
+                  id="weight"
+                  name="weight"
+                  label="Weight (kg)"
+                  type="number"
+                  step="0.1"
+                  value={formValues.weight}
+                  onChange={handleInputChange}
+                />
+              </Grid>
+
+              <Grid item>
+                <TextField
+                  sx={{ width: 240 }}
+                  id="bloodGroup"
+                  name="bloodGroup"
+                  label="Blood Group"
+                  type="text"
+                  placeholder="e.g., DEA 1.1+, A, B"
+                  value={formValues.bloodGroup}
+                  onChange={handleInputChange}
+                />
+              </Grid>
+
+              <Grid item>
+                <TextField
+                  sx={{ width: 240 }}
+                  id="medicalNotes"
+                  name="medicalNotes"
+                  label="Medical Notes"
+                  multiline
+                  rows={3}
+                  value={formValues.medicalNotes}
+                  onChange={handleInputChange}
+                />
               </Grid>
             </Grid>
             <Stack spacing={2} sx={{ py: 3, paddingRight: 0 }} direction="row">
