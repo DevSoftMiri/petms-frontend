@@ -7,6 +7,7 @@ export const PAGE_ACCESS_OPTIONS = [
   { key: "laboratory", label: "Laboratory" },
   { key: "pharmacy", label: "Pharmacy" },
   { key: "grooming", label: "Grooming" },
+  { key: "food", label: "Food" },
   { key: "store", label: "Store" },
   { key: "supplies", label: "Supplies" },
   { key: "finance", label: "Finance" },
@@ -30,8 +31,8 @@ export const ROLE_ALLOWED_PAGES = {
   VET: ["dashboard", "vet", "customers", "pets", "appointments", "laboratory", "pharmacy", "settings"],
   GROOMER: ["dashboard", "customers", "pets", "appointments", "grooming", "settings"],
   RECEPTIONIST: ["dashboard", "customers", "pets", "appointments", "settings"],
-  PHARMACIST: ["dashboard", "customers", "pets", "pharmacy", "store", "supplies", "settings"],
-  STAFF: ["dashboard", "customers", "pets", "appointments", "store", "supplies", "settings"],
+  PHARMACIST: ["dashboard", "customers", "pets", "pharmacy", "food", "store", "supplies", "settings"],
+  STAFF: ["dashboard", "customers", "pets", "appointments", "food", "store", "supplies", "settings"],
   USER: ["dashboard"],
 };
 

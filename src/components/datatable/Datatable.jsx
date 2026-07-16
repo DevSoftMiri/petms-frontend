@@ -2,18 +2,18 @@ import { DataGrid } from "@mui/x-data-grid";
 import { Link } from "react-router-dom";
 import "./datatable.css";
 
-const Datatable = ({ title, userColumns, actionColumn, data, to, onAdd }) => {
+const Datatable = ({ title, userColumns, actionColumn, data, to, onAdd, addLabel = "Add New" }) => {
   return (
     <div className="datatable">
       <div className="datatableTitle">
         <h1 className="title">{title}</h1>
         {onAdd ? (
           <button type="button" className="link" onClick={onAdd}>
-            Add New
+            {addLabel}
           </button>
         ) : (
           <Link to={to} className="link">
-            Add New
+            {addLabel}
           </Link>
         )}
       </div>

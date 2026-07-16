@@ -4,7 +4,8 @@ import HttpService from "../../services/HttpService";
 import "./supplies.css";
 
 const MEDICINE_TYPES = ["Syrup", "Ointment", "Tablet", "Injection", "Drop"];
-const STORE_TYPES = ["Food", "Bed", "Treat"];
+const STORE_TYPES = ["Bed", "Treat"];
+const FOOD_TYPES = ["Wet Food", "Dry Food", "Medicated Food", "Fresh Food"];
 
 const emptyMedicine = {
     productName: "",
@@ -33,6 +34,17 @@ const emptyStoreItem = {
     outwardDate: "",
 };
 
+const emptyFoodItem = {
+    name: "",
+    category: "",
+    quantity: "",
+    supplier: "",
+    expiryDate: "",
+    cost: "",
+    reorderLevel: "",
+    description: "",
+};
+
 const parseArrayResponse = (response) => {
     if (Array.isArray(response)) return response;
     if (Array.isArray(response?.data)) return response.data;
@@ -47,13 +59,18 @@ const Supplies = ({ clinicId }) => {
     const [activeSection, setActiveSection] = useState("medicine");
     const [medicines, setMedicines] = useState([]);
     const [storeItems, setStoreItems] = useState([]);
+    const [foodItems, setFoodItems] = useState([]);
     const [loadingMedicines, setLoadingMedicines] = useState(true);
     const [loadingStoreItems, setLoadingStoreItems] = useState(true);
+    const [loadingFoodItems, setLoadingFoodItems] = useState(true);
     const [search, setSearch] = useState("");
     const [medicineModalOpen, setMedicineModalOpen] = useState(false);
     const [storeModalOpen, setStoreModalOpen] = useState(false);
+    const [foodModalOpen, setFoodModalOpen] = useState(false);
     const [medicineForm, setMedicineForm] = useState(emptyMedicine);
     const [storeForm, setStoreForm] = useState(emptyStoreItem);
+    const [foodForm, setFoodForm] = useState(emptyFoodItem);
+    const [selectedFoodType, setSelectedFoodType] = useState(FOOD_TYPES[0]);
 
     const fetchMedicines = useCallback(async () => {
         if (!clinicId) return;
@@ -77,10 +94,23 @@ const Supplies = ({ clinicId }) => {
         }
     }, [clinicId]);
 
+    const fetchFoodItems = useCallback(async () => {
+        if (!clinicId) return;
+        try {
+            setLoadingFoodItems(true);
+            const response = await HttpService.getWithAuth(`/clinics/${clinicId}/supplies`);
+            const items = parseArrayResponse(response).filter((item) => FOOD_TYPES.includes(item.category));
+            setFoodItems(items);
+        } finally {
+            setLoadingFoodItems(false);
+        }
+    }, [clinicId]);
+
     useEffect(() => {
         fetchMedicines();
         fetchStoreItems();
-    }, [fetchMedicines, fetchStoreItems]);
+        fetchFoodItems();
+    }, [fetchFoodItems, fetchMedicines, fetchStoreItems]);
 
     const filteredMedicines = useMemo(() => {
         const query = search.trim().toLowerCase();
@@ -103,6 +133,26 @@ const Supplies = ({ clinicId }) => {
         ));
     }, [storeItems, search]);
 
+    const filteredFoodItems = useMemo(() => {
+        const query = search.trim().toLowerCase();
+        if (!query) return foodItems;
+        return foodItems.filter((item) => (
+            item.name?.toLowerCase().includes(query)
+            || item.category?.toLowerCase().includes(query)
+            || item.supplier?.toLowerCase().includes(query)
+        ));
+    }, [foodItems, search]);
+
+    const groupedFoodItems = useMemo(() => FOOD_TYPES.map((type) => ({
+        type,
+        items: filteredFoodItems.filter((item) => item.category === type),
+    })), [filteredFoodItems]);
+
+    const selectedFoodSection = useMemo(
+        () => groupedFoodItems.find((section) => section.type === selectedFoodType) || groupedFoodItems[0],
+        [groupedFoodItems, selectedFoodType],
+    );
+
     const handleMedicineChange = (event) => {
         const { name, value } = event.target;
         setMedicineForm((prev) => ({ ...prev, [name]: value }));
@@ -111,6 +161,11 @@ const Supplies = ({ clinicId }) => {
     const handleStoreChange = (event) => {
         const { name, value } = event.target;
         setStoreForm((prev) => ({ ...prev, [name]: value }));
+    };
+
+    const handleFoodChange = (event) => {
+        const { name, value } = event.target;
+        setFoodForm((prev) => ({ ...prev, [name]: value }));
     };
 
     const saveMedicine = async () => {
@@ -163,6 +218,28 @@ const Supplies = ({ clinicId }) => {
         }
     };
 
+    const saveFoodItem = async () => {
+        if (!foodForm.name.trim() || !foodForm.category) {
+            enqueueSnackbar("Food item name and type are required", { variant: "error" });
+            return;
+        }
+
+        try {
+            await HttpService.postWithAuth(`/clinics/${clinicId}/supplies`, {
+                ...foodForm,
+                quantity: Number(foodForm.quantity || 0),
+                cost: Number(foodForm.cost || 0),
+                reorderLevel: Number(foodForm.reorderLevel || 10),
+            });
+            enqueueSnackbar("Food item added", { variant: "success" });
+            setFoodModalOpen(false);
+            setFoodForm(emptyFoodItem);
+            fetchFoodItems();
+        } catch (error) {
+            enqueueSnackbar(error.response?.data?.message || "Failed to add food item", { variant: "error" });
+        }
+    };
+
     return (
         <div className="supplies">
             <div className="supplies-container">
@@ -186,16 +263,24 @@ const Supplies = ({ clinicId }) => {
                             <span className="inventory-card-title">Store Stock</span>
                             <span className="inventory-card-copy">Add food, beds, treats, and other store stock</span>
                         </button>
+
+                        <button className={`inventory-card food-card ${activeSection === "food" ? "active" : ""}`} onClick={() => setActiveSection("food")}>
+                            <span className="inventory-card-icon">FD</span>
+                            <span className="inventory-card-title">Food Stock</span>
+                            <span className="inventory-card-copy">Track wet, dry, medicated, and fresh food items with quantity</span>
+                        </button>
                     </div>
 
                     <section className="supplies-medicine-panel">
                         <div className="section-header">
                             <div>
-                                <h2>{activeSection === "medicine" ? "Medicine Stock" : "Store Stock"}</h2>
+                                <h2>{activeSection === "medicine" ? "Medicine Stock" : activeSection === "store" ? "Store Stock" : "Food Stock"}</h2>
                                 <p className="info-text">Stock is added here and given from Pharmacy or Store pages</p>
                             </div>
                             {activeSection === "medicine" ? (
                                 <button className="btn btn-primary" onClick={() => setMedicineModalOpen(true)}>Add Medicine</button>
+                            ) : activeSection === "food" ? (
+                                <button className="btn btn-primary" onClick={() => setFoodModalOpen(true)}>Add Food Item</button>
                             ) : (
                                 <button className="btn btn-primary" onClick={() => setStoreModalOpen(true)}>Add Store Product</button>
                             )}
@@ -204,7 +289,7 @@ const Supplies = ({ clinicId }) => {
                         <div className="inventory-toolbar">
                             <input
                                 type="search"
-                                placeholder={activeSection === "medicine" ? "Search medicines" : "Search store stock"}
+                                placeholder={activeSection === "medicine" ? "Search medicines" : activeSection === "store" ? "Search store stock" : "Search food stock"}
                                 value={search}
                                 onChange={(event) => setSearch(event.target.value)}
                             />
@@ -277,6 +362,63 @@ const Supplies = ({ clinicId }) => {
                                 </table>
                             </div>
                         ))}
+
+                        {activeSection === "food" && (loadingFoodItems ? <p>Loading food stock...</p> : (
+                            <div className="food-sections">
+                                <div className="food-card-row">
+                                    {groupedFoodItems.map((section) => (
+                                        <button
+                                            type="button"
+                                            key={section.type}
+                                            className={`food-subsection food-subsection-card ${selectedFoodSection?.type === section.type ? "active" : ""}`}
+                                            onClick={() => setSelectedFoodType(section.type)}
+                                        >
+                                            <div className="food-subsection-header">
+                                                <h3>{section.type}</h3>
+                                                <span>{section.items.length} item{section.items.length === 1 ? "" : "s"}</span>
+                                            </div>
+                                        </button>
+                                    ))}
+                                </div>
+
+                                <div className="food-products-panel">
+                                    <div className="food-products-header">
+                                        <h3>{selectedFoodSection?.type || "Food Items"}</h3>
+                                        <p>Products added under this food category</p>
+                                    </div>
+                                    {selectedFoodSection?.items?.length ? (
+                                        <div className="supplies-table">
+                                            <table>
+                                                <thead>
+                                                    <tr>
+                                                        <th>Item Name</th>
+                                                        <th>Quantity</th>
+                                                        <th>Supplier</th>
+                                                        <th>Unit Cost</th>
+                                                        <th>Reorder Level</th>
+                                                        <th>Expiry Date</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {selectedFoodSection.items.map((item) => (
+                                                        <tr key={item.id}>
+                                                            <td>{item.name}</td>
+                                                            <td>{item.quantity || 0}</td>
+                                                            <td>{item.supplier || "-"}</td>
+                                                            <td>{toCurrency(item.cost)}</td>
+                                                            <td>{item.reorderLevel || 0}</td>
+                                                            <td>{item.expiryDate ? new Date(item.expiryDate).toLocaleDateString() : "-"}</td>
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    ) : (
+                                        <p className="empty-food-state">No items added in {selectedFoodSection?.type?.toLowerCase() || "this category"} yet.</p>
+                                    )}
+                                </div>
+                            </div>
+                        ))}
                     </section>
 
                     {medicineModalOpen && (
@@ -346,6 +488,39 @@ const Supplies = ({ clinicId }) => {
                                 <div className="modal-footer">
                                     <button className="btn btn-secondary" onClick={() => setStoreModalOpen(false)}>Cancel</button>
                                     <button className="btn btn-primary" onClick={saveStoreItem}>Add Product</button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {foodModalOpen && (
+                        <div className="modal-overlay" onClick={() => setFoodModalOpen(false)}>
+                            <div className="modal inventory-modal food-modal" onClick={(event) => event.stopPropagation()}>
+                                <div className="modal-header">
+                                    <h2>Add Food Item</h2>
+                                    <button className="close-btn" onClick={() => setFoodModalOpen(false)}>x</button>
+                                </div>
+                                <div className="modal-body">
+                                    <div className="form-grid">
+                                        <div className="form-group"><label>Food Item Name *</label><input name="name" value={foodForm.name} onChange={handleFoodChange} /></div>
+                                        <div className="form-group">
+                                            <label>Food Type *</label>
+                                            <select name="category" value={foodForm.category} onChange={handleFoodChange}>
+                                                <option value="">Select food type</option>
+                                                {FOOD_TYPES.map((type) => <option key={type} value={type}>{type}</option>)}
+                                            </select>
+                                        </div>
+                                        <div className="form-group"><label>Quantity *</label><input type="number" min="0" name="quantity" value={foodForm.quantity} onChange={handleFoodChange} /></div>
+                                        <div className="form-group"><label>Supplier</label><input name="supplier" value={foodForm.supplier} onChange={handleFoodChange} /></div>
+                                        <div className="form-group"><label>Unit Cost</label><input type="number" min="0" step="0.01" name="cost" value={foodForm.cost} onChange={handleFoodChange} /></div>
+                                        <div className="form-group"><label>Reorder Level</label><input type="number" min="0" name="reorderLevel" value={foodForm.reorderLevel} onChange={handleFoodChange} /></div>
+                                        <div className="form-group"><label>Expiry Date</label><input type="date" name="expiryDate" value={foodForm.expiryDate} onChange={handleFoodChange} /></div>
+                                        <div className="form-group form-group-full"><label>Notes</label><textarea name="description" value={foodForm.description} onChange={handleFoodChange} rows="3" /></div>
+                                    </div>
+                                </div>
+                                <div className="modal-footer">
+                                    <button className="btn btn-secondary" onClick={() => setFoodModalOpen(false)}>Cancel</button>
+                                    <button className="btn btn-primary" onClick={saveFoodItem}>Add Food Item</button>
                                 </div>
                             </div>
                         </div>

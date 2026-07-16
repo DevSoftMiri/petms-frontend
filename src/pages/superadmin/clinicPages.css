@@ -47,6 +47,33 @@
 }
 
 /* ---------- Container ---------- */
+.clinic-shell {
+  display: flex;
+  align-items: stretch;
+  min-height: calc(100vh - var(--sa-navbar-h, 62px));
+  max-height: calc(100vh - var(--sa-navbar-h, 62px));
+  overflow: hidden;
+}
+
+.clinic-sidebar-rail {
+  flex: 0 0 auto;
+  position: relative;
+  z-index: 20;
+}
+
+.clinic-shell .sidebar {
+  position: sticky;
+  top: var(--sa-navbar-h, 62px);
+  align-self: flex-start;
+  height: calc(100vh - var(--sa-navbar-h, 62px));
+  max-height: calc(100vh - var(--sa-navbar-h, 62px));
+}
+
+.clinic-shell .sidebar-content {
+  height: 100%;
+  overflow-y: auto;
+}
+
 .clinic-pages-container {
   flex: 1;
   min-width: 0;
@@ -54,7 +81,8 @@
   background: var(--c-bg);
   font-family: 'DM Sans', sans-serif;
   animation: pageFadeIn 0.38s cubic-bezier(0.4, 0, 0.2, 1) both;
-  min-height: 100vh;
+  height: calc(100vh - var(--sa-navbar-h, 62px));
+  overflow-y: auto;
 }
 
 /* ---------- Header ---------- */
@@ -326,7 +354,21 @@
 /* ---------- Responsive ---------- */
 /* Tablets and small devices (max 1024px) */
 @media (max-width: 1024px) {
+  .clinic-shell {
+    min-height: auto;
+    max-height: none;
+    overflow: visible;
+  }
+
+  .clinic-shell .sidebar {
+    top: 0;
+    height: 100vh;
+    max-height: 100vh;
+  }
+
   .clinic-pages-container {
+    height: auto;
+    overflow: visible;
     padding: 20px 16px;
     padding-top: 70px;
   }

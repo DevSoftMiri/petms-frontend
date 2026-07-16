@@ -21,11 +21,7 @@ const AddClinic = () => {
         state: "",
         zipCode: "",
         country: "",
-        licenseNumber: "",
-        businessHours: "9AM-6PM",
         operatingDays: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
-        maxUsers: 50,
-        subscription: "ENTERPRISE",
         description: "",
     });
 
@@ -67,9 +63,6 @@ const AddClinic = () => {
                 state: formData.state,
                 zipCode: formData.zipCode,
                 country: formData.country,
-                licenseNumber: formData.licenseNumber,
-                maxUsers: parseInt(formData.maxUsers, 10) || 10,
-                subscriptionPlan: formData.subscription.toUpperCase(),
             };
 
             console.log("Sending clinic data:", clinicData);
@@ -245,32 +238,9 @@ const AddClinic = () => {
                             </div>
                         </div>
 
-                        {/* License & Business Information */}
+                        {/* Operating Days */}
                         <div className="form-section">
-                            <h2>License & Business</h2>
-
-                            <div className="form-row">
-                                <div className="form-group">
-                                    <label>License Number</label>
-                                    <input
-                                        type="text"
-                                        name="licenseNumber"
-                                        value={formData.licenseNumber}
-                                        onChange={handleInputChange}
-                                        placeholder="License number"
-                                    />
-                                </div>
-                                <div className="form-group">
-                                    <label>Business Hours</label>
-                                    <input
-                                        type="text"
-                                        name="businessHours"
-                                        value={formData.businessHours}
-                                        onChange={handleInputChange}
-                                        placeholder="9AM-6PM"
-                                    />
-                                </div>
-                            </div>
+                            <h2>Operating Days</h2>
 
                             <div className="form-group">
                                 <label>Operating Days</label>
@@ -285,38 +255,6 @@ const AddClinic = () => {
                                             <span>{day}</span>
                                         </label>
                                     ))}
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Subscription Information */}
-                        <div className="form-section">
-                            <h2>Subscription</h2>
-
-                            <div className="form-row">
-                                <div className="form-group">
-                                    <label>Subscription Plan</label>
-                                    <select
-                                        name="subscription"
-                                        value={formData.subscription}
-                                        onChange={handleInputChange}
-                                    >
-
-                                        <option value="STARTER">STARTER</option>
-                                        <option value="PROFESSIONAL">PROFESSIONAL</option>
-                                        <option value="ENTERPRISE">ENTERPRISE</option>
-                                    </select>
-                                </div>
-                                <div className="form-group">
-                                    <label>Max Users</label>
-                                    <input
-                                        type="number"
-                                        name="maxUsers"
-                                        value={formData.maxUsers}
-                                        onChange={handleInputChange}
-                                        placeholder="50"
-                                        min="1"
-                                    />
                                 </div>
                             </div>
                         </div>
@@ -336,7 +274,7 @@ const AddClinic = () => {
                                 className="submit-btn"
                                 disabled={loading}
                             >
-                                {loading ? "Creating..." : "Create Clinic"}
+                                {loading ? "Creating..." : "Add Center"}
                             </button>
                         </div>
                     </form>

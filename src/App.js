@@ -6,6 +6,7 @@ import GeneralInformation from "./pages/generalInformation/GeneralInformation";
 import Customers from "./pages/customers/Customers";
 import Events from "./pages/events/Events";
 import Laboratory from "./pages/laboratory/Laboratory";
+import Food from "./pages/food/Food";
 import Store from "./pages/store/Store";
 import Grooming from "./pages/grooming/Grooming";
 import Pharmacy from "./pages/pharmacy/Pharmacy";
@@ -90,6 +91,7 @@ function App() {
                 <Route path="/clinics/:id/parameters" element={<ClinicPages />} />
                 <Route path="/clinics/:id/grooming" element={<ClinicPages />} />
                 <Route path="/clinics/:id/pharmacy" element={<ClinicPages />} />
+                <Route path="/clinics/:id/food" element={<ClinicPages />} />
                 <Route path="/clinics/:id/store" element={<ClinicPages />} />
                 <Route path="/clinics/:id/finance" element={<ClinicPages />} />
                 <Route path="/clinics/:id/supplies" element={<ClinicPages />} />
@@ -112,6 +114,9 @@ function App() {
                 </Route>
                 <Route element={<PageAccessRoute pageKey="store" />}>
                   <Route path="/store" element={<Store />} />
+                </Route>
+                <Route element={<PageAccessRoute pageKey="food" />}>
+                  <Route path="/food" element={<Food />} />
                 </Route>
                 <Route element={<PageAccessRoute pageKey="grooming" />}>
                   <Route path="/grooming" element={<Grooming />} />

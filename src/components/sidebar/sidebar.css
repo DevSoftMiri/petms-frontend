@@ -19,11 +19,14 @@
 }
 
 .sidebar {
-  position: relative;
+  position: sticky;
+  top: 0;
+  align-self: flex-start;
   width: 220px;
   min-width: 220px;
   flex: 0 0 220px;
-  min-height: 100vh;
+  height: 100vh;
+  max-height: 100vh;
   background: var(--sidebar-bg);
   border-right: 1px solid var(--sidebar-border);
   display: flex;
@@ -65,7 +68,8 @@
   flex-direction: column;
   height: 100%;
   padding-bottom: 16px;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 /* --- Logo / Brand --- */
@@ -451,7 +455,9 @@
 /* Large desktops (1025px and above) */
 @media (min-width: 1025px) {
   .sidebar {
-    position: relative;
+    position: sticky;
+    top: 0;
+    align-self: flex-start;
     transform: translateX(0) !important;
   }
 

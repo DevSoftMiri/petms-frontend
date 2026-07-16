@@ -10,6 +10,7 @@ import Dashboard from "../dashboard/Dashboard";
 import Customers from "../customers/Customers";
 import Events from "../events/Events";
 import Laboratory from "../laboratory/Laboratory";
+import Food from "../food/Food";
 import Store from "../store/Store";
 import Grooming from "../grooming/Grooming";
 import Pharmacy from "../pharmacy/Pharmacy";
@@ -33,6 +34,7 @@ const TAB_ACCESS_MAP = {
     inpatient: "laboratory",
     parameters: "laboratory",
     pharmacy: "pharmacy",
+    food: "food",
     grooming: "grooming",
     store: "store",
     supplies: "supplies",
@@ -70,6 +72,7 @@ const ClinicPages = () => {
         else if (pathname.includes("/laboratory")) tab = "laboratory";
         else if (pathname.includes("/grooming")) tab = "grooming";
         else if (pathname.includes("/pharmacy")) tab = "pharmacy";
+        else if (pathname.includes("/food")) tab = "food";
         else if (pathname.includes("/store")) tab = "store";
         else if (pathname.includes("/supplies")) tab = "supplies";
         else if (pathname.includes("/finance")) tab = "finance";
@@ -154,6 +157,8 @@ const ClinicPages = () => {
                 return <Pharmacy clinicId={id} />;
             case "grooming":
                 return <Grooming clinicId={id} />;
+            case "food":
+                return <Food clinicId={id} />;
             case "store":
                 return <Store clinicId={id} />;
             case "supplies":
@@ -184,8 +189,10 @@ const ClinicPages = () => {
     return (
         <div>
             <SuperAdminNavbar />
-            <div style={{ display: "flex" }}>
-                <Sidebar activeClinicTab={activeTab} onTabChange={handleTabChange} />
+            <div className="clinic-shell">
+                <div className="clinic-sidebar-rail">
+                    <Sidebar activeClinicTab={activeTab} onTabChange={handleTabChange} />
+                </div>
                 <div className="clinic-pages-container">
                     <div className="clinic-pages-header">
                         <h1>{clinic.clinicName}</h1>

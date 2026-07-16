@@ -24,7 +24,7 @@ const ListPet = ({ clinicId: propClinicId }) => {
   const { state: clinicState } = useContext(ClinicContext);
   const clinicId = propClinicId || clinicState?.selectedClinicId;
 
-  const pageTitle = "My Pets";
+  const pageTitle = "Animal Intake Records";
   const navigate = useNavigate();
   const [id, setId] = useState();
   const [data, setData] = useState([]);
@@ -33,7 +33,14 @@ const ListPet = ({ clinicId: propClinicId }) => {
   const { enqueueSnackbar } = useSnackbar();
   const [open, setOpen] = useState(false);
   const initialPetForm = {
-    customerId: "",
+    intakeDate: new Date().toISOString().split("T")[0],
+    formNumber: "",
+    intakeType: "RESCUE",
+    rescuerName: "",
+    rescuerPhone: "",
+    rescuerEmail: "",
+    rescuerAddress: "",
+    rescueLocationCondition: "",
     name: "",
     species: "",
     colour: "",
@@ -41,11 +48,13 @@ const ListPet = ({ clinicId: propClinicId }) => {
     gender: "",
     age: "",
     weight: "",
+    neutered: "Unknown",
+    vaccinationStatus: "Unknown",
+    medicalHistoryVetDetails: "",
     medicalNotes: "",
   };
   const [addPetOpen, setAddPetOpen] = useState(false);
   const [savingPet, setSavingPet] = useState(false);
-  const [customers, setCustomers] = useState([]);
   const [petForm, setPetForm] = useState(initialPetForm);
 
   // Vet assignment state
@@ -54,29 +63,9 @@ const ListPet = ({ clinicId: propClinicId }) => {
   const [selectedPetForAssign, setSelectedPetForAssign] = useState(null);
   const [assigning, setAssigning] = useState(false);
 
-  const parseArrayResponse = (response) => {
-    if (Array.isArray(response)) return response;
-    if (Array.isArray(response?.data)) return response.data;
-    if (Array.isArray(response?.data?.data)) return response.data.data;
-    return [];
-  };
-
-  const fetchCustomers = useCallback(async () => {
-    if (!clinicId) return;
-
-    try {
-      const res = await HttpService.getWithAuth(`/clinics/${clinicId}/customers?limit=100`);
-      setCustomers(parseArrayResponse(res));
-    } catch (error) {
-      console.error("Error fetching customers:", error);
-      enqueueSnackbar("Failed to load customers", { variant: "error" });
-    }
-  }, [clinicId, enqueueSnackbar]);
-
   const handleOpenAddPet = () => {
     setPetForm(initialPetForm);
     setAddPetOpen(true);
-    fetchCustomers();
   };
 
   const handlePetFormChange = (event) => {
@@ -92,13 +81,20 @@ const ListPet = ({ clinicId: propClinicId }) => {
       return;
     }
 
-    if (!petForm.customerId || !petForm.name || !petForm.species) {
-      enqueueSnackbar("Owner, pet name, and species are required", { variant: "error" });
+    if (!petForm.rescuerName || !petForm.name || !petForm.species) {
+      enqueueSnackbar("Rescuer/contact name, animal name, and species are required", { variant: "error" });
       return;
     }
 
     const payload = {
-      customerId: petForm.customerId,
+      intakeDate: petForm.intakeDate,
+      formNumber: petForm.formNumber || undefined,
+      intakeType: petForm.intakeType,
+      rescuerName: petForm.rescuerName,
+      rescuerPhone: petForm.rescuerPhone || undefined,
+      rescuerEmail: petForm.rescuerEmail || undefined,
+      rescuerAddress: petForm.rescuerAddress || undefined,
+      rescueLocationCondition: petForm.rescueLocationCondition || undefined,
       name: petForm.name,
       species: petForm.species,
       colour: petForm.colour || undefined,
@@ -106,13 +102,16 @@ const ListPet = ({ clinicId: propClinicId }) => {
       gender: petForm.gender || undefined,
       age: petForm.age ? Number(petForm.age) : undefined,
       weight: petForm.weight ? Number(petForm.weight) : undefined,
+      neutered: petForm.neutered || undefined,
+      vaccinationStatus: petForm.vaccinationStatus || undefined,
+      medicalHistoryVetDetails: petForm.medicalHistoryVetDetails || undefined,
       medicalNotes: petForm.medicalNotes || undefined,
     };
 
     setSavingPet(true);
     try {
       await HttpService.postWithAuth(`/clinics/${clinicId}/pets`, payload);
-      enqueueSnackbar("Pet created successfully", { variant: "success" });
+      enqueueSnackbar("Animal intake created successfully", { variant: "success" });
       setAddPetOpen(false);
       setPetForm(initialPetForm);
       fetchData();
@@ -401,6 +400,7 @@ const ListPet = ({ clinicId: propClinicId }) => {
             actionColumn={actionColumn}
             data={data}
             onAdd={handleOpenAddPet}
+            addLabel="Add New Animal"
           />
         )}
       </div>
@@ -428,33 +428,95 @@ const ListPet = ({ clinicId: propClinicId }) => {
       </Dialog>
 
       <Dialog open={addPetOpen} onClose={() => setAddPetOpen(false)} maxWidth="md" fullWidth>
-        <DialogTitle>Add New Pet</DialogTitle>
+        <DialogTitle>Add New Animal Intake</DialogTitle>
         <form onSubmit={handleCreatePet}>
           <DialogContent>
             <Grid container spacing={2}>
               <Grid item xs={12} sm={6}>
-                <FormControl fullWidth required>
-                  <InputLabel id="pet-owner-label">Owner Name</InputLabel>
+                <TextField
+                  fullWidth
+                  required
+                  type="date"
+                  name="intakeDate"
+                  label="Date"
+                  value={petForm.intakeDate}
+                  onChange={handlePetFormChange}
+                  InputLabelProps={{ shrink: true }}
+                />
+              </Grid>
+
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  name="formNumber"
+                  label="Form No"
+                  value={petForm.formNumber}
+                  onChange={handlePetFormChange}
+                />
+              </Grid>
+
+              <Grid item xs={12}>
+                <FormControl fullWidth>
+                  <InputLabel id="pet-intake-type-label">Intake Type</InputLabel>
                   <Select
-                    labelId="pet-owner-label"
-                    name="customerId"
-                    label="Owner Name"
-                    value={petForm.customerId}
+                    labelId="pet-intake-type-label"
+                    name="intakeType"
+                    label="Intake Type"
+                    value={petForm.intakeType}
                     onChange={handlePetFormChange}
                   >
-                    <MenuItem value="">
-                      <em>Select existing customer</em>
-                    </MenuItem>
-                    {customers.map((customer) => (
-                      <MenuItem key={customer.id} value={customer.id}>
-                        {customer.firstName} {customer.lastName}
-                        {customer.customerId || customer.code
-                          ? ` (${customer.customerId || customer.code})`
-                          : ""}
-                      </MenuItem>
-                    ))}
+                    <MenuItem value="RESCUE">Rescue</MenuItem>
+                    <MenuItem value="SURRENDER">Surrender</MenuItem>
+                    <MenuItem value="TREATMENT">Treatment</MenuItem>
                   </Select>
                 </FormControl>
+              </Grid>
+
+              <Grid item xs={12}>
+                <DialogContentText sx={{ fontWeight: 600, color: "text.primary" }}>
+                  Rescuer / Surrender / Treatment Details
+                </DialogContentText>
+              </Grid>
+
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  required
+                  name="rescuerName"
+                  label="Name of Rescuer / Surrendered By"
+                  value={petForm.rescuerName}
+                  onChange={handlePetFormChange}
+                />
+              </Grid>
+
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  name="rescuerPhone"
+                  label="Contact No."
+                  value={petForm.rescuerPhone}
+                  onChange={handlePetFormChange}
+                />
+              </Grid>
+
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  name="rescuerEmail"
+                  label="Email ID"
+                  value={petForm.rescuerEmail}
+                  onChange={handlePetFormChange}
+                />
+              </Grid>
+
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  name="rescuerAddress"
+                  label="Address"
+                  value={petForm.rescuerAddress}
+                  onChange={handlePetFormChange}
+                />
               </Grid>
 
               <Grid item xs={12} sm={6}>
@@ -462,7 +524,7 @@ const ListPet = ({ clinicId: propClinicId }) => {
                   fullWidth
                   required
                   name="name"
-                  label="Pet Name"
+                  label="Name of Animal"
                   value={petForm.name}
                   onChange={handlePetFormChange}
                 />
@@ -479,7 +541,7 @@ const ListPet = ({ clinicId: propClinicId }) => {
                     onChange={handlePetFormChange}
                   >
                     <MenuItem value="">
-                      <em>Select species</em>
+                      <em>Select type of animal</em>
                     </MenuItem>
                     <MenuItem value="Dog">Dog</MenuItem>
                     <MenuItem value="Cat">Cat</MenuItem>
@@ -515,16 +577,16 @@ const ListPet = ({ clinicId: propClinicId }) => {
 
               <Grid item xs={12} sm={6}>
                 <FormControl fullWidth>
-                  <InputLabel id="pet-gender-label">Gender</InputLabel>
+                  <InputLabel id="pet-gender-label">Sex</InputLabel>
                   <Select
                     labelId="pet-gender-label"
                     name="gender"
-                    label="Gender"
+                    label="Sex"
                     value={petForm.gender}
                     onChange={handlePetFormChange}
                   >
                     <MenuItem value="">
-                      <em>Select gender</em>
+                      <em>Select sex</em>
                     </MenuItem>
                     <MenuItem value="Male">Male</MenuItem>
                     <MenuItem value="Female">Female</MenuItem>
@@ -562,8 +624,66 @@ const ListPet = ({ clinicId: propClinicId }) => {
                   fullWidth
                   multiline
                   minRows={3}
+                  name="rescueLocationCondition"
+                  label="Narrate Exact Location and Condition of Rescue"
+                  value={petForm.rescueLocationCondition}
+                  onChange={handlePetFormChange}
+                />
+              </Grid>
+
+              <Grid item xs={12} sm={6}>
+                <FormControl fullWidth>
+                  <InputLabel id="pet-neutered-label">Neutered</InputLabel>
+                  <Select
+                    labelId="pet-neutered-label"
+                    name="neutered"
+                    label="Neutered"
+                    value={petForm.neutered}
+                    onChange={handlePetFormChange}
+                  >
+                    <MenuItem value="Yes">Yes</MenuItem>
+                    <MenuItem value="No">No</MenuItem>
+                    <MenuItem value="Unknown">Unknown</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+
+              <Grid item xs={12} sm={6}>
+                <FormControl fullWidth>
+                  <InputLabel id="pet-vaccination-status-label">Vaccination Status</InputLabel>
+                  <Select
+                    labelId="pet-vaccination-status-label"
+                    name="vaccinationStatus"
+                    label="Vaccination Status"
+                    value={petForm.vaccinationStatus}
+                    onChange={handlePetFormChange}
+                  >
+                    <MenuItem value="Yes">Yes</MenuItem>
+                    <MenuItem value="No">No</MenuItem>
+                    <MenuItem value="Unknown">Unknown</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  multiline
+                  minRows={3}
+                  name="medicalHistoryVetDetails"
+                  label="Medical History & Vet Details"
+                  value={petForm.medicalHistoryVetDetails}
+                  onChange={handlePetFormChange}
+                />
+              </Grid>
+
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  multiline
+                  minRows={3}
                   name="medicalNotes"
-                  label="Medical Notes"
+                  label="Additional Notes"
                   value={petForm.medicalNotes}
                   onChange={handlePetFormChange}
                 />
@@ -575,7 +695,7 @@ const ListPet = ({ clinicId: propClinicId }) => {
               Cancel
             </Button>
             <Button type="submit" variant="contained" disabled={savingPet}>
-              {savingPet ? "Adding..." : "Add Pet"}
+              {savingPet ? "Adding..." : "Create Intake"}
             </Button>
           </DialogActions>
         </form>

@@ -40,9 +40,15 @@
 
 .inventory-gateway {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 18px;
-  max-width: 760px;
+  max-width: 100%;
+}
+
+@media (max-width: 900px) {
+  .inventory-gateway {
+    grid-template-columns: 1fr;
+  }
 }
 
 .inventory-card {
@@ -90,6 +96,11 @@
 .store-card .inventory-card-icon {
   background: #dcfce7;
   color: #166534;
+}
+
+.food-card .inventory-card-icon {
+  background: #fef3c7;
+  color: #b45309;
 }
 
 .inventory-card-title {
@@ -142,10 +153,124 @@
   max-width: 920px;
 }
 
+.food-modal {
+  max-width: 820px;
+}
+
 .form-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 14px;
+}
+
+.form-group-full {
+  grid-column: 1 / -1;
+}
+
+.food-sections {
+  display: grid;
+  gap: 18px;
+}
+
+.food-card-row {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.food-subsection {
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 16px;
+  background: #f8fafc;
+}
+
+.food-subsection-card {
+  padding: 14px 16px;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.food-subsection-card:hover {
+  transform: translateY(-1px);
+  border-color: #f59e0b;
+}
+
+.food-subsection-card.active {
+  border-color: #f59e0b;
+  background: #fffaf0;
+  box-shadow: 0 8px 18px rgba(245, 158, 11, 0.12);
+}
+
+.food-subsection-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 0;
+}
+
+.food-subsection-header h3 {
+  margin: 0;
+  font-size: 16px;
+  color: #1f2937;
+}
+
+.food-subsection-header span {
+  font-size: 13px;
+  color: #92400e;
+  background: #fef3c7;
+  padding: 4px 10px;
+  border-radius: 999px;
+}
+
+.food-products-panel {
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 18px;
+  background: #fff;
+}
+
+.food-products-header {
+  margin-bottom: 14px;
+}
+
+.food-products-header h3 {
+  margin: 0 0 4px 0;
+  font-size: 18px;
+  color: #1f2937;
+}
+
+.food-products-header p {
+  margin: 0;
+  color: #64748b;
+  font-size: 14px;
+}
+
+.empty-food-state {
+  margin: 0;
+  color: #64748b;
+  font-size: 14px;
+}
+
+.form-group textarea {
+  width: 100%;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  padding: 11px 12px;
+  font-size: 14px;
+  resize: vertical;
+  font-family: inherit;
+  background: #fff;
+}
+
+@media (max-width: 1100px) {
+  .food-card-row {
+    grid-template-columns: repeat(4, minmax(190px, 1fr));
+    overflow-x: auto;
+    padding-bottom: 4px;
+  }
 }
 
 /* Statistics Cards */

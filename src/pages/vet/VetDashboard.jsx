@@ -244,9 +244,9 @@ const VetDashboard = ({ clinicId: propClinicId }) => {
   if (loading) {
     return (
       <div className="vet-dashboard-container">
-        <div className="loading-spinner">
-          <div className="spinner"></div>
-          <p>Loading Vet Dashboard...</p>
+        <div className="vet-dashboard-loader">
+          <div className="vet-dashboard-loader__spinner"></div>
+          <p className="vet-dashboard-loader__text">Loading Vet Dashboard...</p>
         </div>
       </div>
     );

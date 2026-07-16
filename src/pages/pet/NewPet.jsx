@@ -9,20 +9,27 @@ import {
   TextField,
 } from "@mui/material";
 import { useSnackbar } from "notistack";
-import { useEffect, useState, useContext } from "react";
+import { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../../components/navbar/Navbar";
 import Sidebar from "../../components/sidebar/Sidebar";
-import AuthService from "../../services/AuthService";
 import HttpService from "../../services/HttpService";
 import { ClinicContext } from "../../context/clinicContext";
 import "./pet.css";
 
 const NewPet = () => {
-  const pageTitle = "Add New Pet";
+  const pageTitle = "Add New Animal Intake";
   const { state: clinicState } = useContext(ClinicContext);
   const clinicId = clinicState?.selectedClinicId;
   const defaultValues = {
+    intakeDate: new Date().toISOString().split("T")[0],
+    formNumber: "",
+    intakeType: "RESCUE",
+    rescuerName: "",
+    rescuerPhone: "",
+    rescuerEmail: "",
+    rescuerAddress: "",
+    rescueLocationCondition: "",
     name: "",
     species: "",
     breed: "",
@@ -30,25 +37,15 @@ const NewPet = () => {
     gender: "",
     age: "",
     weight: "",
-    dateOfBirth: "",
-    bloodGroup: "",
+    neutered: "Unknown",
+    vaccinationStatus: "Unknown",
+    medicalHistoryVetDetails: "",
     medicalNotes: "",
-    userId: AuthService.getCurrentUser()?.id,
   };
 
   const { enqueueSnackbar } = useSnackbar();
   const navigate = useNavigate();
   const [formValues, setFormValues] = useState(defaultValues);
-  const [types, setTypes] = useState([]);
-
-  useEffect(() => {
-    const getTypes = async () => {
-      const response = await HttpService.getWithAuth("/types");
-      const types = await response.data.content;
-      setTypes(types);
-    };
-    getTypes();
-  }, []);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -64,7 +61,19 @@ const NewPet = () => {
       enqueueSnackbar("No clinic selected", { variant: "error" });
       return;
     }
+    if (!formValues.rescuerName || !formValues.name || !formValues.species) {
+      enqueueSnackbar("Rescuer/contact name, animal name, and species are required", { variant: "error" });
+      return;
+    }
     const submittedData = {
+      intakeDate: formValues.intakeDate,
+      formNumber: formValues.formNumber || undefined,
+      intakeType: formValues.intakeType,
+      rescuerName: formValues.rescuerName,
+      rescuerPhone: formValues.rescuerPhone || undefined,
+      rescuerEmail: formValues.rescuerEmail || undefined,
+      rescuerAddress: formValues.rescuerAddress || undefined,
+      rescueLocationCondition: formValues.rescueLocationCondition || undefined,
       name: formValues.name,
       species: formValues.species,
       breed: formValues.breed || undefined,
@@ -72,14 +81,14 @@ const NewPet = () => {
       gender: formValues.gender || undefined,
       age: formValues.age ? parseInt(formValues.age) : undefined,
       weight: formValues.weight ? parseFloat(formValues.weight) : undefined,
-      dateOfBirth: formValues.dateOfBirth ? new Date(formValues.dateOfBirth).toISOString() : undefined,
-      bloodGroup: formValues.bloodGroup || undefined,
+      neutered: formValues.neutered || undefined,
+      vaccinationStatus: formValues.vaccinationStatus || undefined,
+      medicalHistoryVetDetails: formValues.medicalHistoryVetDetails || undefined,
       medicalNotes: formValues.medicalNotes || undefined,
-      userId: formValues.userId,
     };
     HttpService.postWithAuth(`/clinics/${clinicId}/pets`, submittedData)
       .then((response) => {
-        enqueueSnackbar("Pet created successfully", { variant: "success" });
+        enqueueSnackbar("Animal intake created successfully", { variant: "success" });
         navigate("/pets");
       })
       .catch((error) => {
@@ -113,11 +122,104 @@ const NewPet = () => {
               <Grid item>
                 <TextField
                   sx={{ width: 240 }}
+                  required
+                  id="intakeDate"
+                  name="intakeDate"
+                  label="Date"
+                  type="date"
+                  value={formValues.intakeDate}
+                  onChange={handleInputChange}
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                />
+              </Grid>
+
+              <Grid item>
+                <TextField
+                  sx={{ width: 240 }}
+                  id="formNumber"
+                  name="formNumber"
+                  label="Form No"
+                  type="text"
+                  value={formValues.formNumber}
+                  onChange={handleInputChange}
+                />
+              </Grid>
+
+              <Grid item>
+                <FormControl sx={{ width: 240 }}>
+                  <InputLabel id="intake-type-label">Intake Type</InputLabel>
+                  <Select
+                    name="intakeType"
+                    label="Intake Type"
+                    value={formValues.intakeType}
+                    onChange={handleInputChange}
+                  >
+                    <MenuItem value="RESCUE">Rescue</MenuItem>
+                    <MenuItem value="SURRENDER">Surrender</MenuItem>
+                    <MenuItem value="TREATMENT">Treatment</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+
+              <Grid item>
+                <TextField
+                  sx={{ width: 240 }}
                   autoFocus
+                  required
+                  id="rescuerName"
+                  name="rescuerName"
+                  label="Rescuer / Contact Name"
+                  type="text"
+                  value={formValues.rescuerName}
+                  onChange={handleInputChange}
+                />
+              </Grid>
+
+              <Grid item>
+                <TextField
+                  sx={{ width: 240 }}
+                  id="rescuerPhone"
+                  name="rescuerPhone"
+                  label="Contact No."
+                  type="text"
+                  value={formValues.rescuerPhone}
+                  onChange={handleInputChange}
+                />
+              </Grid>
+
+              <Grid item>
+                <TextField
+                  sx={{ width: 240 }}
+                  id="rescuerEmail"
+                  name="rescuerEmail"
+                  label="Email ID"
+                  type="email"
+                  value={formValues.rescuerEmail}
+                  onChange={handleInputChange}
+                />
+              </Grid>
+
+              <Grid item>
+                <TextField
+                  sx={{ width: 240 }}
+                  id="rescuerAddress"
+                  name="rescuerAddress"
+                  label="Address"
+                  type="text"
+                  value={formValues.rescuerAddress}
+                  onChange={handleInputChange}
+                />
+              </Grid>
+
+              <Grid item>
+                <TextField
+                  sx={{ width: 240 }}
                   required
                   id="name"
                   name="name"
-                  label="Pet Name"
+                  label="Name of Animal"
                   type="text"
                   value={formValues.name}
                   onChange={handleInputChange}
@@ -126,16 +228,16 @@ const NewPet = () => {
 
               <Grid item>
                 <FormControl sx={{ width: 240 }}>
-                  <InputLabel id="species-label">Species *</InputLabel>
+                  <InputLabel id="species-label">Type of Animal *</InputLabel>
                   <Select
                     required
                     name="species"
-                    label="Species *"
+                    label="Type of Animal *"
                     value={formValues.species}
                     onChange={handleInputChange}
                   >
                     <MenuItem value="">
-                      <em>Select species</em>
+                      <em>Select type</em>
                     </MenuItem>
                     <MenuItem value="Dog">Dog</MenuItem>
                     <MenuItem value="Cat">Cat</MenuItem>
@@ -150,15 +252,15 @@ const NewPet = () => {
 
               <Grid item>
                 <FormControl sx={{ width: 240 }}>
-                  <InputLabel id="gender-label">Gender</InputLabel>
+                  <InputLabel id="gender-label">Sex</InputLabel>
                   <Select
                     name="gender"
-                    label="Gender"
+                    label="Sex"
                     value={formValues.gender}
                     onChange={handleInputChange}
                   >
                     <MenuItem value="">
-                      <em>Select gender</em>
+                      <em>Select sex</em>
                     </MenuItem>
                     <MenuItem value="Male">Male</MenuItem>
                     <MenuItem value="Female">Female</MenuItem>
@@ -196,25 +298,10 @@ const NewPet = () => {
                   sx={{ width: 240 }}
                   id="age"
                   name="age"
-                  label="Age (months)"
+                  label="Age"
                   type="number"
                   value={formValues.age}
                   onChange={handleInputChange}
-                />
-              </Grid>
-
-              <Grid item>
-                <TextField
-                  sx={{ width: 240 }}
-                  id="dateOfBirth"
-                  name="dateOfBirth"
-                  label="Date of Birth"
-                  type="date"
-                  value={formValues.dateOfBirth}
-                  onChange={handleInputChange}
-                  InputLabelProps={{
-                    shrink: true,
-                  }}
                 />
               </Grid>
 
@@ -232,14 +319,59 @@ const NewPet = () => {
               </Grid>
 
               <Grid item>
+                <FormControl sx={{ width: 240 }}>
+                  <InputLabel id="neutered-label">Neutered</InputLabel>
+                  <Select
+                    name="neutered"
+                    label="Neutered"
+                    value={formValues.neutered}
+                    onChange={handleInputChange}
+                  >
+                    <MenuItem value="Yes">Yes</MenuItem>
+                    <MenuItem value="No">No</MenuItem>
+                    <MenuItem value="Unknown">Unknown</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+
+              <Grid item>
+                <FormControl sx={{ width: 240 }}>
+                  <InputLabel id="vaccination-status-label">Vaccination Status</InputLabel>
+                  <Select
+                    name="vaccinationStatus"
+                    label="Vaccination Status"
+                    value={formValues.vaccinationStatus}
+                    onChange={handleInputChange}
+                  >
+                    <MenuItem value="Yes">Yes</MenuItem>
+                    <MenuItem value="No">No</MenuItem>
+                    <MenuItem value="Unknown">Unknown</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+
+              <Grid item>
                 <TextField
                   sx={{ width: 240 }}
-                  id="bloodGroup"
-                  name="bloodGroup"
-                  label="Blood Group"
-                  type="text"
-                  placeholder="e.g., DEA 1.1+, A, B"
-                  value={formValues.bloodGroup}
+                  id="rescueLocationCondition"
+                  name="rescueLocationCondition"
+                  label="Location / Condition"
+                  multiline
+                  rows={3}
+                  value={formValues.rescueLocationCondition}
+                  onChange={handleInputChange}
+                />
+              </Grid>
+
+              <Grid item>
+                <TextField
+                  sx={{ width: 240 }}
+                  id="medicalHistoryVetDetails"
+                  name="medicalHistoryVetDetails"
+                  label="Medical History & Vet Details"
+                  multiline
+                  rows={3}
+                  value={formValues.medicalHistoryVetDetails}
                   onChange={handleInputChange}
                 />
               </Grid>
@@ -266,7 +398,7 @@ const NewPet = () => {
                 Cancel
               </Button>
               <Button sx={{ minWidth: 112 }} type="submit" variant="contained">
-                Add
+                Create Intake
               </Button>
             </Stack>
           </form>

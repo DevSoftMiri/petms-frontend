@@ -6,20 +6,35 @@ import "./grooming.css";
 
 const Grooming = ({ clinicId }) => {
     const { enqueueSnackbar } = useSnackbar();
+    const OUTSIDE_GROOMER_OPTION = "__outside_groomer__";
 
     const [groomings, setGroomings] = useState([]);
     const [pets, setPets] = useState([]);
     const [staff, setStaff] = useState([]);
+    const [externalGroomers, setExternalGroomers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isOutsideGroomerModalOpen, setIsOutsideGroomerModalOpen] = useState(false);
     const [editingGrooming, setEditingGrooming] = useState(null);
 
     const [formData, setFormData] = useState({
         petId: "",
         services: [],
         groomingDate: "",
+        groomerType: "IN_HOUSE",
         groomerId: "",
+        externalGroomerId: "",
         cost: "",
+        notes: "",
+    });
+
+    const [outsideGroomerForm, setOutsideGroomerForm] = useState({
+        name: "",
+        phoneNumber: "",
+        email: "",
+        location: "",
+        address: "",
+        specialization: "",
         notes: "",
     });
 
@@ -33,7 +48,11 @@ const Grooming = ({ clinicId }) => {
 
             const data = Array.isArray(response)
                 ? response
-                : response.data || [];
+                : Array.isArray(response?.data)
+                    ? response.data
+                    : Array.isArray(response?.data?.data)
+                        ? response.data.data
+                        : [];
 
             setGroomings(data);
         } catch (error) {
@@ -55,11 +74,36 @@ const Grooming = ({ clinicId }) => {
 
             const data = Array.isArray(response)
                 ? response
-                : response.data || [];
+                : Array.isArray(response?.data)
+                    ? response.data
+                    : Array.isArray(response?.data?.data)
+                        ? response.data.data
+                        : [];
 
             setPets(data);
         } catch (error) {
             console.error("Error fetching pets:", error);
+        }
+    }, [clinicId]);
+
+    const fetchExternalGroomers = useCallback(async () => {
+        try {
+            const response = await HttpService.getWithAuth(
+                `/clinics/${clinicId}/grooming/external-groomers`
+            );
+
+            const data = Array.isArray(response)
+                ? response
+                : Array.isArray(response?.data)
+                    ? response.data
+                    : Array.isArray(response?.data?.data)
+                        ? response.data.data
+                        : [];
+
+            setExternalGroomers(data);
+        } catch (error) {
+            console.error("Error fetching external groomers:", error);
+            setExternalGroomers([]);
         }
     }, [clinicId]);
 
@@ -71,7 +115,11 @@ const Grooming = ({ clinicId }) => {
 
             const data = Array.isArray(response)
                 ? response
-                : response.data || [];
+                : Array.isArray(response?.data)
+                    ? response.data
+                    : Array.isArray(response?.data?.data)
+                        ? response.data.data
+                        : [];
 
             // Only show GROOMER role
             const filteredStaff = data.filter((user) =>
@@ -89,16 +137,31 @@ const Grooming = ({ clinicId }) => {
             fetchGroomings();
             fetchPets();
             fetchStaff();
+            fetchExternalGroomers();
         }
-    }, [clinicId, fetchGroomings, fetchPets, fetchStaff]);
+    }, [clinicId, fetchExternalGroomers, fetchGroomings, fetchPets, fetchStaff]);
 
     const resetForm = () => {
         setFormData({
             petId: "",
             services: [],
             groomingDate: "",
+            groomerType: "IN_HOUSE",
             groomerId: "",
+            externalGroomerId: "",
             cost: "",
+            notes: "",
+        });
+    };
+
+    const resetOutsideGroomerForm = () => {
+        setOutsideGroomerForm({
+            name: "",
+            phoneNumber: "",
+            email: "",
+            location: "",
+            address: "",
+            specialization: "",
             notes: "",
         });
     };
@@ -133,7 +196,9 @@ const Grooming = ({ clinicId }) => {
             petId: grooming.petId || "",
             services: parsedServices,
             groomingDate: formattedDate,
+            groomerType: grooming.externalGroomerId ? "OUTSIDE" : "IN_HOUSE",
             groomerId: grooming.groomerId || "",
+            externalGroomerId: grooming.externalGroomerId || "",
             cost: grooming.cost || "",
             notes: grooming.notes || "",
         });
@@ -157,10 +222,37 @@ const Grooming = ({ clinicId }) => {
                 return;
             }
 
+            if (
+                formData.groomerType === "IN_HOUSE" &&
+                !formData.groomerId
+            ) {
+                enqueueSnackbar("Please select an in-house groomer", {
+                    variant: "error",
+                });
+                return;
+            }
+
+            if (
+                formData.groomerType === "OUTSIDE" &&
+                !formData.externalGroomerId
+            ) {
+                enqueueSnackbar("Please select an outside groomer", {
+                    variant: "error",
+                });
+                return;
+            }
+
             const payload = {
                 petId: formData.petId,
-                groomerId: formData.groomerId || null,
-                services: JSON.stringify(formData.services),
+                groomerId:
+                    formData.groomerType === "IN_HOUSE"
+                        ? formData.groomerId || null
+                        : null,
+                externalGroomerId:
+                    formData.groomerType === "OUTSIDE"
+                        ? formData.externalGroomerId || null
+                        : null,
+                services: formData.services,
                 groomingDate: formData.groomingDate,
                 cost: parseFloat(formData.cost) || 0,
                 notes: formData.notes,
@@ -231,10 +323,75 @@ const Grooming = ({ clinicId }) => {
     const handleInputChange = (e) => {
         const { name, value } = e.target;
 
+        if (
+            (name === "groomerId" || name === "externalGroomerId") &&
+            value === OUTSIDE_GROOMER_OPTION
+        ) {
+            setIsOutsideGroomerModalOpen(true);
+            return;
+        }
+
+        if (name === "groomerType") {
+            setFormData((prev) => ({
+                ...prev,
+                groomerType: value,
+                groomerId: value === "IN_HOUSE" ? prev.groomerId : "",
+                externalGroomerId:
+                    value === "OUTSIDE" ? prev.externalGroomerId : "",
+            }));
+            return;
+        }
+
         setFormData((prev) => ({
             ...prev,
             [name]: value,
         }));
+    };
+
+    const handleOutsideGroomerInputChange = (e) => {
+        const { name, value } = e.target;
+
+        setOutsideGroomerForm((prev) => ({
+            ...prev,
+            [name]: value,
+        }));
+    };
+
+    const handleSaveOutsideGroomer = async () => {
+        try {
+            if (!outsideGroomerForm.name.trim()) {
+                enqueueSnackbar("Outside groomer name is required", {
+                    variant: "error",
+                });
+                return;
+            }
+
+            const response = await HttpService.postWithAuth(
+                `/clinics/${clinicId}/grooming/external-groomers`,
+                outsideGroomerForm
+            );
+
+            const createdGroomer = response?.data || response;
+
+            setExternalGroomers((prev) => [...prev, createdGroomer].sort((a, b) => a.name.localeCompare(b.name)));
+            setFormData((prev) => ({
+                ...prev,
+                groomerType: "OUTSIDE",
+                groomerId: "",
+                externalGroomerId: createdGroomer.id,
+            }));
+            setIsOutsideGroomerModalOpen(false);
+            resetOutsideGroomerForm();
+            enqueueSnackbar("Outside groomer saved successfully", {
+                variant: "success",
+            });
+        } catch (error) {
+            console.error("Error saving outside groomer:", error);
+            enqueueSnackbar(
+                error.response?.data?.message || "Failed to save outside groomer",
+                { variant: "error" }
+            );
+        }
     };
 
     if (!clinicId) {
@@ -317,12 +474,14 @@ const Grooming = ({ clinicId }) => {
                                                 </td>
 
                                                 <td>
-                                                    {grooming.groomer
-                                                        ? `${grooming.groomer.firstName || ""} ${grooming.groomer
-                                                            .lastName ||
-                                                        ""
-                                                        }`
-                                                        : "N/A"}
+                                                    {grooming.externalGroomer
+                                                        ? `${grooming.externalGroomer.name} (Outside)`
+                                                        : grooming.groomer
+                                                            ? `${grooming.groomer.firstName || ""} ${grooming.groomer
+                                                                .lastName ||
+                                                            ""
+                                                            }`
+                                                            : "N/A"}
                                                 </td>
 
                                                 <td>
@@ -455,29 +614,109 @@ const Grooming = ({ clinicId }) => {
                                     </div>
 
                                     <div className="form-group">
+                                        <label>Groomer Type</label>
+
+                                        <select
+                                            name="groomerType"
+                                            value={formData.groomerType}
+                                            onChange={handleInputChange}
+                                        >
+                                            <option value="IN_HOUSE">
+                                                In-House Groomer
+                                            </option>
+                                            <option value="OUTSIDE">
+                                                Outside Groomer
+                                            </option>
+                                        </select>
+                                    </div>
+
+                                    <div className="form-group">
                                         <label>Groomer</label>
 
                                         <select
-                                            name="groomerId"
-                                            value={formData.groomerId}
+                                            name={
+                                                formData.groomerType === "OUTSIDE"
+                                                    ? "externalGroomerId"
+                                                    : "groomerId"
+                                            }
+                                            value={
+                                                formData.groomerType === "OUTSIDE"
+                                                    ? formData.externalGroomerId
+                                                    : formData.groomerId
+                                            }
                                             onChange={handleInputChange}
                                         >
                                             <option value="">
-                                                Select Groomer
+                                                {formData.groomerType === "OUTSIDE"
+                                                    ? "Select Outside Groomer"
+                                                    : "Select Groomer"}
                                             </option>
 
-                                            {staff.map((user) => (
-                                                <option
-                                                    key={user.id}
-                                                    value={user.id}
-                                                >
-                                                    {user.firstName}{" "}
-                                                    {user.lastName} (
-                                                    {user.role})
-                                                </option>
-                                            ))}
+                                            {formData.groomerType === "OUTSIDE" ? (
+                                                <>
+                                                    {externalGroomers.map((groomer) => (
+                                                        <option
+                                                            key={groomer.id}
+                                                            value={groomer.id}
+                                                        >
+                                                            {groomer.name} [Outside]
+                                                        </option>
+                                                    ))}
+                                                    <option value={OUTSIDE_GROOMER_OPTION}>
+                                                        + Add Outside Groomer
+                                                    </option>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    {staff.map((user) => (
+                                                        <option
+                                                            key={user.id}
+                                                            value={user.id}
+                                                        >
+                                                            {user.firstName}{" "}
+                                                            {user.lastName} (
+                                                            {user.role})
+                                                        </option>
+                                                    ))}
+                                                    <option value={OUTSIDE_GROOMER_OPTION}>
+                                                        + Add Outside Groomer
+                                                    </option>
+                                                </>
+                                            )}
                                         </select>
                                     </div>
+
+                                    {formData.groomerType === "OUTSIDE" &&
+                                        formData.externalGroomerId && (
+                                            <div className="outside-groomer-summary">
+                                                {(() => {
+                                                    const selected = externalGroomers.find(
+                                                        (groomer) =>
+                                                            groomer.id ===
+                                                            formData.externalGroomerId
+                                                    );
+
+                                                    if (!selected) {
+                                                        return null;
+                                                    }
+
+                                                    return (
+                                                        <>
+                                                            <span className="outside-tag">
+                                                                Outside Groomer
+                                                            </span>
+                                                            <strong>{selected.name}</strong>
+                                                            <span>
+                                                                {selected.location || "Location not added"}
+                                                            </span>
+                                                            <span>
+                                                                {selected.phoneNumber || "No phone"}
+                                                            </span>
+                                                        </>
+                                                    );
+                                                })()}
+                                            </div>
+                                        )}
 
                                     <div className="form-group">
                                         <label>
@@ -543,6 +782,130 @@ const Grooming = ({ clinicId }) => {
                                         {editingGrooming
                                             ? "Update Grooming"
                                             : "Add Grooming"}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {isOutsideGroomerModalOpen && (
+                        <div
+                            className="modal-overlay"
+                            onClick={() => setIsOutsideGroomerModalOpen(false)}
+                        >
+                            <div
+                                className="modal nested-modal"
+                                onClick={(e) => e.stopPropagation()}
+                            >
+                                <div className="modal-header">
+                                    <h2>Add Outside Groomer</h2>
+
+                                    <button
+                                        className="close-btn"
+                                        onClick={() =>
+                                            setIsOutsideGroomerModalOpen(false)
+                                        }
+                                    >
+                                        ✕
+                                    </button>
+                                </div>
+
+                                <div className="modal-body">
+                                    <div className="form-group">
+                                        <label>Name *</label>
+                                        <input
+                                            type="text"
+                                            name="name"
+                                            value={outsideGroomerForm.name}
+                                            onChange={handleOutsideGroomerInputChange}
+                                            placeholder="Enter groomer name"
+                                        />
+                                    </div>
+
+                                    <div className="form-row">
+                                        <div className="form-group">
+                                            <label>Phone Number</label>
+                                            <input
+                                                type="text"
+                                                name="phoneNumber"
+                                                value={outsideGroomerForm.phoneNumber}
+                                                onChange={handleOutsideGroomerInputChange}
+                                                placeholder="Enter phone number"
+                                            />
+                                        </div>
+
+                                        <div className="form-group">
+                                            <label>Email</label>
+                                            <input
+                                                type="email"
+                                                name="email"
+                                                value={outsideGroomerForm.email}
+                                                onChange={handleOutsideGroomerInputChange}
+                                                placeholder="Enter email"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label>Location</label>
+                                        <input
+                                            type="text"
+                                            name="location"
+                                            value={outsideGroomerForm.location}
+                                            onChange={handleOutsideGroomerInputChange}
+                                            placeholder="Enter location"
+                                        />
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label>Address</label>
+                                        <textarea
+                                            name="address"
+                                            rows="2"
+                                            value={outsideGroomerForm.address}
+                                            onChange={handleOutsideGroomerInputChange}
+                                            placeholder="Enter address"
+                                        />
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label>Specialization</label>
+                                        <input
+                                            type="text"
+                                            name="specialization"
+                                            value={outsideGroomerForm.specialization}
+                                            onChange={handleOutsideGroomerInputChange}
+                                            placeholder="Breed care, medicated grooming, etc."
+                                        />
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label>Notes</label>
+                                        <textarea
+                                            name="notes"
+                                            rows="3"
+                                            value={outsideGroomerForm.notes}
+                                            onChange={handleOutsideGroomerInputChange}
+                                            placeholder="Capture any extra details"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="modal-footer">
+                                    <button
+                                        className="btn btn-secondary"
+                                        onClick={() =>
+                                            setIsOutsideGroomerModalOpen(false)
+                                        }
+                                    >
+                                        Cancel
+                                    </button>
+
+                                    <button
+                                        className="btn btn-primary"
+                                        onClick={handleSaveOutsideGroomer}
+                                    >
+                                        Save Outside Groomer
                                     </button>
                                 </div>
                             </div>

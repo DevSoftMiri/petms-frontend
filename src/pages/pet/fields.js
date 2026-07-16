@@ -1,18 +1,18 @@
 export const petColumns = [
   {
     field: "name",
-    headerName: "Pet Name",
+    headerName: "Animal Name",
     width: 160,
   },
   {
     field: "ownerName",
-    headerName: "Owner Name",
+    headerName: "Secondary Contact",
     width: 180,
     valueGetter: (params) => params.row.ownerName || "-",
   },
   {
     field: "ownerCode",
-    headerName: "Customer Code",
+    headerName: "Contact Code",
     width: 140,
     valueGetter: (params) => params.row.ownerCode || "-",
   },

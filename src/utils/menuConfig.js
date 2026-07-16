@@ -10,6 +10,7 @@ import ScienceIcon from "@mui/icons-material/Science";
 import MedicalServicesIcon from "@mui/icons-material/MedicalServices";
 import LocalPharmacyIcon from "@mui/icons-material/LocalPharmacy";
 import StorefrontIcon from "@mui/icons-material/Storefront";
+import RestaurantMenuIcon from "@mui/icons-material/RestaurantMenu";
 import ContentCutIcon from "@mui/icons-material/ContentCut";
 import InventoryIcon from "@mui/icons-material/Inventory";
 import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
@@ -78,6 +79,13 @@ export const regularMenuItems = [
         path: "/pharmacy",
         hasArrow: true,
         pageKey: "pharmacy",
+    },
+    {
+        label: "Food",
+        icon: <RestaurantMenuIcon />,
+        path: "/food",
+        hasArrow: true,
+        pageKey: "food",
     },
     {
         label: "Store",
@@ -149,6 +157,7 @@ export const getClinicMenuItems = (clinicId, userRole) => {
         },
         { label: "Pharmacy", value: "pharmacy", icon: <LocalPharmacyIcon />, pageKey: "pharmacy" },
         { label: "Grooming", value: "grooming", icon: <ContentCutIcon />, pageKey: "grooming" },
+        { label: "Food", value: "food", icon: <RestaurantMenuIcon />, pageKey: "food" },
         { label: "Store", value: "store", icon: <StorefrontIcon />, pageKey: "store" },
         { label: "Supplies", value: "supplies", icon: <InventoryIcon />, pageKey: "supplies" },
         { label: "Finance", value: "finance", icon: <AccountBalanceWalletIcon />, pageKey: "finance" },

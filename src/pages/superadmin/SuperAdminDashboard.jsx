@@ -527,7 +527,7 @@ const SuperAdminDashboard = () => {
                             ) : filteredClinics.length === 0 ? (
                                 <div className="empty-state">
                                     <p>No clinics found</p>
-                                    <button onClick={handleAddClinic}>Create First Clinic</button>
+                                    <button onClick={handleAddClinic}>Add First Center</button>
                                 </div>
                             ) : (
                                 <div className="clinics-grid">

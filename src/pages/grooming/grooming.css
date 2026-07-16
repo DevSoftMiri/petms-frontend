@@ -363,7 +363,8 @@
 }
 
 .form-group input,
-.form-group select {
+.form-group select,
+.form-group textarea {
   padding: 10px;
   border: 1px solid #ddd;
   border-radius: 4px;
@@ -371,10 +372,37 @@
 }
 
 .form-group input:focus,
-.form-group select:focus {
+.form-group select:focus,
+.form-group textarea:focus {
   outline: none;
   border-color: #57a7b3;
   box-shadow: 0 0 0 3px rgba(87, 167, 179, 0.1);
+}
+
+.outside-groomer-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 14px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, rgba(87, 167, 179, 0.12), rgba(70, 147, 153, 0.08));
+  border: 1px solid rgba(87, 167, 179, 0.25);
+}
+
+.outside-tag {
+  align-self: flex-start;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #57a7b3;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+}
+
+.nested-modal {
+  max-width: 680px;
 }
 
 .modal-footer {
@@ -468,15 +496,23 @@
 }
 
 .app.dark .form-group input,
-.app.dark .form-group select {
+.app.dark .form-group select,
+.app.dark .form-group textarea {
   background-color: #333;
   border-color: #444;
   color: #fff;
 }
 
 .app.dark .form-group input:focus,
-.app.dark .form-group select:focus {
+.app.dark .form-group select:focus,
+.app.dark .form-group textarea:focus {
   border-color: #57a7b3;
+}
+
+.app.dark .outside-groomer-summary {
+  background: linear-gradient(135deg, rgba(87, 167, 179, 0.2), rgba(70, 147, 153, 0.14));
+  border-color: rgba(87, 167, 179, 0.4);
+  color: #f3f4f6;
 }
 
 .app.dark .modal-footer {
