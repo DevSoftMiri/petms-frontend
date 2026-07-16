@@ -39,6 +39,7 @@ export const AuthProvider = ({ children }) => {
                 firstName: storedUser.firstName,
                 lastName: storedUser.lastName,
                 role: storedUser.role,
+                allowedPages: storedUser.allowedPages || [],
                 clinicId: storedUser.clinicId,
                 clinics: storedUser.clinics || [],
             });
@@ -69,6 +70,7 @@ export const AuthProvider = ({ children }) => {
                         firstName: userData.firstName,
                         lastName: userData.lastName,
                         role: userData.role,
+                        allowedPages: userData.allowedPages || [],
                         clinicId: userData.clinicId,
                         clinics: userData.clinics || [],
                     });

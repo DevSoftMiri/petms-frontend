@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { useSnackbar } from "notistack";
 import AddIcon from "@mui/icons-material/Add";
 import SuperAdminNavbar from "../../components/superadmin/SuperAdminNavbar";
+import FundsView from "./FundsView";
 // import Sidebar from "../../components/sidebar/Sidebar";
 import HttpService from "../../services/HttpService";
 import "./superAdminDashboard.css";
@@ -19,7 +20,7 @@ const SuperAdminDashboard = () => {
     const [roleFilter, setRoleFilter] = useState("ALL");
     const [activeView, setActiveView] = useState(() => {
         const view = searchParams.get("view");
-        return view === "clinics" || view === "users" || view === "dashboard" ? view : "dashboard";
+        return view === "clinics" || view === "users" || view === "funds" || view === "dashboard" ? view : "dashboard";
     });
 
     const handleViewChange = (view) => {
@@ -89,7 +90,7 @@ const SuperAdminDashboard = () => {
 
     useEffect(() => {
         const view = searchParams.get("view");
-        if (view && (view === "clinics" || view === "users" || view === "dashboard")) {
+        if (view && (view === "clinics" || view === "users" || view === "funds" || view === "dashboard")) {
             setActiveView(view);
         }
     }, [searchParams]);
@@ -312,7 +313,7 @@ const SuperAdminDashboard = () => {
     return (
         <div>
             <SuperAdminNavbar />
-            <div style={{ display: "flex" }}>
+            <div className="superadmin-layout">
                 {/* Left Sidebar Navigation */}
                 <div className="superadmin-sidebar">
                     <nav className="sidebar-nav">
@@ -337,6 +338,13 @@ const SuperAdminDashboard = () => {
                             <span className="sidebar-icon">👥</span>
                             <span className="sidebar-label">Users</span>
                         </button>
+                        <button
+                            className={`sidebar-nav-item ${activeView === "funds" ? "active" : ""}`}
+                            onClick={() => handleViewChange("funds")}
+                        >
+                            <span className="sidebar-icon">₹</span>
+                            <span className="sidebar-label">Funds</span>
+                        </button>
                     </nav>
                 </div>
 
@@ -350,6 +358,8 @@ const SuperAdminDashboard = () => {
                                     ? "Dashboard"
                                     : activeView === "clinics"
                                         ? "Center Management"
+                                        : activeView === "funds"
+                                            ? "Funds"
                                         : "User Management"}
                             </h1>
                             <p>
@@ -357,6 +367,8 @@ const SuperAdminDashboard = () => {
                                     ? "Overview of all Centre and system statistics"
                                     : activeView === "clinics"
                                         ? "Manage all centre locations and access control"
+                                        : activeView === "funds"
+                                            ? "Track and manage platform funds"
                                         : "Manage system users and roles"}
                             </p>
                         </div>
@@ -473,7 +485,7 @@ const SuperAdminDashboard = () => {
                     )}
 
                     {/* ---- Search ---- */}
-                    {activeView !== "dashboard" && (
+                    {activeView !== "dashboard" && activeView !== "funds" && (
                         <div className="search-bar">
                             <input
                                 type="text"
@@ -633,6 +645,8 @@ const SuperAdminDashboard = () => {
                             )}
                         </>
                     )}
+
+                    {activeView === "funds" && <FundsView />}
 
                     {/* ============================================================
                         USER MODAL

@@ -1,350 +1,405 @@
-import React, { useState } from "react";
-// import Navbar from "../../components/navbar/Navbar";
-// import Sidebar from "../../components/sidebar/Sidebar";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import ReactDOM from "react-dom";
+import { useSnackbar } from "notistack";
+import HttpService from "../../services/HttpService";
+import AuthService from "../../services/AuthService";
+import {
+    PAGE_ACCESS_OPTIONS,
+    ROLE_ALLOWED_PAGES,
+    ROLE_LABELS,
+} from "../../utils/pageAccess";
 import "./settings.css";
 
-const Settings = () => {
-    const [users, setUsers] = useState([
-        {
-            id: 1,
-            name: "John Admin",
-            email: "john@admin.com",
-            phone: "123-456-7890",
-            role: "Super Admin",
-            department: "Management",
-            status: "Active",
-            joinDate: "2023-01-15",
-            permissions: ["All Access"],
-        },
-        {
-            id: 2,
-            name: "Sarah Manager",
-            email: "sarah@manager.com",
-            phone: "098-765-4321",
-            role: "Manager",
-            department: "Operations",
-            status: "Active",
-            joinDate: "2023-03-20",
-            permissions: ["User Management", "Report Access"],
-        },
-        {
-            id: 3,
-            name: "Mike Staff",
-            email: "mike@staff.com",
-            phone: "555-123-4567",
-            role: "Staff",
-            department: "Customer Service",
-            status: "Active",
-            joinDate: "2023-05-10",
-            permissions: ["View Reports"],
-        },
-        {
-            id: 4,
-            name: "Emma Veterinarian",
-            email: "emma@vet.com",
-            phone: "555-987-6543",
-            role: "Veterinarian",
-            department: "Medical",
-            status: "Active",
-            joinDate: "2023-07-05",
-            permissions: ["Patient Records", "Prescriptions", "Reports"],
-        },
-    ]);
+const EDITABLE_ROLES = ["ADMIN", "VET", "GROOMER", "RECEPTIONIST", "PHARMACIST", "STAFF"];
 
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [editingUser, setEditingUser] = useState(null);
-    const [formData, setFormData] = useState({});
-    const [activeTab, setActiveTab] = useState("users");
+const emptyFormState = {
+    id: "",
+    firstName: "",
+    lastName: "",
+    email: "",
+    phoneNumber: "",
+    role: "STAFF",
+    isActive: true,
+    allowedPages: ROLE_ALLOWED_PAGES.STAFF,
+};
 
-    const ROLES = [
-        {
-            value: "Super Admin",
-            label: "Super Admin",
-            description: "Full system access",
-            permissions: ["All Access"],
-        },
-        {
-            value: "Admin",
-            label: "Admin",
-            description: "Administrative access",
-            permissions: ["User Management", "Report Access", "Settings"],
-        },
-        {
-            value: "Manager",
-            label: "Manager",
-            description: "Management level access",
-            permissions: ["User Management", "Report Access", "View Analytics"],
-        },
-        {
-            value: "Veterinarian",
-            label: "Veterinarian",
-            description: "Medical professional",
-            permissions: ["Patient Records", "Prescriptions", "Reports"],
-        },
-        {
-            value: "Staff",
-            label: "Staff",
-            description: "Basic staff access",
-            permissions: ["View Reports", "Create Appointments"],
-        },
-        {
-            value: "Receptionist",
-            label: "Receptionist",
-            description: "Reception desk access",
-            permissions: ["Create Appointments", "Customer Info"],
-        },
-    ];
+// ── Three-dot dropdown for allowed pages ──
+// Uses a portal so the dropdown escapes table overflow:hidden/auto clipping
+const PagesDropdown = ({ allowedPages }) => {
+    const [open, setOpen] = useState(false);
+    const [coords, setCoords] = useState({ top: 0, left: 0 });
+    const btnRef = useRef(null);
+    const dropRef = useRef(null);
 
-    const DEPARTMENTS = [
-        "Management",
-        "Operations",
-        "Medical",
-        "Customer Service",
-        "Finance",
-        "Human Resources",
-    ];
-
-    const handleAddUser = () => {
-        setEditingUser(null);
-        setFormData({});
-        setIsModalOpen(true);
-    };
-
-    const handleEditUser = (user) => {
-        setEditingUser(user);
-        setFormData(user);
-        setIsModalOpen(true);
-    };
-
-    const handleDeleteUser = (id) => {
-        if (window.confirm("Are you sure you want to delete this user?")) {
-            setUsers(users.filter((u) => u.id !== id));
+    const handleButtonClick = () => {
+        if (!open && btnRef.current) {
+            const rect = btnRef.current.getBoundingClientRect();
+            setCoords({
+                top: rect.bottom + window.scrollY + 6,
+                left: rect.left + window.scrollX + rect.width / 2,
+            });
         }
+        setOpen((v) => !v);
     };
 
-    const handleCloseModal = () => {
-        setIsModalOpen(false);
-        setEditingUser(null);
-        setFormData({});
-    };
+    useEffect(() => {
+        if (!open) return;
+        const handleOutside = (e) => {
+            if (
+                btnRef.current && !btnRef.current.contains(e.target) &&
+                dropRef.current && !dropRef.current.contains(e.target)
+            ) {
+                setOpen(false);
+            }
+        };
+        document.addEventListener("mousedown", handleOutside);
+        return () => document.removeEventListener("mousedown", handleOutside);
+    }, [open]);
 
-    const handleSaveUser = () => {
-        if (!formData.name || !formData.email) {
-            alert("Please fill in all required fields");
+    const dropdown = open
+        ? ReactDOM.createPortal(
+            <div
+                ref={dropRef}
+                className="pages-dropdown"
+                style={{ top: coords.top, left: coords.left }}
+            >
+                <p className="pages-dropdown-title">Allowed Pages</p>
+                {allowedPages.length === 0 ? (
+                    <span className="pages-dropdown-empty">No pages assigned</span>
+                ) : (
+                    <div className="pages-dropdown-list">
+                        {allowedPages.map((pageKey) => {
+                            const page = PAGE_ACCESS_OPTIONS.find((item) => item.key === pageKey);
+                            return (
+                                <span key={pageKey} className="permission-tag">
+                                    {page?.label || pageKey}
+                                </span>
+                            );
+                        })}
+                    </div>
+                )}
+            </div>,
+            document.body
+        )
+        : null;
+
+    return (
+        <div className="pages-dropdown-wrap">
+            <button
+                ref={btnRef}
+                className="three-dot-btn"
+                onClick={handleButtonClick}
+                title="View allowed pages"
+            >
+                •••
+            </button>
+            {dropdown}
+        </div>
+    );
+};
+
+const Settings = ({ clinicId: propClinicId }) => {
+    const { enqueueSnackbar } = useSnackbar();
+    const currentUser = AuthService.getCurrentUser();
+    const clinicId = propClinicId || localStorage.getItem("selectedClinicId") || currentUser?.clinicId;
+
+    const [users, setUsers] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [activeTab, setActiveTab] = useState("users");
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [formData, setFormData] = useState(emptyFormState);
+
+    const fetchUsers = useCallback(async () => {
+        if (!clinicId) {
+            setUsers([]);
+            setLoading(false);
             return;
         }
 
-        if (editingUser) {
-            setUsers(
-                users.map((u) =>
-                    u.id === editingUser.id ? { ...u, ...formData } : u
-                )
-            );
-        } else {
-            setUsers([
-                ...users,
-                { id: Math.max(...users.map((u) => u.id), 0) + 1, ...formData },
-            ]);
+        try {
+            setLoading(true);
+            const response = await HttpService.getWithAuth(`/users?clinicId=${clinicId}&limit=100`);
+            const userList = Array.isArray(response?.data) ? response.data : [];
+            setUsers(userList);
+        } catch (error) {
+            console.error(error);
+            enqueueSnackbar("Failed to load clinic users", { variant: "error" });
+            setUsers([]);
+        } finally {
+            setLoading(false);
         }
-        handleCloseModal();
+    }, [clinicId, enqueueSnackbar]);
+
+    useEffect(() => {
+        fetchUsers();
+    }, [fetchUsers]);
+
+    const roleCards = useMemo(
+        () =>
+            EDITABLE_ROLES.map((role) => ({
+                value: role,
+                label: ROLE_LABELS[role],
+                count: users.filter((user) => user.role === role).length,
+                defaultPages: ROLE_ALLOWED_PAGES[role] || [],
+            })),
+        [users]
+    );
+
+    const totalUsers = users.length;
+    const activeUsers = users.filter((user) => user.isActive).length;
+    const inactiveUsers = totalUsers - activeUsers;
+    const usersWithSettings = users.filter((user) => (user.allowedPages || []).includes("settings")).length;
+
+    const openEditModal = (user) => {
+        setFormData({
+            id: user.id,
+            firstName: user.firstName || "",
+            lastName: user.lastName || "",
+            email: user.email || "",
+            phoneNumber: user.phoneNumber || "",
+            role: user.role || "STAFF",
+            isActive: user.isActive !== false,
+            allowedPages: Array.isArray(user.allowedPages)
+                ? user.allowedPages
+                : (ROLE_ALLOWED_PAGES[user.role] || ROLE_ALLOWED_PAGES.STAFF),
+        });
+        setIsModalOpen(true);
     };
 
-    const handleFormChange = (field, value) => {
-        if (field === "role") {
-            const selectedRole = ROLES.find((r) => r.value === value);
-            setFormData({
-                ...formData,
-                role: value,
-                permissions: selectedRole?.permissions || [],
+    const closeModal = () => {
+        setIsModalOpen(false);
+        setFormData(emptyFormState);
+    };
+
+    const handleFieldChange = (field, value) => {
+        setFormData((prev) => ({ ...prev, [field]: value }));
+    };
+
+    const handleRoleChange = (role) => {
+        setFormData((prev) => ({
+            ...prev,
+            role,
+            allowedPages: ROLE_ALLOWED_PAGES[role] || [],
+        }));
+    };
+
+    const toggleAllowedPage = (pageKey) => {
+        setFormData((prev) => {
+            const alreadySelected = prev.allowedPages.includes(pageKey);
+            return {
+                ...prev,
+                allowedPages: alreadySelected
+                    ? prev.allowedPages.filter((page) => page !== pageKey)
+                    : [...prev.allowedPages, pageKey],
+            };
+        });
+    };
+
+    const handleSaveUser = async () => {
+        try {
+            if (!formData.id) {
+                enqueueSnackbar("Select a user to update", { variant: "error" });
+                return;
+            }
+
+            await HttpService.putWithAuth(`/users/${formData.id}`, {
+                firstName: formData.firstName,
+                lastName: formData.lastName,
+                email: formData.email,
+                phoneNumber: formData.phoneNumber,
+                role: formData.role,
+                isActive: formData.isActive,
+                allowedPages: formData.allowedPages,
             });
-        } else {
-            setFormData({ ...formData, [field]: value });
+
+            if (currentUser?.id === formData.id) {
+                AuthService.mergeCurrentUser({
+                    firstName: formData.firstName,
+                    lastName: formData.lastName,
+                    email: formData.email,
+                    phoneNumber: formData.phoneNumber,
+                    role: formData.role,
+                    isActive: formData.isActive,
+                    allowedPages: formData.allowedPages,
+                });
+            }
+
+            enqueueSnackbar("User settings updated", { variant: "success" });
+            closeModal();
+            fetchUsers();
+        } catch (error) {
+            console.error(error);
+            enqueueSnackbar(error?.response?.data?.message || "Failed to update user", {
+                variant: "error",
+            });
         }
     };
 
-    const getRoleColor = (role) => {
-        switch (role) {
-            case "Super Admin":
-                return "role-super-admin";
-            case "Admin":
-                return "role-admin";
-            case "Manager":
-                return "role-manager";
-            case "Veterinarian":
-                return "role-veterinarian";
-            case "Staff":
-                return "role-staff";
-            case "Receptionist":
-                return "role-receptionist";
-            default:
-                return "role-default";
-        }
-    };
+    const getFullName = (user) =>
+        `${user.firstName || ""} ${user.lastName || ""}`.trim() || user.username || "Unnamed User";
 
-    const activeUsers = users.filter((u) => u.status === "Active").length;
-    const superAdmins = users.filter((u) => u.role === "Super Admin").length;
-    const managers = users.filter((u) => u.role === "Manager").length;
+    if (!clinicId) {
+        return (
+            <div className="settings">
+                <div className="settings-container">
+                    <div className="settings-content">
+                        <div className="tab-content">
+                            <p>No clinic selected.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="settings">
-            {/* <Sidebar /> */}
             <div className="settings-container">
-                {/* <Navbar /> */}
-
                 <div className="settings-content">
                     <div className="page-header">
                         <div>
-                            <h1>Settings & User Management</h1>
-                            <p>Manage users, roles, and permissions</p>
+                            <h1>Clinic Settings</h1>
+                            <p>Manage real clinic users, roles, and page visibility</p>
                         </div>
                     </div>
 
-                    {/* Statistics Cards */}
                     <div className="stats-container">
                         <div className="stat-card">
-                            <div className="stat-icon">👥</div>
                             <div className="stat-info">
-                                <h3>{users.length}</h3>
+                                <h3>{totalUsers}</h3>
                                 <p>Total Users</p>
                             </div>
                         </div>
                         <div className="stat-card">
-                            <div className="stat-icon">✅</div>
                             <div className="stat-info">
                                 <h3>{activeUsers}</h3>
                                 <p>Active Users</p>
                             </div>
                         </div>
                         <div className="stat-card">
-                            <div className="stat-icon">👑</div>
                             <div className="stat-info">
-                                <h3>{superAdmins}</h3>
-                                <p>Super Admins</p>
+                                <h3>{inactiveUsers}</h3>
+                                <p>Inactive Users</p>
                             </div>
                         </div>
                         <div className="stat-card">
-                            <div className="stat-icon">📊</div>
                             <div className="stat-info">
-                                <h3>{managers}</h3>
-                                <p>Managers</p>
+                                <h3>{usersWithSettings}</h3>
+                                <p>Users With Settings Access</p>
                             </div>
                         </div>
                     </div>
 
-                    {/* Tabs */}
                     <div className="tab-container">
                         <button
                             className={`tab-btn ${activeTab === "users" ? "active" : ""}`}
                             onClick={() => setActiveTab("users")}
                         >
-                            👥 User Management
+                            User Directory
                         </button>
                         <button
                             className={`tab-btn ${activeTab === "roles" ? "active" : ""}`}
                             onClick={() => setActiveTab("roles")}
                         >
-                            🔐 Roles & Permissions
+                            Roles & Page Access
                         </button>
                     </div>
 
-                    {/* Users Tab */}
                     {activeTab === "users" && (
                         <div className="tab-content">
                             <div className="section-header">
                                 <h2>User Directory</h2>
-                                <button className="btn btn-primary" onClick={handleAddUser}>
-                                    ➕ Add New User
-                                </button>
+                                {/* <span className="settings-note">Users are loaded from the real superadmin user records for this clinic.</span> */}
                             </div>
 
-                            <div className="users-table">
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th>ID</th>
-                                            <th>Name</th>
-                                            <th>Email</th>
-                                            <th>Phone</th>
-                                            <th>Role</th>
-                                            <th>Department</th>
-                                            <th>Status</th>
-                                            <th>Join Date</th>
-                                            <th>Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {users.map((user) => (
-                                            <tr key={user.id}>
-                                                <td>{user.id}</td>
-                                                <td className="user-name">
-                                                    <strong>{user.name}</strong>
-                                                </td>
-                                                <td>{user.email}</td>
-                                                <td>{user.phone}</td>
-                                                <td>
-                                                    <span className={`role-badge ${getRoleColor(user.role)}`}>
-                                                        {user.role}
-                                                    </span>
-                                                </td>
-                                                <td>{user.department}</td>
-                                                <td>
-                                                    <span
-                                                        className={`status ${user.status.toLowerCase()}`}
-                                                    >
-                                                        {user.status}
-                                                    </span>
-                                                </td>
-                                                <td>{user.joinDate}</td>
-                                                <td className="actions">
-                                                    <button
-                                                        className="btn-action edit"
-                                                        onClick={() => handleEditUser(user)}
-                                                        title="Edit"
-                                                    >
-                                                        ✏️
-                                                    </button>
-                                                    {user.role !== "Super Admin" && (
-                                                        <button
-                                                            className="btn-action delete"
-                                                            onClick={() => handleDeleteUser(user.id)}
-                                                            title="Delete"
-                                                        >
-                                                            🗑️
-                                                        </button>
-                                                    )}
-                                                </td>
+                            {loading ? (
+                                <p>Loading users...</p>
+                            ) : (
+                                <div className="users-table">
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th>Name</th>
+                                                <th>Email</th>
+                                                <th>Phone</th>
+                                                <th>Role</th>
+                                                <th>Status</th>
+                                                <th>Pages</th>
+                                                <th>Joined</th>
+                                                <th>Actions</th>
                                             </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
+                                        </thead>
+                                        <tbody>
+                                            {users.map((user) => (
+                                                <tr key={user.id}>
+                                                    <td className="user-name">
+                                                        <strong>{getFullName(user)}</strong>
+                                                    </td>
+                                                    <td>{user.email || "-"}</td>
+                                                    <td>{user.phoneNumber || "-"}</td>
+                                                    <td>
+                                                        <span className={`role-badge role-${(user.role || "").toLowerCase()}`}>
+                                                            {ROLE_LABELS[user.role] || user.role}
+                                                        </span>
+                                                    </td>
+                                                    <td>
+                                                        <span className={`status ${user.isActive ? "active" : "inactive"}`}>
+                                                            {user.isActive ? "Active" : "Inactive"}
+                                                        </span>
+                                                    </td>
+                                                    <td>
+                                                        <PagesDropdown allowedPages={user.allowedPages || []} />
+                                                    </td>
+                                                    <td>{user.createdAt ? new Date(user.createdAt).toLocaleDateString() : "-"}</td>
+                                                    <td className="actions">
+                                                        <button
+                                                            className="btn-action edit-text"
+                                                            onClick={() => openEditModal(user)}
+                                                        >
+                                                            Edit Access
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                            {users.length === 0 && (
+                                                <tr>
+                                                    <td colSpan="8" className="empty-state">
+                                                        No users found for this clinic.
+                                                    </td>
+                                                </tr>
+                                            )}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            )}
                         </div>
                     )}
 
-                    {/* Roles Tab */}
                     {activeTab === "roles" && (
                         <div className="tab-content">
                             <div className="section-header">
-                                <h2>Roles & Permissions</h2>
+                                <h2>Roles & Default Page Access</h2>
                             </div>
 
                             <div className="roles-grid">
-                                {ROLES.map((role) => (
+                                {roleCards.map((role) => (
                                     <div key={role.value} className="role-card">
-                                        <div className={`role-card-header ${getRoleColor(role.value)}`}>
+                                        <div className={`role-card-header role-${role.value.toLowerCase()}`}>
                                             <h3>{role.label}</h3>
-                                            <p>{role.description}</p>
+                                            <p>{role.count} users</p>
                                         </div>
                                         <div className="role-card-body">
-                                            <h4>Permissions:</h4>
-                                            <ul>
-                                                {role.permissions.map((perm, idx) => (
-                                                    <li key={idx}>✓ {perm}</li>
-                                                ))}
-                                            </ul>
-                                            <p className="user-count">
-                                                Users: {users.filter((u) => u.role === role.value).length}
-                                            </p>
+                                            <h4>Default Pages</h4>
+                                            <div className="page-tag-list">
+                                                {role.defaultPages.map((pageKey) => {
+                                                    const page = PAGE_ACCESS_OPTIONS.find((item) => item.key === pageKey);
+                                                    return (
+                                                        <span key={pageKey} className="permission-tag">
+                                                            {page?.label || pageKey}
+                                                        </span>
+                                                    );
+                                                })}
+                                            </div>
                                         </div>
                                     </div>
                                 ))}
@@ -352,122 +407,102 @@ const Settings = () => {
                         </div>
                     )}
 
-                    {/* User Modal */}
                     {isModalOpen && (
-                        <div className="modal-overlay" onClick={handleCloseModal}>
-                            <div className="modal" onClick={(e) => e.stopPropagation()}>
+                        <div className="modal-overlay" onClick={closeModal}>
+                            <div className="modal modal-wide" onClick={(event) => event.stopPropagation()}>
                                 <div className="modal-header">
-                                    <h2>
-                                        {editingUser ? "Edit User" : "Add New User"}
-                                    </h2>
-                                    <button className="close-btn" onClick={handleCloseModal}>
-                                        ✕
+                                    <h2>Edit User Access</h2>
+                                    <button className="close-btn" onClick={closeModal}>
+                                        x
                                     </button>
                                 </div>
                                 <div className="modal-body">
                                     <div className="form-row">
                                         <div className="form-group">
-                                            <label>Full Name *</label>
+                                            <label>First Name</label>
                                             <input
                                                 type="text"
-                                                placeholder="Enter full name"
-                                                value={formData.name || ""}
-                                                onChange={(e) =>
-                                                    handleFormChange("name", e.target.value)
-                                                }
+                                                value={formData.firstName}
+                                                onChange={(event) => handleFieldChange("firstName", event.target.value)}
                                             />
                                         </div>
                                         <div className="form-group">
-                                            <label>Email *</label>
+                                            <label>Last Name</label>
                                             <input
-                                                type="email"
-                                                placeholder="Enter email"
-                                                value={formData.email || ""}
-                                                onChange={(e) =>
-                                                    handleFormChange("email", e.target.value)
-                                                }
+                                                type="text"
+                                                value={formData.lastName}
+                                                onChange={(event) => handleFieldChange("lastName", event.target.value)}
                                             />
                                         </div>
                                     </div>
 
                                     <div className="form-row">
                                         <div className="form-group">
+                                            <label>Email</label>
+                                            <input
+                                                type="email"
+                                                value={formData.email}
+                                                onChange={(event) => handleFieldChange("email", event.target.value)}
+                                            />
+                                        </div>
+                                        <div className="form-group">
                                             <label>Phone</label>
                                             <input
-                                                type="tel"
-                                                placeholder="Enter phone number"
-                                                value={formData.phone || ""}
-                                                onChange={(e) =>
-                                                    handleFormChange("phone", e.target.value)
-                                                }
+                                                type="text"
+                                                value={formData.phoneNumber}
+                                                onChange={(event) => handleFieldChange("phoneNumber", event.target.value)}
                                             />
+                                        </div>
+                                    </div>
+
+                                    <div className="form-row">
+                                        <div className="form-group">
+                                            <label>Role</label>
+                                            <select
+                                                value={formData.role}
+                                                onChange={(event) => handleRoleChange(event.target.value)}
+                                            >
+                                                {EDITABLE_ROLES.map((role) => (
+                                                    <option key={role} value={role}>
+                                                        {ROLE_LABELS[role]}
+                                                    </option>
+                                                ))}
+                                            </select>
                                         </div>
                                         <div className="form-group">
                                             <label>Status</label>
                                             <select
-                                                value={formData.status || "Active"}
-                                                onChange={(e) =>
-                                                    handleFormChange("status", e.target.value)
-                                                }
+                                                value={formData.isActive ? "active" : "inactive"}
+                                                onChange={(event) => handleFieldChange("isActive", event.target.value === "active")}
                                             >
-                                                <option>Active</option>
-                                                <option>Inactive</option>
-                                                <option>Suspended</option>
-                                            </select>
-                                        </div>
-                                    </div>
-
-                                    <div className="form-row">
-                                        <div className="form-group">
-                                            <label>Role *</label>
-                                            <select
-                                                value={formData.role || "Staff"}
-                                                onChange={(e) =>
-                                                    handleFormChange("role", e.target.value)
-                                                }
-                                            >
-                                                {ROLES.map((role) => (
-                                                    <option key={role.value} value={role.value}>
-                                                        {role.label} - {role.description}
-                                                    </option>
-                                                ))}
-                                            </select>
-                                        </div>
-                                        <div className="form-group">
-                                            <label>Department</label>
-                                            <select
-                                                value={formData.department || ""}
-                                                onChange={(e) =>
-                                                    handleFormChange("department", e.target.value)
-                                                }
-                                            >
-                                                <option value="">Select Department</option>
-                                                {DEPARTMENTS.map((dept) => (
-                                                    <option key={dept} value={dept}>
-                                                        {dept}
-                                                    </option>
-                                                ))}
+                                                <option value="active">Active</option>
+                                                <option value="inactive">Inactive</option>
                                             </select>
                                         </div>
                                     </div>
 
                                     <div className="form-group">
-                                        <label>Assigned Permissions</label>
-                                        <div className="permissions-box">
-                                            {(formData.permissions || []).map((perm, idx) => (
-                                                <span key={idx} className="permission-tag">
-                                                    {perm}
-                                                </span>
+                                        <label>Visible Pages</label>
+                                        <div className="page-access-grid">
+                                            {PAGE_ACCESS_OPTIONS.map((page) => (
+                                                <label key={page.key} className="page-access-option">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={formData.allowedPages.includes(page.key)}
+                                                        onChange={() => toggleAllowedPage(page.key)}
+                                                    />
+                                                    <span>{page.label}</span>
+                                                </label>
                                             ))}
                                         </div>
                                     </div>
                                 </div>
                                 <div className="modal-footer">
-                                    <button className="btn btn-secondary" onClick={handleCloseModal}>
+                                    <button className="btn btn-secondary" onClick={closeModal}>
                                         Cancel
                                     </button>
                                     <button className="btn btn-primary" onClick={handleSaveUser}>
-                                        Save User
+                                        Save Changes
                                     </button>
                                 </div>
                             </div>

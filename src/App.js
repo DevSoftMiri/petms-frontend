@@ -33,6 +33,7 @@ import PetCaseDetail from "./pages/vet/PetCaseDetail";
 import VetPetDetails from "./pages/vet/VetPetDetails";
 import PrivateRoute from "./PrivateRoute";
 import RoleAccess from "./RoleAccess";
+import PageAccessRoute from "./PageAccessRoute";
 import "./style/dark.css";
 
 const ClinicEntry = () => {
@@ -97,30 +98,50 @@ function App() {
 
               <Route path="/" element={<PrivateRoute />}>
                 <Route path="/general-info" element={<GeneralInformation />} />
-                <Route path="/customers" element={<Customers />} />
-                <Route path="/appointments" element={<Events />} />
+                <Route element={<PageAccessRoute pageKey="customers" />}>
+                  <Route path="/customers" element={<Customers />} />
+                </Route>
+                <Route element={<PageAccessRoute pageKey="appointments" />}>
+                  <Route path="/appointments" element={<Events />} />
+                </Route>
                 <Route path="/events" element={<Navigate to="/appointments" replace />} />
-                <Route path="/laboratory" element={<Laboratory />} />
-                <Route path="/laboratory/inpatient" element={<Laboratory />} />
-                <Route path="/laboratory/parameters" element={<Laboratory />} />
-                <Route path="/store" element={<Store />} />
-                <Route path="/grooming" element={<Grooming />} />
-                <Route path="/pharmacy" element={<Pharmacy />} />
-                <Route path="/finance" element={<Finance />} />
+                <Route element={<PageAccessRoute pageKey="laboratory" />}>
+                  <Route path="/laboratory" element={<Laboratory />} />
+                  <Route path="/laboratory/inpatient" element={<Laboratory />} />
+                  <Route path="/laboratory/parameters" element={<Laboratory />} />
+                </Route>
+                <Route element={<PageAccessRoute pageKey="store" />}>
+                  <Route path="/store" element={<Store />} />
+                </Route>
+                <Route element={<PageAccessRoute pageKey="grooming" />}>
+                  <Route path="/grooming" element={<Grooming />} />
+                </Route>
+                <Route element={<PageAccessRoute pageKey="pharmacy" />}>
+                  <Route path="/pharmacy" element={<Pharmacy />} />
+                </Route>
+                <Route element={<PageAccessRoute pageKey="finance" />}>
+                  <Route path="/finance" element={<Finance />} />
+                </Route>
                 <Route path="/clinic-users" element={<ClinicUsers />} />
-                <Route path="/settings" element={<Settings />} />
-                <Route path="/supplies" element={<Supplies />} />
+                <Route element={<PageAccessRoute pageKey="settings" />}>
+                  <Route path="/settings" element={<Settings />} />
+                </Route>
+                <Route element={<PageAccessRoute pageKey="supplies" />}>
+                  <Route path="/supplies" element={<Supplies />} />
+                </Route>
               </Route>
 
               <Route path="pets" element={<PrivateRoute />}>
-                <Route element={<RoleAccess roles={["ADMIN", "VET", "GROOMER", "RECEPTIONIST", "STAFF", "SUPERADMIN"]} />} >
-                  <Route index element={<ListPet />} />
-                </Route>
-                <Route element={<RoleAccess roles={["ADMIN", "VET", "GROOMER", "RECEPTIONIST", "STAFF", "SUPERADMIN"]} />} >
-                  <Route path="new" element={<NewPet />} />
-                </Route>
-                <Route element={<RoleAccess roles={["ADMIN", "VET", "GROOMER", "RECEPTIONIST", "STAFF", "SUPERADMIN"]} />} >
-                  <Route path="edit" element={<EditPet />} />
+                <Route element={<PageAccessRoute pageKey="pets" />}>
+                  <Route element={<RoleAccess roles={["ADMIN", "VET", "GROOMER", "RECEPTIONIST", "STAFF", "SUPERADMIN"]} />} >
+                    <Route index element={<ListPet />} />
+                  </Route>
+                  <Route element={<RoleAccess roles={["ADMIN", "VET", "GROOMER", "RECEPTIONIST", "STAFF", "SUPERADMIN"]} />} >
+                    <Route path="new" element={<NewPet />} />
+                  </Route>
+                  <Route element={<RoleAccess roles={["ADMIN", "VET", "GROOMER", "RECEPTIONIST", "STAFF", "SUPERADMIN"]} />} >
+                    <Route path="edit" element={<EditPet />} />
+                  </Route>
                 </Route>
               </Route>
 
@@ -144,14 +165,16 @@ function App() {
 
               {/* Vet Dashboard - Accessible to VET role */}
               <Route path="/vet" element={<PrivateRoute />}>
-                <Route element={<RoleAccess roles={["VET", "ADMIN", "SUPERADMIN"]} />} >
-                  <Route index element={<VetDashboard />} />
-                  <Route path="dashboard" element={<VetDashboard />} />
-                  <Route path="case/:caseId" element={<PetCaseDetail />} />
-                  <Route path="pet/:petId" element={<PetCaseDetail />} />
-                  <Route path="pet/:petId/details" element={<VetPetDetails />} />
-                  <Route path="medical-record/:medicalRecordNumber" element={<PetCaseDetail />} />
-                  <Route path="medical-record/:medicalRecordNumber/appointment/:appointmentId" element={<PetCaseDetail />} />
+                <Route element={<PageAccessRoute pageKey="vet" />}>
+                  <Route element={<RoleAccess roles={["VET", "ADMIN", "SUPERADMIN"]} />} >
+                    <Route index element={<VetDashboard />} />
+                    <Route path="dashboard" element={<VetDashboard />} />
+                    <Route path="case/:caseId" element={<PetCaseDetail />} />
+                    <Route path="pet/:petId" element={<PetCaseDetail />} />
+                    <Route path="pet/:petId/details" element={<VetPetDetails />} />
+                    <Route path="medical-record/:medicalRecordNumber" element={<PetCaseDetail />} />
+                    <Route path="medical-record/:medicalRecordNumber/appointment/:appointmentId" element={<PetCaseDetail />} />
+                  </Route>
                 </Route>
               </Route>
 
@@ -164,4 +187,3 @@ function App() {
 }
 
 export default App;
-

@@ -74,6 +74,24 @@ const getCurrentUser = () => {
   return null;
 };
 
+const setCurrentUser = (user) => {
+  localStorage.setItem("user", JSON.stringify(user));
+  return user;
+};
+
+const mergeCurrentUser = (partialUser) => {
+  const currentUser = getCurrentUser();
+  if (!currentUser) return null;
+
+  const nextUser = {
+    ...currentUser,
+    ...partialUser,
+  };
+
+  localStorage.setItem("user", JSON.stringify(nextUser));
+  return nextUser;
+};
+
 const changePassword = (oldPassword, newPassword) => {
   const url = "/auth/change-password";
   return axios.put(url, { oldPassword, newPassword }).then((response) => {
@@ -99,6 +117,8 @@ const AuthService = {
   signup,
   logout,
   getCurrentUser,
+  setCurrentUser,
+  mergeCurrentUser,
   changePassword,
   getProfile,
 };

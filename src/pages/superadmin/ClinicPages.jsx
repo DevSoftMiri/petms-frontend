@@ -19,7 +19,27 @@ import ListPet from "../pet/ListPet";
 import Settings from "../settings/Settings";
 import UserManagement from "./UserManagement";
 import VetDashboard from "../vet/VetDashboard";
+import { canAccessPage, getFirstAccessiblePage } from "../../utils/pageAccess";
 import "./clinicPages.css";
+
+const TAB_ACCESS_MAP = {
+    dashboard: "dashboard",
+    vet: "vet",
+    customers: "customers",
+    pets: "pets",
+    appointments: "appointments",
+    laboratory: "laboratory",
+    "imaging-reports": "laboratory",
+    inpatient: "laboratory",
+    parameters: "laboratory",
+    pharmacy: "pharmacy",
+    grooming: "grooming",
+    store: "store",
+    supplies: "supplies",
+    finance: "finance",
+    settings: "settings",
+    users: null,
+};
 
 const ClinicPages = () => {
     const { id } = useParams();
@@ -57,6 +77,21 @@ const ClinicPages = () => {
 
         setActiveTab(tab);
     }, [id, location.pathname, navigate]);
+
+    useEffect(() => {
+        const requiredPage = TAB_ACCESS_MAP[activeTab];
+        if (!requiredPage || canAccessPage(user, requiredPage)) {
+            return;
+        }
+
+        const fallbackTab = getFirstAccessiblePage(user, null);
+        if (!fallbackTab) {
+            navigate("/unauthorized", { replace: true });
+            return;
+        }
+
+        navigate(`/clinics/${id}/${fallbackTab}`, { replace: true });
+    }, [activeTab, id, navigate, user]);
 
     const fetchClinic = useCallback(async () => {
         try {
@@ -135,6 +170,12 @@ const ClinicPages = () => {
     };
 
     const handleTabChange = (tab) => {
+        const requiredPage = TAB_ACCESS_MAP[tab];
+        if (requiredPage && !canAccessPage(user, requiredPage)) {
+            enqueueSnackbar("You do not have access to that page", { variant: "warning" });
+            return;
+        }
+
         setActiveTab(tab);
         // Navigate to the clinic-scoped route for this tab
         navigate(`/clinics/${id}/${tab}`);

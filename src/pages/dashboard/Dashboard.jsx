@@ -7,14 +7,12 @@ import './dashboard.css';
 const Dashboard = ({ clinicId: propClinicId }) => {
     const { clinicId: paramClinicId } = useParams();
     const clinicId = propClinicId || paramClinicId;
-    const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [dashboardData, setDashboardData] = useState(null);
 
     // Fetch dashboard data
     const fetchDashboardData = useCallback(async () => {
         try {
-            setLoading(true);
             setError(null);
             const response = await HttpService.getWithAuth(
                 `/clinics/${clinicId}/dashboard`
@@ -28,8 +26,6 @@ const Dashboard = ({ clinicId: propClinicId }) => {
         } catch (err) {
             setError(err.message || 'Failed to load dashboard data');
             console.error('Dashboard fetch error:', err);
-        } finally {
-            setLoading(false);
         }
     }, [clinicId]);
 
@@ -41,18 +37,6 @@ const Dashboard = ({ clinicId: propClinicId }) => {
     const handleCloseError = () => {
         setError(null);
     };
-
-    // Loading state
-    if (loading) {
-        return (
-            <div className="dashboard-container">
-                <div className="loading-spinner">
-                    <div className="spinner"></div>
-                    <p>Loading Dashboard...</p>
-                </div>
-            </div>
-        );
-    }
 
     // Error state
     if (error) {

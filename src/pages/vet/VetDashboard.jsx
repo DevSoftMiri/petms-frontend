@@ -436,6 +436,12 @@ const VetDashboard = ({ clinicId: propClinicId }) => {
                   {/* ── Custom Three-Dot Actions Dropdown ── */}
                   <div className="case-actions-group" style={{ position: "relative" }}>
                     <button
+                      className="case-view-btn"
+                      onClick={(e) => { e.stopPropagation(); handleViewCase(caseItem.id); }}
+                    >
+                      View Case
+                    </button>
+                    <button
                       className="three-dot-btn"
                       onClick={(e) => { e.stopPropagation(); setOpenDropdown(openDropdown === caseItem.id ? null : caseItem.id); }}
                       aria-label="Case actions"
@@ -447,12 +453,6 @@ const VetDashboard = ({ clinicId: propClinicId }) => {
 
                     {openDropdown === caseItem.id && (
                       <div className="three-dot-menu">
-                        <button
-                          className="three-dot-item view-item"
-                          onClick={() => { handleViewCase(caseItem.id); setOpenDropdown(null); }}
-                        >
-                          📋 View Case
-                        </button>
                         <button
                           className="three-dot-item inpatient-item"
                           onClick={() => { handleMoveToInpatient(caseItem); setOpenDropdown(null); }}
@@ -678,3 +678,4 @@ const VetDashboard = ({ clinicId: propClinicId }) => {
 };
 
 export default VetDashboard;
+

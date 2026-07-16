@@ -5,6 +5,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import { superAdminMenuItems, regularMenuItems, getClinicMenuItems } from "../../utils/menuConfig";
+import { filterMenuItemsByAccess } from "../../utils/pageAccess";
 import AuthService from "../../services/AuthService";
 
 import "./sidebar.css";
@@ -47,6 +48,8 @@ const Sidebar = ({ activeClinicTab = null, onTabChange = null }) => {
   } else {
     menuItems = regularMenuItems;
   }
+
+  menuItems = filterMenuItemsByAccess(menuItems, user);
 
   // Toggle dropdown
   const toggleDropdown = (label) => {
