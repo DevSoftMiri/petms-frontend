@@ -234,10 +234,6 @@ const ClinicDetail = () => {
                         <h2>Subscription & Users</h2>
                         <div className="info-grid">
                             <div className="info-item">
-                                <span className="label">Subscription Plan:</span>
-                                <span className="value">{clinic.subscription}</span>
-                            </div>
-                            <div className="info-item">
                                 <span className="label">Subscription Start Date:</span>
                                 <span className="value">
                                     {clinic.subscriptionStartDate

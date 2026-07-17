@@ -532,7 +532,6 @@ const SuperAdminDashboard = () => {
                                             </div>
                                             <div className="clinic-info">
                                                 <p><strong>Code:</strong> {clinic.clinicCode}</p>
-                                                <p><strong>Plan:</strong> {clinic.subscriptionPlan || "Standard"}</p>
                                                 <p><strong>Max Users:</strong> {clinic.maxUsers}</p>
                                             </div>
                                             <div className="clinic-actions">
