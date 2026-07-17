@@ -592,7 +592,7 @@
 /* ===========================
    Loading & Empty
    =========================== */
-.case-detail-container .loading-spinner {
+.case-detail-container .case-loading-spinner {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -600,19 +600,28 @@
   min-height: 400px;
   color: #6b7280;
   font-size: 14px;
+  text-align: center;
 }
 
-.case-detail-container .spinner {
+.case-detail-container .case-spinner {
   width: 44px;
   height: 44px;
   border: 3px solid #e5e7eb;
   border-top: 3px solid #3feb25;
   border-radius: 50%;
-  animation: spin 0.75s linear infinite;
+  animation: caseDetailSpin 0.75s linear infinite;
   margin-bottom: 14px;
+  flex-shrink: 0;
 }
 
-@keyframes spin {
+.case-detail-container .case-loading-spinner p {
+  margin: 0;
+  color: #6b7280;
+  animation: none;
+  transform: none;
+}
+
+@keyframes caseDetailSpin {
   0%   { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }

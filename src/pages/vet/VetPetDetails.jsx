@@ -249,16 +249,19 @@ const VetPetDetails = () => {
             enqueueSnackbar("Test type is required", { variant: "error" });
             return;
         }
+        const requestingVeterinarian = petData?.assignedVet
+            ? `Dr. ${`${petData.assignedVet.firstName || ""} ${petData.assignedVet.lastName || ""}`.trim()}`.trim()
+            : "";
         try {
             await HttpService.postWithAuth(`/clinics/${clinicId}/laboratory`, {
                 petId: petId,
                 petName: petData?.name || "",
-                customerCode: petData?.owner?.customerId || "",
+                customerCode: petData?.medicalRecordNumber || "",
                 testType: labTestForm.testType,
                 date: labTestForm.date,
                 notes: labTestForm.notes,
                 status: "Pending",
-                veterinarian: "",
+                veterinarian: requestingVeterinarian,
                 result: "",
                 reportUrl: "",
             });

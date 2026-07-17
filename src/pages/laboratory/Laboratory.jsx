@@ -695,7 +695,7 @@ const Laboratory = ({ clinicId: propClinicId, subView: propSubView }) => {
                     <div className="search-bar">
                         <input
                             type="text"
-                            placeholder="Search by customer code or pet name..."
+                        placeholder="Search by MR number or pet name..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                             className="search-input"
@@ -713,7 +713,7 @@ const Laboratory = ({ clinicId: propClinicId, subView: propSubView }) => {
                     <table>
                         <thead>
                             <tr>
-                                <th>Customer Code</th>
+                                <th>MR Number</th>
                                 <th>Pet Name</th>
                                 <th>Test Type</th>
                                 <th>Date</th>

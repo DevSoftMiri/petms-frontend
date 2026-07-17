@@ -175,16 +175,21 @@ const PetCaseDetail = () => {
   const handleSubmitLabTest = async (e) => {
     e.preventDefault();
     if (!labTestForm.testType) { enqueueSnackbar("Test type is required", { variant: "error" }); return; }
+    const requestingVeterinarian = caseData.pet?.assignedVet
+      ? `Dr. ${`${caseData.pet.assignedVet.firstName || ""} ${caseData.pet.assignedVet.lastName || ""}`.trim()}`.trim()
+      : caseData.vet
+        ? `Dr. ${`${caseData.vet.firstName || ""} ${caseData.vet.lastName || ""}`.trim()}`.trim()
+        : "";
     try {
       await HttpService.postWithAuth(`/clinics/${clinicId}/laboratory`, {
         petId: caseData.petId,
         petName: caseData.pet?.name || "",
-        customerCode: caseData.pet?.owner?.customerId || "",
+        customerCode: caseData.medicalRecordNumber || "",
         testType: labTestForm.testType,
         date: labTestForm.date,
         notes: labTestForm.notes,
         status: "Pending",
-        veterinarian: "",
+        veterinarian: requestingVeterinarian,
         result: "",
         reportUrl: ""
       });
@@ -329,7 +334,7 @@ const PetCaseDetail = () => {
   };
 
   // ── Loading / empty states ───────────────────────────────────────────────────
-  if (loading) return renderWithSidebar(<div className="case-detail-container"><div className="loading-spinner"><div className="spinner"></div><p>Loading case...</p></div></div>);
+  if (loading) return renderWithSidebar(<div className="case-detail-container"><div className="case-loading-spinner"><div className="case-spinner"></div><p>Loading case...</p></div></div>);
   if (!caseData) return renderWithSidebar(<div className="case-detail-container"><div className="empty-state">Case not found</div></div>);
 
   const procedures = caseData.procedures || [];
