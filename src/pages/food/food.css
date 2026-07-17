@@ -18,6 +18,28 @@
   padding: 30px;
 }
 
+.store-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.store-tabs .tab-btn {
+  border: 0;
+  background: transparent;
+  padding: 11px 14px;
+  cursor: pointer;
+  font-weight: 700;
+  color: #1f2937;
+  border-bottom: 3px solid transparent;
+}
+
+.store-tabs .tab-btn.active {
+  color: #ffffff;
+  border-bottom-color: #f97316;
+}
+
 .food-hero {
   display: grid;
   grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
@@ -227,6 +249,11 @@
   margin: 8px 0 0 0;
   color: #475569;
   font-size: 14px;
+}
+
+.food-page .btn-primary,
+.food-page .btn-action.primary {
+  color: #ffffff;
 }
 
 @media (max-width: 1100px) {

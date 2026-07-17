@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useSnackbar } from "notistack";
+import AuthService from "../../services/AuthService";
 import HttpService from "../../services/HttpService";
 import "./food.css";
 
@@ -21,10 +22,78 @@ const parseArrayResponse = (response) => {
     return [];
 };
 
+const FOOD_HISTORY_NOTE_PREFIX = "FOOD_HISTORY::";
+
+const buildFoodHistoryNotes = ({ recipientType, recipientName, notes }) => {
+    const payload = {
+        recipientType: recipientType || "GENERAL_FEEDING",
+        recipientName: recipientName?.trim() || "",
+        notes: notes?.trim() || "",
+    };
+
+    return `${FOOD_HISTORY_NOTE_PREFIX}${JSON.stringify(payload)}`;
+};
+
+const parseFoodHistoryNotes = (rawNotes) => {
+    if (!rawNotes) {
+        return {
+            recipientType: "GENERAL_FEEDING",
+            recipientName: "",
+            notes: "",
+        };
+    }
+
+    if (!rawNotes.startsWith(FOOD_HISTORY_NOTE_PREFIX)) {
+        return {
+            recipientType: "GENERAL_FEEDING",
+            recipientName: "",
+            notes: rawNotes,
+        };
+    }
+
+    try {
+        const parsed = JSON.parse(rawNotes.slice(FOOD_HISTORY_NOTE_PREFIX.length));
+        return {
+            recipientType: parsed.recipientType || "GENERAL_FEEDING",
+            recipientName: parsed.recipientName || "",
+            notes: parsed.notes || "",
+        };
+    } catch (error) {
+        return {
+            recipientType: "GENERAL_FEEDING",
+            recipientName: "",
+            notes: rawNotes,
+        };
+    }
+};
+
+const formatStaffName = (staff) => {
+    if (!staff) return "-";
+    const fullName = `${staff.firstName || ""} ${staff.lastName || ""}`.trim();
+    return fullName || staff.email || "-";
+};
+
+const formatRecipientType = (recipientType) => {
+    switch (recipientType) {
+    case "SHELTER_ANIMAL":
+        return "Shelter Animal";
+    case "RESCUE_CASE":
+        return "Rescue Case";
+    case "FEEDING_PACK":
+        return "Feeding Pack";
+    default:
+        return "General Feeding";
+    }
+};
+
 const Food = ({ clinicId }) => {
     const { enqueueSnackbar } = useSnackbar();
+    const currentUser = AuthService.getCurrentUser();
+    const [activeTab, setActiveTab] = useState("give");
     const [foodItems, setFoodItems] = useState([]);
+    const [history, setHistory] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [historyLoading, setHistoryLoading] = useState(true);
     const [pets, setPets] = useState([]);
     const [search, setSearch] = useState("");
     const [selectedType, setSelectedType] = useState(FOOD_TYPES[0]);
@@ -57,10 +126,30 @@ const Food = ({ clinicId }) => {
         }
     }, [clinicId]);
 
+    const fetchHistory = useCallback(async () => {
+        if (!clinicId) return;
+        try {
+            setHistoryLoading(true);
+            const response = await HttpService.getWithAuth(`/clinics/${clinicId}/store/dispense?limit=100`);
+            const entries = parseArrayResponse(response)
+                .filter((entry) => FOOD_TYPES.includes(entry.storeItem?.category))
+                .map((entry) => ({
+                    ...entry,
+                    foodHistoryMeta: parseFoodHistoryNotes(entry.notes),
+                }));
+            setHistory(entries);
+        } catch (error) {
+            enqueueSnackbar("Failed to load food given history", { variant: "error" });
+        } finally {
+            setHistoryLoading(false);
+        }
+    }, [clinicId, enqueueSnackbar]);
+
     useEffect(() => {
         fetchFoodItems();
         fetchPets();
-    }, [fetchFoodItems, fetchPets]);
+        fetchHistory();
+    }, [fetchFoodItems, fetchPets, fetchHistory]);
 
     const filteredFoodItems = useMemo(() => {
         const query = search.trim().toLowerCase();
@@ -71,6 +160,18 @@ const Food = ({ clinicId }) => {
             || item.supplier?.toLowerCase().includes(query)
         ));
     }, [foodItems, search]);
+
+    const filteredHistory = useMemo(() => {
+        const query = search.trim().toLowerCase();
+        if (!query) return history;
+        return history.filter((entry) => (
+            entry.storeItem?.name?.toLowerCase().includes(query)
+            || entry.pet?.name?.toLowerCase().includes(query)
+            || entry.foodHistoryMeta?.recipientName?.toLowerCase().includes(query)
+            || formatRecipientType(entry.foodHistoryMeta?.recipientType).toLowerCase().includes(query)
+            || formatStaffName(entry.staff).toLowerCase().includes(query)
+        ));
+    }, [history, search]);
 
     const groupedSections = useMemo(() => FOOD_TYPES.map((type) => ({
         type,
@@ -111,6 +212,10 @@ const Food = ({ clinicId }) => {
 
     const handleGiveFood = async () => {
         if (!selectedItem) return;
+        if (!currentUser?.id) {
+            enqueueSnackbar("Logged-in user not found", { variant: "error" });
+            return;
+        }
 
         const quantityToGive = Number(giveForm.quantity || 0);
         const availableQuantity = Number(selectedItem.quantity || 0);
@@ -127,15 +232,22 @@ const Food = ({ clinicId }) => {
 
         try {
             setSubmitting(true);
-            await HttpService.putWithAuth(`/clinics/${clinicId}/supplies/${selectedItem.id}`, {
-                ...selectedItem,
-                quantity: availableQuantity - quantityToGive,
+            await HttpService.postWithAuth(`/clinics/${clinicId}/store/dispense`, {
+                sourceSupplyId: selectedItem.id,
+                quantity: quantityToGive,
+                dispensingType: "CLINIC_USE",
+                petId: giveForm.petId || null,
+                customerId: null,
+                dispensedBy: currentUser.id,
+                notes: buildFoodHistoryNotes(giveForm),
             });
-            enqueueSnackbar("Food given and stock updated", { variant: "success" });
+            enqueueSnackbar("Food given and history recorded", { variant: "success" });
             setGiveModalOpen(false);
             setSelectedItem(null);
             setGiveForm(emptyGiveForm);
             fetchFoodItems();
+            fetchHistory();
+            setActiveTab("history");
         } catch (error) {
             enqueueSnackbar(error.response?.data?.message || "Failed to give food", { variant: "error" });
         } finally {
@@ -152,8 +264,17 @@ const Food = ({ clinicId }) => {
                     <div className="page-header">
                         <div>
                             <h1>Food</h1>
-                            <p>Give food from available stock and monitor category-wise availability</p>
+                            <p>Give food from available stock and review complete given history</p>
                         </div>
+                    </div>
+
+                    <div className="store-tabs">
+                        <button className={`tab-btn ${activeTab === "give" ? "active" : ""}`} onClick={() => setActiveTab("give")}>
+                            Give Food
+                        </button>
+                        <button className={`tab-btn ${activeTab === "history" ? "active" : ""}`} onClick={() => setActiveTab("history")}>
+                            Given History
+                        </button>
                     </div>
 
                     <div className="food-hero">
@@ -181,76 +302,129 @@ const Food = ({ clinicId }) => {
                     <div className="inventory-toolbar">
                         <input
                             type="search"
-                            placeholder="Search food item, vendor, or type"
+                            placeholder={activeTab === "give" ? "Search food item, vendor, or type" : "Search food history, recipient, or staff"}
                             value={search}
                             onChange={(event) => setSearch(event.target.value)}
                         />
                     </div>
 
-                    <div className="food-type-row">
-                        {groupedSections.map((section) => (
-                            <button
-                                type="button"
-                                key={section.type}
-                                className={`food-type-card ${selectedSection?.type === section.type ? "active" : ""}`}
-                                onClick={() => setSelectedType(section.type)}
-                            >
-                                <span className="food-type-card__title">{section.type}</span>
-                                <span className="food-type-card__meta">{section.items.length} item{section.items.length === 1 ? "" : "s"}</span>
-                                <strong>{section.totalQuantity}</strong>
-                            </button>
-                        ))}
-                    </div>
-
-                    <section className="food-panel">
-                        <div className="section-header">
-                            <div>
-                                <h2>{selectedSection?.type || "Food Stock"}</h2>
-                                <p className="info-text">Available products for staff to issue right now</p>
+                    {activeTab === "give" && (
+                        <>
+                            <div className="food-type-row">
+                                {groupedSections.map((section) => (
+                                    <button
+                                        type="button"
+                                        key={section.type}
+                                        className={`food-type-card ${selectedSection?.type === section.type ? "active" : ""}`}
+                                        onClick={() => setSelectedType(section.type)}
+                                    >
+                                        <span className="food-type-card__title">{section.type}</span>
+                                        <span className="food-type-card__meta">{section.items.length} item{section.items.length === 1 ? "" : "s"}</span>
+                                        <strong>{section.totalQuantity}</strong>
+                                    </button>
+                                ))}
                             </div>
-                        </div>
 
-                        {loading ? <p>Loading food stock...</p> : selectedSection?.items?.length ? (
-                            <div className="food-table">
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th>Food Item</th>
-                                            <th>Vendor</th>
-                                            <th>Available Qty</th>
-                                            <th>Reorder Level</th>
-                                            <th>Expiry Date</th>
-                                            <th>Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {selectedSection.items.map((item) => (
-                                            <tr key={item.id}>
-                                                <td>
-                                                    <div className="food-item-name">
-                                                        <strong>{item.name}</strong>
-                                                        <span>{item.description || item.category}</span>
-                                                    </div>
-                                                </td>
-                                                <td>{item.supplier || "-"}</td>
-                                                <td>{item.quantity || 0}</td>
-                                                <td>{item.reorderLevel || 0}</td>
-                                                <td>{item.expiryDate ? new Date(item.expiryDate).toLocaleDateString() : "-"}</td>
-                                                <td className="actions">
-                                                    <button className="btn-action primary" onClick={() => openGiveModal(item)}>Give Food</button>
-                                                </td>
+                            <section className="food-panel">
+                                <div className="section-header">
+                                    <div>
+                                        <h2>{selectedSection?.type || "Food Stock"}</h2>
+                                        <p className="info-text">Available products for staff to issue right now</p>
+                                    </div>
+                                </div>
+
+                                {loading ? <p>Loading food stock...</p> : selectedSection?.items?.length ? (
+                                    <div className="food-table">
+                                        <table>
+                                            <thead>
+                                                <tr>
+                                                    <th>Food Item</th>
+                                                    <th>Vendor</th>
+                                                    <th>Available Qty</th>
+                                                    <th>Reorder Level</th>
+                                                    <th>Expiry Date</th>
+                                                    <th>Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {selectedSection.items.map((item) => (
+                                                    <tr key={item.id}>
+                                                        <td>
+                                                            <div className="food-item-name">
+                                                                <strong>{item.name}</strong>
+                                                                <span>{item.description || item.category}</span>
+                                                            </div>
+                                                        </td>
+                                                        <td>{item.supplier || "-"}</td>
+                                                        <td>{item.quantity || 0}</td>
+                                                        <td>{item.reorderLevel || 0}</td>
+                                                        <td>{item.expiryDate ? new Date(item.expiryDate).toLocaleDateString() : "-"}</td>
+                                                        <td className="actions">
+                                                            <button className="btn-action primary" onClick={() => openGiveModal(item)}>Give Food</button>
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                ) : (
+                                    <div className="food-empty">
+                                        <h3>No food items ready in this category</h3>
+                                        <p>Add stock from the Supplies page under the Food section to start issuing it here.</p>
+                                    </div>
+                                )}
+                            </section>
+                        </>
+                    )}
+
+                    {activeTab === "history" && (
+                        <section className="food-panel">
+                            <div className="section-header">
+                                <div>
+                                    <h2>Food Given History</h2>
+                                    <p className="info-text">Superadmin and clinic staff can review who gave food and where it went</p>
+                                </div>
+                            </div>
+
+                            {historyLoading ? <p>Loading given history...</p> : filteredHistory.length ? (
+                                <div className="food-table">
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th>Food Item</th>
+                                                <th>Qty</th>
+                                                <th>Given For</th>
+                                                <th>Pet</th>
+                                                <th>Recipient</th>
+                                                <th>Given By</th>
+                                                <th>Date</th>
+                                                <th>Notes</th>
                                             </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                        ) : (
-                            <div className="food-empty">
-                                <h3>No food items ready in this category</h3>
-                                <p>Add stock from the Supplies page under the Food section to start issuing it here.</p>
-                            </div>
-                        )}
-                    </section>
+                                        </thead>
+                                        <tbody>
+                                            {filteredHistory.map((entry) => (
+                                                <tr key={entry.id}>
+                                                    <td>{entry.storeItem?.name || "-"}</td>
+                                                    <td>{entry.quantity || 0}</td>
+                                                    <td>{formatRecipientType(entry.foodHistoryMeta?.recipientType)}</td>
+                                                    <td>{entry.pet?.name || "-"}</td>
+                                                    <td>{entry.foodHistoryMeta?.recipientName || "-"}</td>
+                                                    <td>{formatStaffName(entry.staff)}</td>
+                                                    <td>{entry.dispensingDate ? new Date(entry.dispensingDate).toLocaleDateString() : "-"}</td>
+                                                    <td>{entry.foodHistoryMeta?.notes || "-"}</td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            ) : (
+                                <div className="food-empty">
+                                    <h3>No food given history yet</h3>
+                                    <p>Once staff give food from stock, the full record will show here with the user who issued it.</p>
+                                </div>
+                            )}
+                        </section>
+                    )}
 
                     {giveModalOpen && selectedItem && (
                         <div className="modal-overlay" onClick={() => setGiveModalOpen(false)}>
