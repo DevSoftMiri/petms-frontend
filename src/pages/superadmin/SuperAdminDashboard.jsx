@@ -338,13 +338,6 @@ const SuperAdminDashboard = () => {
                             <span className="sidebar-icon">👥</span>
                             <span className="sidebar-label">Users</span>
                         </button>
-                        <button
-                            className={`sidebar-nav-item ${activeView === "funds" ? "active" : ""}`}
-                            onClick={() => handleViewChange("funds")}
-                        >
-                            <span className="sidebar-icon">₹</span>
-                            <span className="sidebar-label">Funds</span>
-                        </button>
                     </nav>
                 </div>
 

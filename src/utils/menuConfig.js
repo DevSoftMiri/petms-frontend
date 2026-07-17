@@ -39,11 +39,6 @@ export const superAdminMenuItems = [
         icon: <ManageAccountsIcon />,
         path: "/superadmin/dashboard?view=users",
     },
-    {
-        label: "Funds",
-        icon: <AccountBalanceWalletIcon />,
-        path: "/superadmin/dashboard?view=funds",
-    },
 ];
 
 /**
