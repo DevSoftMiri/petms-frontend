@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { useSnackbar } from "notistack";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import SuperAdminNavbar from "../../components/superadmin/SuperAdminNavbar";
-import Sidebar from "../../components/sidebar/Sidebar";
 import HttpService from "../../services/HttpService";
 import "./addClinic.css";
 
@@ -98,7 +97,6 @@ const AddClinic = () => {
         <div>
             <SuperAdminNavbar />
             <div style={{ display: "flex" }}>
-                <Sidebar />
                 <div className="add-clinic-container">
                     <div className="add-clinic-header">
                         <button
