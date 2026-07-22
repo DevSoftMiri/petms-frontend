@@ -18,6 +18,7 @@ import LocalHospitalIcon from "@mui/icons-material/LocalHospital";
 import SettingsIcon from "@mui/icons-material/Settings";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
+import PetsIcon from "@mui/icons-material/Pets";
 
 /**
  * Super Admin Menu Items
@@ -55,6 +56,7 @@ export const regularMenuItems = [
         pageKey: "customers",
     },
     { label: "Appointments", icon: <EventIcon />, path: "/appointments", pageKey: "appointments" },
+    { label: "Rescue Booking", icon: <PetsIcon />, path: "/rescue-booking" },
     {
         label: "Laboratory",
         icon: <ScienceIcon />,

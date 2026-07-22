@@ -32,6 +32,7 @@ import ClinicPages from "./pages/superadmin/ClinicPages";
 import VetDashboard from "./pages/vet/VetDashboard";
 import PetCaseDetail from "./pages/vet/PetCaseDetail";
 import VetPetDetails from "./pages/vet/VetPetDetails";
+import RescueBooking from "./pages/rescueBooking/RescueBooking";
 import PrivateRoute from "./PrivateRoute";
 import RoleAccess from "./RoleAccess";
 import PageAccessRoute from "./PageAccessRoute";
@@ -61,6 +62,7 @@ function App() {
           <Fragment>
             <Routes>
               <Route path="/login" element={<Login />} />
+              <Route path="/rescue-booking" element={<RescueBooking />} />
               <Route path="/select-clinic" element={<ClinicSelect />} />
               <Route path="/unauthorized" element={<Unauthorized />} />
               <Route path="/" element={<Navigate to="/login" />} />

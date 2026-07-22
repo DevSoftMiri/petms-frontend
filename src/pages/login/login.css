@@ -3,282 +3,332 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #ffffff;
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  position: relative;
-  overflow: hidden;
-}
-
-.login-bg-shape {
-  position: absolute;
-  width: 400px;
-  height: 400px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 50%;
-  top: -100px;
-  right: -100px;
-  animation: float 6s ease-in-out infinite;
-}
-
-@keyframes float {
-  0%, 100% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(20px);
-  }
-}
-
-.login-box {
-  background: white;
-  border-radius: 15px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-  padding: 50px 40px;
-  width: 100%;
-  max-width: 450px;
-  position: relative;
-  z-index: 10;
-  animation: slideUp 0.5s ease-out;
-}
-
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.login-header {
-  text-align: center;
-  margin-bottom: 40px;
-}
-
-.login-header h1 {
-  margin: 0;
-  font-size: 32px;
-  color: #667eea;
-  font-weight: 700;
-  letter-spacing: -0.5px;
-}
-
-.login-header p {
-  margin: 8px 0 0 0;
-  font-size: 13px;
-  color: #999;
-  font-weight: 500;
-  letter-spacing: 1px;
-}
-
-/* Role Selection */
-.role-selection {
-  margin-bottom: 30px;
-}
-
-.role-selection label {
-  display: block;
-  font-size: 13px;
-  font-weight: 600;
-  color: #333;
-  margin-bottom: 12px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.role-buttons {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 10px;
-  margin-bottom: 10px;
-}
-
-.role-btn {
-  padding: 12px 10px;
-  border: 2px solid #e0e0e0;
-  background: #f9f9f9;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 12px;
-  font-weight: 600;
-  color: #666;
-  transition: all 0.3s ease;
-  white-space: nowrap;
-}
-
-.role-btn:hover {
-  border-color: #667eea;
-  background: #f0f4ff;
-}
-
-.role-btn.active {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  border-color: #667eea;
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-}
-
-.role-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-/* Form Group */
-.form-group {
-  margin-bottom: 20px;
-}
-
-.form-group label {
-  display: block;
-  font-size: 13px;
-  font-weight: 600;
-  color: #333;
-  margin-bottom: 8px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.form-group input {
-  width: 100%;
-  padding: 12px 16px;
-  border: 2px solid #e0e0e0;
-  border-radius: 8px;
-  font-size: 14px;
-  font-family: inherit;
-  transition: all 0.3s ease;
+  padding: 24px;
   box-sizing: border-box;
 }
 
-.form-group input:focus {
-  outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-  background: #fafbff;
-}
-
-.form-group input:disabled {
-  background: #f5f5f5;
-  color: #999;
-  cursor: not-allowed;
-}
-
-.form-group input::placeholder {
-  color: #bbb;
-}
-
-/* Password Field */
-.password-field {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-.password-field input {
+.restricted-box {
   width: 100%;
-  padding-right: 45px;
-}
-
-.show-password-btn {
-  position: absolute;
-  right: 12px;
-  background: none;
-  border: none;
-  font-size: 18px;
-  cursor: pointer;
-  padding: 5px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: transform 0.2s ease;
-}
-
-.show-password-btn:hover {
-  transform: scale(1.2);
-}
-
-.show-password-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-/* Login Button */
-.login-btn {
-  width: 100%;
-  padding: 14px;
-  border: none;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  font-size: 15px;
-  font-weight: 700;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  margin-top: 10px;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
-}
-
-.login-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
-}
-
-.login-btn:active {
-  transform: translateY(0px);
-}
-
-.login-btn:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
-  transform: none;
-}
-
-/* Login Footer */
-.login-footer {
+  max-width: 520px;
   text-align: center;
-  margin-top: 30px;
-  padding-top: 20px;
-  border-top: 1px solid #e0e0e0;
+  background: #ffffff;
+  border: 2px solid #dc2626;
+  border-radius: 8px;
+  padding: 48px 32px;
+  box-shadow: 0 12px 32px rgba(220, 38, 38, 0.12);
 }
 
-.login-footer p {
+.restricted-box h1 {
   margin: 0;
-  font-size: 12px;
-  color: #999;
-  letter-spacing: 0.5px;
+  color: #dc2626;
+  font-size: 34px;
+  font-weight: 800;
+  letter-spacing: 0;
 }
 
-/* Responsive Design */
+.restricted-box p {
+  margin: 14px 0 0;
+  color: #b91c1c;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.45;
+}
+
 @media (max-width: 600px) {
-  .login-box {
-    padding: 35px 25px;
-    max-width: 100%;
-    margin: 20px;
+  .restricted-box {
+    padding: 36px 22px;
   }
 
-  .login-header h1 {
-    font-size: 26px;
+  .restricted-box h1 {
+    font-size: 28px;
   }
 
-  .role-buttons {
-    grid-template-columns: 1fr;
+  .restricted-box p {
+    font-size: 16px;
   }
+}
 
-  .role-btn {
-    padding: 10px;
-    font-size: 11px;
-  }
+/*
+  Login form styles temporarily disabled until access is restored.
 
   .login-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    position: relative;
+    overflow: hidden;
   }
 
   .login-bg-shape {
-    width: 250px;
-    height: 250px;
-    top: -50px;
-    right: -50px;
+    position: absolute;
+    width: 400px;
+    height: 400px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    top: -100px;
+    right: -100px;
+    animation: float 6s ease-in-out infinite;
   }
-}
+
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(20px);
+    }
+  }
+
+  .login-box {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    padding: 50px 40px;
+    width: 100%;
+    max-width: 450px;
+    position: relative;
+    z-index: 10;
+    animation: slideUp 0.5s ease-out;
+  }
+
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .login-header {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+
+  .login-header h1 {
+    margin: 0;
+    font-size: 32px;
+    color: #667eea;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+  }
+
+  .login-header p {
+    margin: 8px 0 0 0;
+    font-size: 13px;
+    color: #999;
+    font-weight: 500;
+    letter-spacing: 1px;
+  }
+
+  .role-selection {
+    margin-bottom: 30px;
+  }
+
+  .role-selection label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .role-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .role-btn {
+    padding: 12px 10px;
+    border: 2px solid #e0e0e0;
+    background: #f9f9f9;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+    color: #666;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+  }
+
+  .role-btn:hover {
+    border-color: #667eea;
+    background: #f0f4ff;
+  }
+
+  .role-btn.active {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-color: #667eea;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+  }
+
+  .role-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  .form-group {
+    margin-bottom: 20px;
+  }
+
+  .form-group label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .form-group input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: inherit;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+  }
+
+  .form-group input:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    background: #fafbff;
+  }
+
+  .form-group input:disabled {
+    background: #f5f5f5;
+    color: #999;
+    cursor: not-allowed;
+  }
+
+  .form-group input::placeholder {
+    color: #bbb;
+  }
+
+  .password-field {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  .password-field input {
+    width: 100%;
+    padding-right: 45px;
+  }
+
+  .show-password-btn {
+    position: absolute;
+    right: 12px;
+    background: none;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease;
+  }
+
+  .show-password-btn:hover {
+    transform: scale(1.2);
+  }
+
+  .show-password-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .login-btn {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    font-size: 15px;
+    font-weight: 700;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 10px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  .login-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+  }
+
+  .login-btn:active {
+    transform: translateY(0px);
+  }
+
+  .login-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .login-footer {
+    text-align: center;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #e0e0e0;
+  }
+
+  .login-footer p {
+    margin: 0;
+    font-size: 12px;
+    color: #999;
+    letter-spacing: 0.5px;
+  }
+
+  @media (max-width: 600px) {
+    .login-box {
+      padding: 35px 25px;
+      max-width: 100%;
+      margin: 20px;
+    }
+
+    .login-header h1 {
+      font-size: 26px;
+    }
+
+    .role-buttons {
+      grid-template-columns: 1fr;
+    }
+
+    .role-btn {
+      padding: 10px;
+      font-size: 11px;
+    }
+
+    .login-container {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .login-bg-shape {
+      width: 250px;
+      height: 250px;
+      top: -50px;
+      right: -50px;
+    }
+  }
+*/
