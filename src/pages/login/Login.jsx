@@ -1,80 +1,129 @@
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useSnackbar } from "notistack";
+import { useAuth } from "../../context/AuthContext";
 import "./login.css";
 
 const Login = () => {
+    const navigate = useNavigate();
+    const { enqueueSnackbar } = useSnackbar();
+    const { login } = useAuth();
+
+    const [formData, setFormData] = useState({
+        username: "",
+        password: "",
+    });
+
+    const [loading, setLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
+
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setFormData((prev) => ({
+            ...prev,
+            [name]: value,
+        }));
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        if (!formData.username || !formData.password) {
+            enqueueSnackbar("Please enter username/email and password", { variant: "warning" });
+            return;
+        }
+
+        setLoading(true);
+        try {
+            const response = await login(formData.username, formData.password);
+
+            enqueueSnackbar("Login successful!", { variant: "success" });
+
+            setFormData({
+                username: "",
+                password: "",
+            });
+
+            const userRole = response.data?.user?.role;
+
+            if (userRole === "SUPERADMIN") {
+                navigate("/superadmin/dashboard");
+            } else {
+                navigate("/dashboard");
+            }
+        } catch (error) {
+            const message = error.response?.data?.message || "Login failed. Please try again.";
+            enqueueSnackbar(message, { variant: "error" });
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
         <div className="login-container">
-            <div className="restricted-box">
-                <h1>You are restricted</h1>
-                <p>Access has been disabled </p>
-            </div>
+            <div className="login-box">
+                <div className="login-header">
+                    <h1>Pet Managment</h1>
+                    <p>Pet Veterinary Management System</p>
+                </div>
 
-            {/*
-                Login form temporarily disabled until access is restored.
-
-                <div className="login-box">
-                    <div className="login-header">
-                        <h1>Pet Managment</h1>
-                        <p>Pet Veterinary Management System</p>
+                <form onSubmit={handleSubmit}>
+                    <div className="form-group">
+                        <label htmlFor="username">Email or Username</label>
+                        <input
+                            type="text"
+                            id="username"
+                            name="username"
+                            value={formData.username}
+                            onChange={handleInputChange}
+                            placeholder="Enter your email or username"
+                            disabled={loading}
+                            required
+                        />
                     </div>
 
-                    <form onSubmit={handleSubmit}>
-                        <div className="form-group">
-                            <label htmlFor="username">Email or Username</label>
+                    <div className="form-group">
+                        <label htmlFor="password">Password</label>
+                        <div className="password-field">
                             <input
-                                type="text"
-                                id="username"
-                                name="username"
-                                value={formData.username}
+                                type={showPassword ? "text" : "password"}
+                                id="password"
+                                name="password"
+                                value={formData.password}
                                 onChange={handleInputChange}
-                                placeholder="Enter your email or username"
+                                placeholder="Enter your password"
                                 disabled={loading}
                                 required
                             />
+                            <button
+                                type="button"
+                                className="show-password-btn"
+                                onClick={() => setShowPassword(!showPassword)}
+                                disabled={loading}
+                            >
+                                {showPassword ? "Hide" : "Show"}
+                            </button>
                         </div>
-
-                        <div className="form-group">
-                            <label htmlFor="password">Password</label>
-                            <div className="password-field">
-                                <input
-                                    type={showPassword ? "text" : "password"}
-                                    id="password"
-                                    name="password"
-                                    value={formData.password}
-                                    onChange={handleInputChange}
-                                    placeholder="Enter your password"
-                                    disabled={loading}
-                                    required
-                                />
-                                <button
-                                    type="button"
-                                    className="show-password-btn"
-                                    onClick={() => setShowPassword(!showPassword)}
-                                    disabled={loading}
-                                >
-                                    Show
-                                </button>
-                            </div>
-                        </div>
-
-                        <button
-                            type="submit"
-                            className="login-btn"
-                            disabled={loading}
-                        >
-                            {loading ? "Logging in..." : "Login"}
-                        </button>
-                    </form>
-
-                    <div className="login-footer">
-                        <p>Secure Pet Veterinary Management</p>
-                        <p style={{ fontSize: "0.85rem", marginTop: "1rem", opacity: 0.7 }}>
-                            Demo Credentials:<br />
-                            Email: superadmin@petvms.com<br />
-                            Password: Admin@12345
-                        </p>
                     </div>
+
+                    <button
+                        type="submit"
+                        className="login-btn"
+                        disabled={loading}
+                    >
+                        {loading ? "Logging in..." : "Login"}
+                    </button>
+                </form>
+
+                <div className="login-footer">
+                    <p>Secure Pet Veterinary Management</p>
+                    <p style={{ fontSize: "0.85rem", marginTop: "1rem", opacity: 0.7 }}>
+                        Demo Credentials:<br />
+                        Email: superadmin@petvms.com<br />
+                        Password: Admin@12345
+                    </p>
                 </div>
-            */}
+            </div>
         </div>
     );
 };
